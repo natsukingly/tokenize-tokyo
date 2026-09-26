@@ -29,6 +29,7 @@ import {
   type Offer,
 } from "@/lib/finance-lab";
 import type { MarketState } from "@/lib/model";
+import { parseFinanceStorage } from "@/lib/finance-storage";
 const SAMPLE_SPACES: Record<string, string> = {
   "fraction-parking": "Akihabara Parking Bay",
   "fraction-ad": "Ningyocho Wall Canvas",
@@ -82,16 +83,12 @@ export default function FinanceMarkets({
     try {
       const raw = localStorage.getItem(STORAGE);
       if (raw) {
-        const saved = JSON.parse(raw);
-        if (
-          saved.version === 1 &&
-          Array.isArray(saved.offers) &&
-          Array.isArray(saved.positions) &&
-          Array.isArray(saved.resales) &&
-          Array.isArray(saved.rentals) &&
-          Number.isFinite(saved.cash)
-        )
-          setState(saved);
+        const saved = parseFinanceStorage(JSON.parse(raw));
+        if (saved) setState(saved);
+        else {
+          localStorage.setItem(`${STORAGE}:recovery`, raw);
+          setNotice("Saved market demo data could not be read. Showing the initial sample markets.");
+        }
       }
     } catch {}
   }, []);

@@ -1,5 +1,6 @@
 import { assetTypeCode, SPACE_TYPES, type AssetKind } from "./catalog";
 import { parseEther, keccak256, stringToHex } from "viem";
+import { z } from "zod";
 import { metadataURI, type ChainEvent, type MarketState } from "./model";
 import { project } from "./projection";
 import type { ContractKey } from "./config";
@@ -20,6 +21,9 @@ export const DEMO_ADDRESSES: Record<ContractKey, string> = {
 export { DEMO_SITES } from "./demo-catalog";
 import { DEMO_SITES, DEMO_CATALOG_VERSION } from "./demo-catalog";
 const KEY = "tokenize-tokyo-demo-v2";
+// Only externally changed storage needs a full validation/projection. Each load
+// still parses a fresh object, so callers cannot mutate a cached store.
+let validatedSnapshot: string | null = null;
 type Store = {
   events: ChainEvent[];
   balances: Record<string, string>;
@@ -28,6 +32,31 @@ type Store = {
   catalogVersion?: number;
   showcaseVersion?: number;
 };
+const savedAmounts = z.record(z.string(), z.string().regex(/^\d{1,78}$/));
+const savedStore = z.object({
+  events: z.array(
+    z.object({
+      contract: z.enum([
+        "registry",
+        "rights",
+        "market",
+        "revenue",
+        "basket",
+        "settlement",
+      ]),
+      name: z.string(),
+      args: z.record(z.string(), z.unknown()),
+      block: z.number().int().nonnegative(),
+      txHash: z.string(),
+      timestamp: z.string(),
+    }),
+  ),
+  balances: savedAmounts,
+  cash: savedAmounts,
+  claims: savedAmounts,
+  catalogVersion: z.number().int().nonnegative().optional(),
+  showcaseVersion: z.number().int().nonnegative().optional(),
+});
 const bkey = (who: string, token: string, id: string) =>
   who.toLowerCase() + ":" + token + ":" + id;
 function emit(
@@ -195,13 +224,22 @@ function seedSite(s: Store, site: (typeof DEMO_SITES)[number], index: number) {
   }
 }
 function load(): Store {
+  let raw: string | null = null;
   try {
-    const raw = localStorage.getItem(KEY);
+    raw = localStorage.getItem(KEY);
     if (raw) {
-      const s = JSON.parse(raw) as Store;
+      const known = raw === validatedSnapshot;
+      const s: Store = known
+        ? JSON.parse(raw)
+        : savedStore.parse(JSON.parse(raw));
+      // Validate numeric event payloads before they reach rendering/analytics.
+      const existing =
+        !known || (s.catalogVersion || 0) < DEMO_CATALOG_VERSION
+          ? project(s.events, DEMO_ADDRESSES.rights).assets
+          : [];
+      validatedSnapshot = raw;
       if ((s.catalogVersion || 0) < DEMO_CATALOG_VERSION) {
         // Append the new use cases without clearing user-created assets, holdings or history.
-        const existing = project(s.events, DEMO_ADDRESSES.rights).assets;
         DEMO_SITES.forEach((site, i) => {
           if (!existing.some((a) => a.name === site.name)) seedSite(s, site, i);
         });
@@ -210,16 +248,25 @@ function load(): Store {
       }
       return s;
     }
-  } catch {}
+  } catch {
+    // Keep the unreadable snapshot for recovery; never erase a valid history.
+    if (raw)
+      try {
+        localStorage.setItem(`${KEY}:recovery`, raw);
+      } catch {}
+  }
   const initial = seed();
   save(initial);
   return initial;
 }
 function save(s: Store) {
-  localStorage.setItem(KEY, JSON.stringify(s));
+  const raw = JSON.stringify(s);
+  localStorage.setItem(KEY, raw);
+  validatedSnapshot = raw;
 }
 export function resetDemo() {
   localStorage.removeItem(KEY);
+  validatedSnapshot = null;
 }
 
 // An explicit, repeat-safe historical scenario. Never used by the live MultiBaas adapter.

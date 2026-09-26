@@ -91,6 +91,7 @@ import { FundingProgress } from "./Launchpad";
 import { fundingCampaigns, openFundingProjects } from "@/lib/funding";
 import TokenizeFlow from "./TokenizeFlow";
 import { suggestedProject, parseAssumptions } from "@/lib/project-plan";
+import { spaceDraftError, rightDraftError, rightTermsURI } from "@/lib/tokenize-validation";
 import { compactMetadataURI } from "@/lib/model";
 import { ProjectEconomics } from "./ProjectPlan";
 import TokenizeDialog from "./TokenizeDialog";
@@ -665,18 +666,10 @@ function DashboardContent({ demo }: { demo: boolean }) {
     : same(verifierRoles.account, active) && verifierRoles.rights;
   const createAsset = () =>
     run("Register asset", async () => {
-      if (!form.name.trim()) throw new Error("Enter an asset name.");
+      const validation = spaceDraftError(form);
+      if (validation) throw new Error(validation);
       const lng = Number(form.lng),
         lat = Number(form.lat);
-      if (
-        !Number.isFinite(lng) ||
-        !Number.isFinite(lat) ||
-        lng < 138 ||
-        lng > 141 ||
-        lat < 34 ||
-        lat > 37
-      )
-        throw new Error("Choose a location near Tokyo.");
       const meta = {
         name: form.name,
         kind: form.kind,
@@ -715,23 +708,11 @@ function DashboardContent({ demo }: { demo: boolean }) {
     });
   const createRight = (a: Asset) =>
     run("Issue right for verification", async () => {
+      const validation = rightDraftError(form);
+      if (validation) throw new Error(validation);
       const start = Math.floor(new Date(form.start).getTime() / 1000),
         end = Math.floor(new Date(form.end).getTime() / 1000);
-      if (
-        !form.terms.trim() ||
-        !/^\d+$/.test(form.supply) ||
-        BigInt(form.supply) <= 0n ||
-        BigInt(form.supply) > 1000000000000n ||
-        end <= start
-      )
-        throw new Error("Check terms, positive supply and dates.");
-      const terms = metadataURI({
-        purpose: form.terms,
-        evidence: form.evidence,
-        simulated: true,
-        permittedUse: form.purpose,
-        repairConditions: "Issuer approval required for structural works.",
-      });
+      const terms = rightTermsURI(form);
       await send("rights", "createScopedRight", [
         [
           a.id,

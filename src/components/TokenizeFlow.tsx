@@ -18,6 +18,7 @@ import { formatEther, parseEther } from "viem";
 import { ASSET_KINDS, defaultsForKind, type AssetKind } from "@/lib/catalog";
 import ProjectPlan from "./ProjectPlan";
 import { suggestedProject } from "@/lib/project-plan";
+import { spaceDraftError, rightDraftError } from "@/lib/tokenize-validation";
 import {
   parseMetadata,
   type Asset,
@@ -165,24 +166,18 @@ export default function TokenizeFlow(p: Props) {
     </label>
   );
   const next = () => {
-    if (!form.name.trim()) {
-      setValidation("Give this space a name.");
+    const error = spaceDraftError(form);
+    if (error) {
+      setValidation(error);
       return;
     }
     setValidation("");
     setStep(1);
   };
   const review = () => {
-    if (
-      !form.terms.trim() ||
-      !form.start ||
-      !form.end ||
-      form.end <= form.start ||
-      Number(form.price) <= 0 ||
-      !/^\d+$/.test(form.supply) ||
-      BigInt(form.supply) <= 0n
-    ) {
-      setValidation("Check the period, price, supply and terms.");
+    const error = rightDraftError(form);
+    if (error) {
+      setValidation(error);
       return;
     }
     setValidation("");
