@@ -146,15 +146,15 @@ MultiBaas is the app's only data and transaction backend in `multibaas` mode. Th
 
 ## (c) Team and social handles
 
-```
-TODO natsuki: team name / GitHub / X handles
-Team name:
-Members:
-  - Name / role / GitHub @ / X @
-Repository URL:
-Live demo URL:
-Demo video URL:
-```
+**Team: Urban Rights Lab**
+
+| Member | Role | GitHub | X |
+| --- | --- | --- | --- |
+| natsuki | Product, protocol design, full-stack | [@natsukingly](https://github.com/natsukingly) | [@0x_natto](https://x.com/0x_natto) |
+
+- Repository: <https://github.com/natsukingly/tokenize-tokyo>
+- Live demo: `TODO: add hosted URL before submission` (local: `npm run dev`, demo mode, no keys)
+- Demo video: `TODO: add link before submission`
 
 ## (d) Setup and testing
 
