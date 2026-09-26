@@ -4,7 +4,8 @@
 
 - The app includes optional Privy email/Google login and a separate MetaMask connection choice. `NEXT_PUBLIC_PRIVY_APP_ID` activates it; without that setting, existing injected wallets continue to work.
 - WalletConnect is optional and only appears when `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` is set. A Reown account is not required for the default Privy + MetaMask setup.
-- A Privy development app named TOKENIZE TOKYO has been created and its public App ID was confirmed in the dashboard. Local App ID activation, login-method configuration and live login verification remain pending.
+- **Privy activated on 2026-09-27 JST.** The Tokenize Tokyo development app's public App ID is configured in `.env.local`, `.env.sepolia` and Vercel production, and production was rebuilt. Email, Google and external-wallet login are enabled. EVM embedded wallets are configured to be created for all users on login; Solana wallets are disabled.
+- Allowed origins are `https://tokenize-tokyo.vercel.app`, `http://localhost:3000` and `http://127.0.0.1:3000`. The app remains in Privy development mode; no paid upgrade or gas sponsorship was enabled.
 - **Cloud Wallet setup completed on 2026-09-27 JST.** An enabled Azure subscription, a dedicated Standard Key Vault and a service principal restricted to key create/read/sign are configured. Separate operator keys are linked to Curvegrid Testnet (`2017072401`) and Sepolia (`11155111`). Both passed live MultiBaas `personal_sign` signature recovery checks. No on-chain Cloud Wallet transaction has been submitted.
 - Neither embedded login nor WalletConnect automatically sponsors gas. Sponsored tokenization is **not enabled** by this change. The current transaction flow still requires gas in the sending wallet.
 
@@ -13,9 +14,16 @@
 - Production build and TypeScript checks passed.
 - All 131 unit tests passed, including account/chain binding, cancellation and private Cloud Wallet configuration validation.
 - Three local browser tests passed for injected-wallet connection, account-change state clearing, market loading and demo behavior. MultiBaas was mocked for these browser tests; no transaction was signed or broadcast.
-- Live Azure key creation and MultiBaas Cloud Wallet signing passed on both configured networks. Privy live login, Cloud Wallet transaction submission/TXM and sponsored tokenization remain unverified. See [the public verification record](../deployments/cloud-wallet-verification.json).
+- The deployed site was checked with the real Privy SDK: email and Google login inputs, the MetaMask choice, and cancellation work on desktop and mobile. Asset details return after cancelling login. Local email/Google UI was also checked on Curvegrid Testnet. No email was submitted or OAuth account authenticated by these checks; authenticated embedded-wallet creation and signing still require an account-owner test.
+- Live Azure key creation and MultiBaas Cloud Wallet signing passed on both configured networks. Cloud Wallet transaction submission/TXM and sponsored tokenization remain unverified. See [the public verification record](../deployments/cloud-wallet-verification.json).
 
-## 1. Activate Privy
+The read-only Privy browser checks are opt-in because they require a configured app and allowed origin:
+
+```sh
+PRIVY_SMOKE=1 PLAYWRIGHT_BASE_URL=https://tokenize-tokyo.vercel.app npx playwright test tests/privy-access.spec.ts
+```
+
+## 1. Activate Privy in another environment
 
 1. Sign in to [Privy Dashboard](https://dashboard.privy.io/) and create an app for TOKENIZE TOKYO.
 2. Enable Email and Google login. Enable Ethereum embedded wallets; use user-controlled wallets.

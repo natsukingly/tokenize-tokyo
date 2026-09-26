@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, type ReactNode } from "react";
 import { X } from "lucide-react";
+import { useWalletConnection } from "./WalletConnection";
 import styles from "./TokenizeDialog.module.css";
 
 export default function TokenizeDialog({
@@ -19,20 +20,30 @@ export default function TokenizeDialog({
   const dialog = useRef<HTMLDialogElement>(null);
   const title = useRef<HTMLHeadingElement>(null);
   const backdropPress = useRef(false);
+  const walletModalOpen = useWalletConnection().access?.modalOpen === true;
   useEffect(() => {
     const element = dialog.current;
     if (!open || !element) return;
     const previousOverflow = document.body.style.overflow;
     const opener = document.activeElement as HTMLElement | null;
-    element.showModal();
     document.body.style.overflow = "hidden";
-    title.current?.focus();
     return () => {
       element.close();
       document.body.style.overflow = previousOverflow;
       opener?.focus({ preventScroll: true });
     };
   }, [open]);
+  // Native dialogs cover portals. Keep the draft mounted while Privy handles
+  // login/signing, then restore the tokenization form when its modal closes.
+  useEffect(() => {
+    const element = dialog.current;
+    if (!element || !open) return;
+    if (walletModalOpen) element.close();
+    else if (!element.open) {
+      element.showModal();
+      title.current?.focus();
+    }
+  }, [open, walletModalOpen]);
   return (
     <dialog
       ref={dialog}
