@@ -53,7 +53,7 @@ it("adds consistent historical income examples without overwriting holdings or d
   const events = after.events.length;
   expect(addDemoActivity()).toBe(false);
   expect(demoState(ACTORS["Investor B"]).events).toHaveLength(events);
-});
+}, 15000); // The expanded 265-space history exercises repeated full projections on CI.
 it("preserves the on-chain type enum and accepts only recognized Other subtypes", () => {
   expect(assetTypeCode("Parking")).toBe(3);
   expect(assetKindFromMetadata(3, "Storage")).toBe("Storage");

@@ -14,6 +14,7 @@
     "test:finance": "tsx scripts/test-finance.ts",
     "finance:link": "tsx scripts/link-finance-multibaas.ts",
     "test:e2e": "playwright test",
+    "test:accounts": "playwright test --config playwright.account.config.ts",
     "multibaas:verify": "tsx scripts/verify-multibaas.ts",
     "ens:inspect": "tsx scripts/inspect-ens.ts",
     "ens:preflight": "tsx scripts/ens-preflight.ts",

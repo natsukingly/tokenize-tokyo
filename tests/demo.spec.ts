@@ -12,7 +12,7 @@ test("buy, activate, deposit, claim, secondary trade, custody and basket redempt
   await page
     .getByRole("button", { name: "Acquire right", exact: true })
     .click();
-  await expect(page.getByRole("status")).toContainText(
+  await expect(page.locator(".feedback[role='status']")).toContainText(
     "simulated successfully",
   );
   await page
@@ -69,7 +69,9 @@ test("buy, activate, deposit, claim, secondary trade, custody and basket redempt
     .click();
   await page.locator(".underlying input").nth(0).check();
   await page.locator(".underlying input").nth(1).check();
-  await page.getByLabel("Basket name", { exact: true }).fill("Tokyo Solar Basket");
+  await page
+    .getByLabel("Basket name", { exact: true })
+    .fill("Tokyo Solar Basket");
   await page.getByRole("button", { name: "Save basket plan" }).click();
   await page.getByRole("button", { name: "Deposit & mint" }).click();
   await page
@@ -88,8 +90,11 @@ test("initial city is clearly simulated and mobile is usable", async ({
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/?theme=original");
+  await page.getByLabel("About this map", { exact: true }).click();
   await expect(
-    page.locator(".demo-note").getByText("Test assets only.", { exact: false }),
+    page
+      .locator(".city-map-info")
+      .getByText("Test assets only.", { exact: false }),
   ).toBeVisible();
   await expect(page.locator("body")).toHaveJSProperty("scrollWidth", 390);
 });

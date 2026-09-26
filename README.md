@@ -181,6 +181,8 @@ npm run demo:seed
 
 This sends local transactions. The browser's demo mode continues to use its simulator; it does not automatically read Anvil.
 
+`npm run test:accounts` runs wallet/account UI checks against an isolated MultiBaas-format fixture. It uses test-only addresses and intercepted reads, with no testnet credentials or signing. The general `npm run test:e2e` suite uses demo mode. Live Sepolia loading checks can be run with `TOKENIZE_LIVE_E2E=1 PLAYWRIGHT_BASE_URL=http://127.0.0.1:8131 npx playwright test tests/loading-overlay.spec.ts` against an already running Sepolia-configured app.
+
 **MultiBaas mode:** set the following in `.env.local`, using matching addresses from your deployment manifest:
 
 ```dotenv

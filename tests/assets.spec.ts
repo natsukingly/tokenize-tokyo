@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { DEMO_SITES } from "../src/lib/demo-catalog";
 
 test("asset directory filters independently, opens the selected space and preserves a purchase", async ({
   page,
@@ -24,15 +25,15 @@ test("asset directory filters independently, opens the selected space and preser
   ).toHaveAttribute("aria-selected", "true");
   const directory = page.getByRole("region", { name: "Asset directory" });
   const table = page.getByRole("table", { name: "Registered assets" });
-  await expect(directory).toContainText("53 of 53 registered spaces");
+  await expect(directory).toContainText(
+    `${DEMO_SITES.length} of ${DEMO_SITES.length} registered spaces`,
+  );
   await expect(page.locator(".map-wrap")).toHaveCount(0);
   await expect(page.locator(".metrics")).toHaveCount(0);
   await page.getByLabel("Sort by", { exact: true }).selectOption("price-asc");
   await expect(table.locator("tbody tr").first()).toContainText("Solar");
   await page.getByLabel("Sort by", { exact: true }).selectOption("price-desc");
-  await expect(table.locator("tbody tr").first()).toContainText(
-    "80,000",
-  );
+  await expect(table.locator("tbody tr").first()).toContainText("80,000");
   await page.getByLabel("Find a space").fill("not-a-real-space");
   await expect(
     page.getByRole("heading", { name: "No spaces match these filters." }),
@@ -45,7 +46,7 @@ test("asset directory filters independently, opens the selected space and preser
   await page
     .getByLabel("Asset state", { exact: true })
     .selectOption("Available");
-  await page.getByLabel("Find a space").fill("chiyoda");
+  await page.getByLabel("Find a space").fill("Akihabara Parking Bay");
   await expect(table.locator("tbody tr")).toHaveCount(1);
   await page.getByRole("tab", { name: "Funding", exact: true }).click();
   await expect(directory).toHaveCount(0);
@@ -53,7 +54,9 @@ test("asset directory filters independently, opens the selected space and preser
   await page.getByRole("tab", { name: "Fractional", exact: true }).click();
   await expect(page.locator(".lab-disclaimer")).toContainText("MOCK ONLY");
   await page.getByRole("tab", { name: "All assets", exact: true }).click();
-  await expect(page.getByLabel("Find a space")).toHaveValue("chiyoda");
+  await expect(page.getByLabel("Find a space")).toHaveValue(
+    "Akihabara Parking Bay",
+  );
   await expect(table.locator("tbody tr")).toHaveCount(1);
   await page
     .getByRole("button", { name: "View Akihabara Parking Bay on map" })
@@ -67,11 +70,13 @@ test("asset directory filters independently, opens the selected space and preser
   await page
     .getByRole("button", { name: "Acquire right", exact: true })
     .click();
-  await expect(page.getByRole("status")).toContainText(
+  await expect(page.locator(".feedback[role='status']")).toContainText(
     "simulated successfully",
   );
   await nav("Markets");
-  await expect(page.getByLabel("Find a space")).toHaveValue("chiyoda");
+  await expect(page.getByLabel("Find a space")).toHaveValue(
+    "Akihabara Parking Bay",
+  );
   await expect(page.getByLabel("Asset type", { exact: true })).toHaveValue(
     "Parking",
   );
@@ -81,7 +86,7 @@ test("asset directory filters independently, opens the selected space and preser
   await page.getByLabel("Asset state", { exact: true }).selectOption("Funded");
   await expect(table.locator("tbody tr")).toHaveCount(1);
   await expect(table.locator("tbody tr")).toContainText("Not listed");
-  await nav("Portfolio");
+  await nav("My assets");
   await expect(page.locator(".holding")).toContainText("Akihabara Parking Bay");
 });
 

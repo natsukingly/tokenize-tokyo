@@ -35,6 +35,8 @@ test("filters highlight all matching spaces without selecting or moving the map;
     exact: true,
   });
   await expect(land).toBeVisible();
+  await expect(land).toBeInViewport();
+  await expect(page.locator(".map-loading")).toHaveCount(0);
   await expect(land).toHaveCSS("position", "absolute");
   const before = await land.evaluate((element) => {
     const { x, y, width, height } = element.getBoundingClientRect();

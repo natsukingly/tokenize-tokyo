@@ -97,6 +97,9 @@ test("mock markets support fractional resale and rental without touching protoco
   page,
 }) => {
   await page.goto("/");
+  await page.waitForFunction(
+    () => localStorage.getItem("tokenize-tokyo-demo-v2") !== null,
+  );
   const before = await page.evaluate(() =>
     localStorage.getItem("tokenize-tokyo-demo-v2"),
   );
@@ -149,9 +152,16 @@ test("a held usage right can be referenced by a new mock fractional market", asy
   page,
 }) => {
   await page.goto("/?theme=original");
-  await page.getByRole("button", { name: "Storage", exact: true }).click();
   await page
-    .getByRole("button", { name: "Explore Asakusabashi Storage", exact: true })
+    .getByRole("navigation")
+    .getByRole("button", { name: "Markets", exact: true })
+    .click();
+  await page.getByLabel("Find a space").fill("Asakusabashi Storage");
+  await page
+    .getByRole("button", {
+      name: "View Asakusabashi Storage on map",
+      exact: true,
+    })
     .click();
   await page.getByLabel("I have reviewed the rights and their terms.").check();
   await page

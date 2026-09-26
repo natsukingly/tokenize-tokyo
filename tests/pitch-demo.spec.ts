@@ -76,7 +76,7 @@ test("pitch story: one building, three scopes, rejected conflict, funded then ac
   await actor("Investor B");
   await nav("Explore");
   await page.getByRole("button", { name: "Rooftop", exact: true }).click();
-  await page.getByLabel("Lifecycle filter").selectOption("Available");
+  await page.getByLabel("Lifecycle filter").selectOption("All stages");
   await page
     .getByRole("button", { name: "Opportunity Lens", exact: true })
     .click();

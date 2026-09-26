@@ -138,7 +138,7 @@ test("populated demo shows historical analytics, a mixed basket and a clear cust
 }) => {
   await page.goto("/demo?view=dashboard&sample=1");
   await expect(
-    page.getByRole("img", { name: "Seven-day volume in mJPY" }),
+    page.getByRole("img", { name: "Twenty-four-hour volume in mJPY" }),
   ).toBeVisible();
   await page
     .getByRole("combobox", { name: "Activity period" })
