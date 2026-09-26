@@ -146,11 +146,11 @@ This sandbox has its own **mock credits** and localStorage. It does not use Mock
 
 ## Screenshots
 
-**`multibaas` mode, live on Curvegrid Testnet.** Explore stats and the analytics panel rendered from MultiBaas Event Queries after the scripted scenario (50 assets, 2,269,800 mJPY volume, 117,000 mJPY deposited):
+**`multibaas` mode, live on Curvegrid Testnet.** The current Explore map in `multibaas` mode after the scripted scenario: 150 dormant demo sites, 50 tokenized assets and 18 activated ones on the live counter, all read through MultiBaas Event Queries:
 
 ![Explore in multibaas mode with live Event Query data](docs/screenshots/multibaas-explore-live.png)
 
-The Activity ledger from MultiBaas Event Queries. This capture was taken before the scripted scenario, so it shows the first seeded asset and its lifecycle events:
+The Activity ledger and stats from MultiBaas Event Queries after the scripted scenario (50 assets, 37 active listings, 2,269,800 mJPY volume, 117,000 mJPY deposited; latest indexed events at the top):
 
 ![Activity ledger in multibaas mode](docs/screenshots/multibaas-activity.png)
 
