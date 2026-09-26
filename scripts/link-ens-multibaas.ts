@@ -5,6 +5,7 @@ import {
   ContractsApi,
   AddressesApi,
   ChainsApi,
+  AdminApi,
 } from "@curvegrid/multibaas-sdk";
 
 async function main() {
@@ -28,7 +29,8 @@ async function main() {
   const contracts = new ContractsApi(cfg),
     addresses = new AddressesApi(cfg),
     chains = new ChainsApi(cfg);
-  if ((await chains.getChainStatus()).data.result.chainID !== 11155111)
+  const status = (await chains.getChainStatus()).data.result;
+  if (status.chainID !== 11155111)
     throw new Error(
       "MultiBaas must be on Sepolia; existing Curvegrid deployment will not be modified",
     );
@@ -43,6 +45,32 @@ async function main() {
     ["building", "UserRegistryImpl", "ensuserregistry"],
     ["resolver", "PermissionedResolverImpl", "enspermissionedresolver"],
   ];
+  // Do not silently omit historical events or create a partial nine-contract setup.
+  // A newly created Free deployment can have a restricted indexing lookback.
+  const plan = (await new AdminApi(cfg).getPlan()).data.result;
+  const linkedLimit = plan.limits.find(
+    (limit) => limit.name === "linked_contracts",
+  )?.limit;
+  const historyLimit = plan.limits.find(
+    (limit) => limit.name === "past_logs_max_depth",
+  )?.limit;
+  if (
+    linkedLimit !== undefined &&
+    linkedLimit !== null &&
+    linkedLimit < entries.length
+  )
+    throw new Error(
+      `Plan ${plan.name} supports ${linkedLimit} linked contracts; this deployment requires ${entries.length}. No contracts were linked.`,
+    );
+  const requiredHistory = status.blockNumber - d.startingBlock;
+  if (
+    historyLimit !== undefined &&
+    historyLimit !== null &&
+    requiredHistory > historyLimit
+  )
+    throw new Error(
+      `Plan ${plan.name} permits ${historyLimit} historical blocks, but complete deployment history requires ${requiredHistory}. Request a suitable plan or hackathon allowance before linking; no contracts were linked.`,
+    );
   const published = new Set<string>();
   for (const [name, contractName, label] of entries) {
     const abi = JSON.parse(
