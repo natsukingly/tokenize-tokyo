@@ -1,5 +1,6 @@
 /** Logo lab picks, rendered inline so app fonts apply. variant: "plate" (10-A1), "stack" (01-A1), "grid" (09-x3). */
-export type BrandVariant = "plate" | "stack" | "grid";
+export type BrandVariant = "plate" | "stack" | "grid" | "jp" | "bar" | "mono" | "terminal";
+export const BRAND_VARIANTS: BrandVariant[] = ["stack", "plate", "grid", "jp", "bar", "mono", "terminal"];
 const Y = "#f0df37", MUTED = "#8b9098", INK = "#f1f2f3";
 function Steps({ x, y, s, color = Y }: { x: number; y: number; s: number; color?: string }) {
   return (
@@ -48,10 +49,52 @@ export default function BrandPlate({ className = "", width = 190, variant = "sta
         </defs>
         <rect width="190" height="64" rx="6" fill="#0b0c0e" />
         <rect width="190" height="64" rx="6" fill="url(#tt-iso)" />
-        <line x1="158" y1="0" x2="158" y2="22" stroke={Y} strokeWidth="1.2" />
-        <g transform="translate(158 30)"><path d="M0-8 8-3.4V5.8L0 10.4-8 5.8V-3.4Z" fill="#c9bb2f" /><path d="M0-8 8-3.4 0 1.2-8-3.4Z" fill={Y} /><path d="M0 1.2 8-3.4V5.8L0 10.4Z" fill="#9e9226" /></g>
-        <text x="12" y="36" fontFamily="'Anton', 'Bebas Neue', Impact, sans-serif" fontSize="24" fill={INK} style={{ ...upright, letterSpacing: "0.6px" }}>TOKENIZE TOKYO</text>
+        <line x1="170" y1="0" x2="170" y2="20" stroke={Y} strokeWidth="1.2" />
+        <g transform="translate(170 28)"><path d="M0-8 8-3.4V5.8L0 10.4-8 5.8V-3.4Z" fill="#c9bb2f" /><path d="M0-8 8-3.4 0 1.2-8-3.4Z" fill={Y} /><path d="M0 1.2 8-3.4V5.8L0 10.4Z" fill="#9e9226" /></g>
+        <text x="12" y="35" fontFamily="'Anton', 'Bebas Neue', Impact, sans-serif" fontSize="20.5" fill={INK} style={{ ...upright, letterSpacing: "0.5px" }}>TOKENIZE TOKYO</text>
         <text x="12.5" y="52" fontFamily="'DM Sans', 'Noto Sans JP', sans-serif" fontWeight="500" fontSize="6.4" fill={MUTED} style={{ ...upright, letterSpacing: "2.4px" }}>東京トークン化計画</text>
+      </svg>
+    );
+  }
+  if (variant === "jp") {
+    const height = Math.round((width * 64) / 190);
+    return (
+      <svg className={className} width={width} height={height} viewBox="0 0 190 64" role="img" aria-label={label}>
+        <rect width="190" height="64" rx="6" fill={Y} />
+        <text x="95" y="36" textAnchor="middle" fontFamily="'Noto Sans JP', 'Hiragino Sans', 'Zen Kaku Gothic New', sans-serif" fontWeight="900" fontSize="20" fill="#0b0c0e" style={{ ...upright, letterSpacing: "0.5px" }}>東京トークン化計画</text>
+        <text x="95" y="52" textAnchor="middle" fontFamily="'DM Sans', sans-serif" fontWeight="700" fontSize="7" fill="#0b0c0e" style={{ ...upright, letterSpacing: "3.2px" }}>TOKENIZE TOKYO</text>
+      </svg>
+    );
+  }
+  if (variant === "bar") {
+    const height = Math.round((width * 64) / 190);
+    return (
+      <svg className={className} width={width} height={height} viewBox="0 0 190 64" role="img" aria-label={label}>
+        <text x="0" y="28" fontFamily="'Noto Sans JP', 'Hiragino Sans', sans-serif" fontWeight="700" fontSize="12.5" fill={INK} style={{ ...upright, letterSpacing: "0.3px" }}>東京トークン化計画</text>
+        <rect x="0" y="35" width="190" height="2" fill={Y} />
+        <text x="0" y="57" fontFamily="'Bebas Neue', 'Anton', Impact, sans-serif" fontSize="22" fill={Y} style={{ ...upright, letterSpacing: "2.6px" }}>TOKENIZE TOKYO</text>
+      </svg>
+    );
+  }
+  if (variant === "mono") {
+    const height = Math.round((width * 64) / 190);
+    return (
+      <svg className={className} width={width} height={height} viewBox="0 0 190 64" role="img" aria-label={label}>
+        <text x="0" y="30" fontFamily="'Manrope', 'DM Sans', sans-serif" fontWeight="800" fontSize="21" fill={INK} style={{ ...upright, letterSpacing: "-0.4px" }}>TOKENIZE TOKY</text>
+        <circle cx="178" cy="22.5" r="7.5" fill="none" stroke={Y} strokeWidth="3" /><circle cx="178" cy="22.5" r="2.2" fill={Y} />
+        <text x="0.5" y="50" fontFamily="'DM Sans', 'Noto Sans JP', sans-serif" fontWeight="500" fontSize="7" fill={MUTED} style={{ ...upright, letterSpacing: "2.4px" }}>東京トークン化計画 · URBAN RIGHTS</text>
+      </svg>
+    );
+  }
+  if (variant === "terminal") {
+    const height = Math.round((width * 64) / 190);
+    return (
+      <svg className={className} width={width} height={height} viewBox="0 0 190 64" role="img" aria-label={label}>
+        <rect width="190" height="64" rx="4" fill="#040705" stroke="#1f3a26" />
+        <text x="10" y="18" fontFamily="'IBM Plex Mono', ui-monospace, monospace" fontSize="6.5" fill="#5f7f66" style={upright}>&gt; resolve tokenizetokyo.eth</text>
+        <text x="10" y="38" fontFamily="'IBM Plex Mono', ui-monospace, monospace" fontWeight="700" fontSize="14.5" fill="#39ff14" style={{ ...upright, letterSpacing: "0.2px" }}>[ TOKENIZE_TOKYO ]</text>
+        <rect x="163" y="27" width="7" height="13" fill="#39ff14" />
+        <text x="10" y="54" fontFamily="'DotGothic16', 'IBM Plex Mono', monospace" fontSize="8.5" fill="#8bff9a" style={{ ...upright, letterSpacing: "1.5px" }}>東京トークン化計画</text>
       </svg>
     );
   }
