@@ -50,13 +50,23 @@ test("buy, activate, deposit, claim, secondary trade, custody and basket redempt
     .getByRole("navigation")
     .getByRole("button", { name: "Explore", exact: true })
     .click();
+  await page.getByLabel("I have reviewed the rights and their terms.").check();
   await page.getByLabel("Purchase quantity").fill("5");
   await page
     .getByRole("button", { name: "Acquire right", exact: true })
     .last()
     .click();
   await page
-    .getByRole("button", { name: "Explore Kanda Community Solar", exact: true })
+    .getByRole("navigation")
+    .getByRole("button", { name: "Markets", exact: true })
+    .click();
+  const directory = page.getByRole("region", { name: "Asset directory" });
+  await directory.getByLabel("Find a space").fill("Kanda Community Solar");
+  await directory
+    .getByRole("button", {
+      name: "View Kanda Community Solar on map",
+      exact: true,
+    })
     .click();
   await page.getByLabel("I have reviewed the rights and their terms.").check();
   await page.getByLabel("Purchase quantity").fill("5");
@@ -73,7 +83,13 @@ test("buy, activate, deposit, claim, secondary trade, custody and basket redempt
     .getByLabel("Basket name", { exact: true })
     .fill("Tokyo Solar Basket");
   await page.getByRole("button", { name: "Save basket plan" }).click();
-  await page.getByRole("button", { name: "Deposit & mint" }).click();
+  await page
+    .getByText("Add your rights to this basket", { exact: true })
+    .click();
+  await page.getByLabel("Shares to receive").fill("5");
+  await page
+    .getByRole("button", { name: "Deposit rights & receive shares" })
+    .click();
   await page
     .getByRole("navigation")
     .getByRole("button", { name: "My assets" })
@@ -90,11 +106,10 @@ test("initial city is clearly simulated and mobile is usable", async ({
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/?theme=original");
-  await page.getByLabel("About this map", { exact: true }).click();
   await expect(
-    page
-      .locator(".city-map-info")
-      .getByText("Test assets only.", { exact: false }),
+    page.getByText("Demo simulation · no on-chain transactions", {
+      exact: false,
+    }),
   ).toBeVisible();
   await expect(page.locator("body")).toHaveJSProperty("scrollWidth", 390);
 });
@@ -151,13 +166,14 @@ test("3D map mounts, scoped opportunity filters and X-ray remain interactive", a
   await page.getByRole("button", { name: "City X-ray" }).click();
   await expect(page.getByText("URBAN RIGHTS / X-RAY")).toBeVisible();
   await page.getByRole("button", { name: "Vacant Home", exact: true }).click();
-  await page
-    .getByRole("button", { name: "Explore Kuramae Makers House", exact: true })
-    .click();
+  const marker = page.locator(".map-pin:visible").first();
+  const name = (await marker.getAttribute("aria-label"))!.replace(
+    /^Explore /,
+    "",
+  );
+  await marker.click();
   await expect(page.locator(".map-pin")).toHaveCount(
     DEMO_SITES.filter((s) => s.kind === "Vacant Home").length,
   );
-  await expect(page.locator(".asset-detail h2")).toHaveText(
-    "Kuramae Makers House",
-  );
+  await expect(page.locator(".asset-detail h2")).toHaveText(name);
 });

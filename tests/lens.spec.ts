@@ -30,18 +30,17 @@ test("filters highlight all matching spaces without selecting or moving the map;
   page,
 }) => {
   await page.goto("/demo");
-  const land = page.getByRole("button", {
-    name: "Explore Yaesu Weekend Market",
-    exact: true,
-  });
-  await expect(land).toBeVisible();
-  await expect(land).toBeInViewport();
-  await expect(page.locator(".map-loading")).toHaveCount(0);
-  await expect(land).toHaveCSS("position", "absolute");
-  const before = await land.evaluate((element) => {
-    const { x, y, width, height } = element.getBoundingClientRect();
-    return { x: x + width / 2, y: y + height };
-  });
+  // Clustered markers remain in the DOM at their actual projected position.
+  const land = page.locator(
+    '.map-pin[aria-label="Explore Yaesu Weekend Market"]',
+  );
+  await expect(
+    page.locator('.map-stage[data-basemap-state="ready"]'),
+  ).toBeVisible({ timeout: 45000 });
+  await expect(land).toBeAttached();
+  const before = await land.evaluate(
+    (element) => (element as HTMLElement).style.transform,
+  );
   await page.getByLabel("Filters", { exact: true }).click();
   await page.getByRole("button", { name: "Idle Land", exact: true }).click();
   await expect(page.locator(".map-pin")).toHaveCount(
@@ -54,12 +53,11 @@ test("filters highlight all matching spaces without selecting or moving the map;
   await expect(page.locator(".asset-detail")).not.toBeVisible();
   // Wait through the old automatic fly-to duration: the same space must stay put.
   await page.waitForTimeout(1600);
-  const after = await land.evaluate((element) => {
-    const { x, y, width, height } = element.getBoundingClientRect();
-    return { x: x + width / 2, y: y + height };
-  });
-  expect(Math.abs(after.x - before.x)).toBeLessThan(2);
-  expect(Math.abs(after.y - before.y)).toBeLessThan(2);
+  await expect
+    .poll(() =>
+      land.evaluate((element) => (element as HTMLElement).style.transform),
+    )
+    .toBe(before);
   await page.getByLabel("Lifecycle filter").selectOption("Secondary Market");
   await expect(page.locator(".map-pin")).toHaveCount(0);
   await expect(page.getByLabel("Map controls")).toContainText(
@@ -72,12 +70,11 @@ test("filters highlight all matching spaces without selecting or moving the map;
   await expect(page.locator(".map-pin.matched")).toHaveCount(0);
   await expect(page.locator(".map-pin.selected")).toHaveCount(0);
   await expect(page.getByLabel("Lifecycle filter")).toHaveValue("All stages");
-  const restored = await land.evaluate((element) => {
-    const { x, y, width, height } = element.getBoundingClientRect();
-    return { x: x + width / 2, y: y + height };
-  });
-  expect(Math.abs(restored.x - before.x)).toBeLessThan(2);
-  expect(Math.abs(restored.y - before.y)).toBeLessThan(2);
+  await expect
+    .poll(() =>
+      land.evaluate((element) => (element as HTMLElement).style.transform),
+    )
+    .toBe(before);
   await expect(
     page.getByRole("button", { name: "Reset filters", exact: true }),
   ).toBeDisabled();
@@ -93,31 +90,22 @@ test("filters highlight all matching spaces without selecting or moving the map;
   await expect(
     page.getByRole("button", { name: "My spaces", exact: true }),
   ).toHaveAttribute("aria-pressed", "false");
-  await land.click();
-  await expect(page.locator(".asset-detail h2")).toHaveText(
-    "Yaesu Weekend Market",
-  );
 });
 
-test("zooming out keeps compact location markers and reveals names on hover", async ({
+test("zooming out groups nearby spaces while keeping all locations in the dataset", async ({
   page,
 }) => {
   await page.goto("/demo");
-  const land = page.getByRole("button", {
-    name: "Explore Yaesu Weekend Market",
-    exact: true,
-  });
-  await expect(land).toBeVisible();
+  await expect(
+    page.locator('.map-stage[data-basemap-state="ready"]'),
+  ).toBeVisible({ timeout: 45000 });
   await page.getByRole("button", { name: "Zoom out", exact: true }).click();
   await expect(page.locator(".map-canvas")).toHaveClass(/compact-markers/);
-  await expect(land).toHaveCSS("width", "22px");
-  await expect(land.locator("b")).not.toBeVisible();
-  await land.hover();
-  await expect(land.locator("b")).toBeVisible();
+  await expect(page.locator(".map-cluster:visible").first()).toBeVisible();
+  await expect(page.locator(".map-pin")).toHaveCount(DEMO_SITES.length);
   await page.getByRole("button", { name: "Zoom in", exact: true }).click();
   await expect(page.locator(".map-canvas")).not.toHaveClass(/compact-markers/);
-  await land.hover();
-  await expect(land.locator("b")).toBeVisible();
+  await expect(page.locator(".map-pin")).toHaveCount(DEMO_SITES.length);
 });
 
 test("Active filter shows operating examples while keeping unactivated fundraising projects separate", async ({
