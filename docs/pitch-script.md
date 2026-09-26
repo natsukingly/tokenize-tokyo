@@ -1,4 +1,6 @@
-# TOKENIZE TOKYO — 4-minute finalist script (v1, 2026-09-26)
+# TOKENIZE TOKYO — 4-minute finalist script (v2, 2026-09-26)
+
+Decks: `pitch/index.html` (general, 5 slides), `pitch/curvegrid.html` (6 slides: 4 = Programmable rights, 5 = MultiBaas), `pitch/ens.html` (6 slides: 4 = Spatial namespace, 5 = Four layers). Slide numbers below are for the general deck; in the track decks, "Slide 4" below becomes slides 4 and 5, and "Slide 5" becomes slide 6.
 
 Format assumed: 4 min demo + 3 min Q&A. Judging axes: Technicality / Originality / Practicality / Usability / WOW.
 Rule for this script: every claim maps to something that exists in the repo. No PLATEAU, no ENS, no numbers other than the three verified ones.
@@ -48,7 +50,7 @@ Switch back to the deck.
 > We don't tokenize buildings. We tokenize what buildings can do. A physical asset becomes a set of rights, each scoped in space, time and usage, with its own cash flow. Overlapping exclusive rights are impossible by construction. Revenue rights can be pooled into baskets.
 
 ## 3:25–3:35 · Slide 4 · Infrastructure (10 s, do not linger)
-> 3D Tokyo on MapLibre, the Urban Rights Protocol in six contracts, Curvegrid MultiBaas for event queries, contract calls and webhooks. MultiBaas is what makes a city's worth of heterogeneous rights observable in one dashboard.
+> 3D Tokyo on MapLibre, the Urban Rights Protocol in six contracts, Curvegrid MultiBaas for event queries, contract calls and webhooks. The six contracts are deployed on Curvegrid Testnet and indexed by MultiBaas today. MultiBaas is what makes a city's worth of heterogeneous rights observable in one dashboard.
 
 ## 3:35–3:50 · Slide 5 · Why it matters at scale
 > We are not competing for the real estate market. We are creating a market for urban capacity that isn't marketable today. Today rooftops, vacant homes, idle land. Tomorrow revenue baskets, lending, collateral.
@@ -62,4 +64,4 @@ Switch back to the deck.
 - Slide 4 is optional under time pressure; Slide 3 and the closing are not.
 
 ## Q&A
-See `qa-cheatsheet.md`. Expect: why blockchain, who verifies ownership, is it a security, why Curvegrid, what is simulated. Answer "what is simulated" first and plainly: verification, map ownership and JPY are simulated; contracts, conflict engine, settlement and event indexing are real code with 25 Foundry tests.
+See `qa-cheatsheet.md`. Expect: why blockchain, who verifies ownership, is it a security, why Curvegrid, what is simulated. Answer "what is simulated" first and plainly: verification, map ownership and JPY are simulated; the contracts, conflict engine and settlement are deployed on Curvegrid Testnet and indexed live by MultiBaas, with 25 Foundry tests behind them.

@@ -26,3 +26,18 @@
 - この repo は Codex（ChatGPT アプリ）が構築・並行編集している。docs/IMPLEMENTATION_REPORT.md と docs/ENSV2_DESIGN.md は Codex 作。同じファイルを両者で触らないこと
 - MultiBaas は実サービスで一度も動かしていない（deployment 未作成）。Curvegrid 賞の最大リスク。締切前に deployment 作成 → `npm run multibaas:link` → `multibaas:verify` を通したい
 - deployer が VERIFIER_ROLE も持つ（ADMIN_ADDRESS 未指定時）。Q&A の「誰が検証するか」で正直に言う
+
+## 16:05 状況
+- Codex が並行で大量変更中（Dashboard 全面改稿、TokenizeFlow/Tutorial/FinanceMarkets 追加、README・showcase・qa-cheatsheet に ENS「planned」節を追記、docs/PITCH_DEMO.md 追加）。未コミット。私はコミットしない（Codex の作業中のため）
+- 現ツリーで typecheck / vitest 43 / playwright 9（lens 含む）全通過を確認
+- ピッチ台本が2本ある: docs/pitch-script.md（私、ENS/PLATEAU 無し、デモ 2:15）と docs/PITCH_DEMO.md（Codex、ENS を slide 4 で説明、mock Markets を 25 秒）。natsuki が一本化を決める
+
+## 17:00 MultiBaas ライブ接続
+- deployment 作成済み（Curvegrid Testnet、chain 2017072401、Free プラン: 2 events/s・10 contracts・30k calls/月）
+- API キー3種（admin-scripts / dapp-browser / web3-rpc）→ .env.local（gitignored）。テスト用 deployer 鍵は cast wallet new で生成、faucet 1 ETH
+- forge deploy 成功（6本、0.027 ETH）→ deployments/2017072401.json。multibaas:link 一発成功、索引 6 本とも追いつき済み
+- verify: DApp キーでは 403（索引状態などは admin 権限）→ admin キーで通し、最後の unsigned 合成が 400。調査中
+- 課題: CORS origin 追加、seed をテストネットで実行して AssetRegistered を作る
+- 17:20 verify 全通過。原因3件: (1) select は inputIndex 必須（name だと 400 invalid request）(2) limit>50 で 400 (3) DApp キーは索引状態/アドレス参照が 403 → verify を admin/DApp 二鍵化。gas 見積りは from の残高依存（残高0だと 400）。修正コミット 24570f3、push 済み
+- 手動 seed: asset 1 / right 1 を cast で作成（scripts/seed.ts は anvil 前提で「already seeded」になる）
+- ブラウザ multibaas モードは 3001（next build+start、CORS 追加済み）で確認: Activity に実イベント7件、エラー0。未検証: webhook 配信、Cloud Wallet、TXM

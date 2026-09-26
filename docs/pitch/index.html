@@ -130,36 +130,37 @@
   }
   .stat-row{
     display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:20px;
-    margin-top:44px;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+    margin-top:36px;
   }
   .stat{
     border:1px solid #3a4a3c;
     border-radius:8px;
     background:linear-gradient(135deg, rgba(28,39,30,0.82), rgba(20,28,22,0.86));
-    padding:22px 24px;
+    padding:16px 16px;
     backdrop-filter:blur(2px);
   }
   .stat strong{
     display:block;
     font-family:var(--font-head);
-    font-size:44px;
+    font-size:32px;
     font-weight:600;
-    letter-spacing:-1.2px;
+    letter-spacing:-1px;
     color:var(--lime);
     line-height:1;
   }
   .stat p{
-    margin-top:11px;
-    font-size:13px;
+    margin-top:9px;
+    font-size:11.5px;
     color:#d7e0d1;
-    line-height:1.5;
+    line-height:1.45;
   }
   .stat small{
     display:block;
-    margin-top:6px;
-    font-size:11px;
+    margin-top:5px;
+    font-size:9.5px;
+    line-height:1.4;
     color:#8fa48f;
   }
   .sources{
@@ -471,6 +472,9 @@
     color:#d7e6cc;
     background:#1d2b1d;
   }
+  .portability-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px;}
+  .portability-row span{font-size:13px;padding:8px 15px;border:1px solid #4a5847;border-radius:20px;color:#d7e6cc;background:#1d2b1d;}
+  .portability-caption{margin-top:10px;font-size:12px;color:#8a9d84;}
   .closing-line{
     margin-top:36px;
     padding-top:26px;
@@ -579,6 +583,43 @@
     }
     #hud, #counter, #notes-panel{display:none !important;}
   }
+
+  .sources a{color:inherit;text-decoration:underline;text-underline-offset:3px;}
+  .opening-line{margin-top:26px;font-size:22px;color:var(--lime);}
+  #s2 h1{font-size:54px;max-width:1000px;line-height:1.13;margin-top:46px;}
+  .solution-line{font-size:24px;color:#b6c4ac;margin-top:26px;}
+  .solution-examples{display:flex;gap:90px;border-top:1px solid var(--line);margin-top:50px;padding-top:24px;}
+  .solution-examples span{color:var(--lime);font-size:12px;letter-spacing:1.4px;}
+  .solution-examples p{margin-top:10px;font-size:21px;}
+  .solution-next{font-size:24px;margin-top:38px;}
+  .market-forms{margin-top:32px;}
+  .market-forms .eyebrow{font-size:10px;letter-spacing:1.8px;}
+  .flow-strip{display:flex;flex-wrap:wrap;align-items:center;gap:8px 6px;margin-top:14px;}
+  .flow-strip .step{border:1px solid var(--line);border-radius:6px;background:#171f1a;padding:9px 12px;font-size:11px;line-height:1.4;color:#cddac3;max-width:172px;}
+  .flow-strip .step small{display:block;margin-top:3px;font-size:9.5px;color:#8fa483;font-weight:400;}
+  .flow-strip .arrow{color:#5c7250;font-size:13px;flex:none;}
+  .market-thesis{margin-top:18px;font-size:15px;line-height:1.55;color:#dbe6d3;max-width:980px;}
+  #s3 h1{font-size:42px;margin-top:18px;}
+  .demo-preview{height:330px;position:relative;margin-top:22px;overflow:hidden;border:1px solid var(--line);border-radius:8px;}
+  .demo-preview img{width:100%;height:100%;object-fit:cover;object-position:50% 49%;}
+  .demo-preview span{position:absolute;bottom:0;left:0;right:0;padding:10px 16px;background:#0d1310ed;color:#c3d1c0;font-size:13px;}
+  .demo-sequence{display:flex;gap:30px;margin-top:20px;color:var(--lime);font-size:17px;}
+  .demo-launch{display:inline-flex;align-items:center;gap:22px;align-self:flex-start;margin-top:22px;padding:13px 20px;border-radius:6px;background:var(--lime);color:#16210f;font-size:18px;font-weight:600;text-decoration:none;}
+  .demo-launch small{font-size:12px;border:1px solid #799052;border-radius:3px;padding:1px 5px;}
+  .demo-return{position:absolute;bottom:74px;right:76px;color:var(--muted);font-size:13px;}
+  .right-dimensions{margin:12px 0 34px;display:grid;gap:20px;}
+  .right-dimensions p{font-size:22px;display:flex;align-items:center;gap:24px;}
+  .right-dimensions span{display:inline-block;width:64px;color:var(--teal);font-size:12px;letter-spacing:1.4px;}
+  #s5 h1{font-size:45px;line-height:1.1;}
+  #s5 .roadmap-cols{margin-top:28px;}
+  #s5 .rmap-block{padding:21px 26px;}
+  #s5 .closing-line{margin-top:26px;padding-top:20px;font-size:22px;}
+  #rehearsal{position:fixed;top:14px;right:18px;z-index:50;display:none;color:var(--lime);background:#0d1310e8;padding:8px 12px;border:1px solid var(--line);border-radius:5px;font:13px var(--font);font-variant-numeric:tabular-nums;pointer-events:none;}
+  #rehearsal.visible{display:block;}
+  #rehearsal.over{color:#ffbdad;}
+  #rehearsal span{color:var(--muted);margin-left:10px;}
+  @media print{#rehearsal{display:none !important;}}
+
 </style>
 </head>
 <body>
@@ -589,12 +630,17 @@
     <section class="slide with-photo active" id="s1">
       <div class="slide-index">01 <span>/</span> 05</div>
       <div class="eyebrow">ETHGlobal Tokyo 2026 · TOKENIZE TOKYO</div>
-      <h1>Tokyo is full of dormant capital.</h1>
+      <h1>Tokyo is full of<br>dormant urban capacity.</h1>
       <div class="stat-row">
         <div class="stat">
           <strong>897K</strong>
           <p>vacant homes in Tokyo</p>
-          <small>214K not for rent or sale</small>
+          <small>10.9% vacancy rate · 214K not for rent or sale</small>
+        </div>
+        <div class="stat">
+          <strong>+9.0%</strong>
+          <p>residential land price, 23 wards, 2026</p>
+          <small>5th straight year of increases</small>
         </div>
         <div class="stat">
           <strong>1,303 ha</strong>
@@ -603,57 +649,56 @@
         <div class="stat">
           <strong>~6%</strong>
           <p>of detached houses have solar</p>
+          <small>solar mandatory on new houses since Apr 2025</small>
         </div>
       </div>
-      <div class="sources">MIC Housing and Land Survey 2023 · TMG Land Use Survey 2021 · TMG Bureau of Environment solar survey FY2022</div>
+      <p class="opening-line">Land keeps getting more expensive. Roofs keep sitting empty. The grid ran out of margin in 2022.</p>
+      <div class="sources">MIC Housing and Land Survey 2023 · MLIT Land Price Publication 2026 · TMG Land Use Survey 2021 · TMG Bureau of Environment FY2022 · METI supply-demand alert 22 Mar 2022</div>
     </section>
 
     <section class="slide" id="s2">
       <div class="slide-index">02 <span>/</span> 05</div>
-      <div class="eyebrow">The problem</div>
-      <h1>The assets already exist. The market doesn't.</h1>
-      <div class="actor-row">
-        <div class="actor-box"><span>OWNER</span><p>"I have space."</p></div>
-        <div class="x-sep">×</div>
-        <div class="actor-box"><span>OPERATOR</span><p>"I know how to use it."</p></div>
-        <div class="x-sep">×</div>
-        <div class="actor-box"><span>CAPITAL</span><p>"I want to fund it."</p></div>
-        <div class="x-sep">×</div>
-        <div class="actor-box"><span>USER</span><p>"I want access."</p></div>
+      <div class="eyebrow">TOKENIZE TOKYO</div>
+      <h1>Discover, fund and trade<br>what a city can do.</h1>
+      <p class="solution-line">Turn unused urban capacity into programmable rights.</p>
+      <div class="solution-examples">
+        <div><span>UNUSED ROOFTOP</span><p>Solar usage + revenue rights</p></div>
+        <div><span>VACANT HOME</span><p>Workshop usage for a fixed period</p></div>
       </div>
-      <div class="thesis">We're not competing for the real estate market. We're creating a <b>market for urban capacity</b> that isn't marketable today.</div>
-      <div class="s2-bottom">
-        <div class="live-demo-cue">→ LIVE DEMO</div>
+      <div class="market-forms">
+        <div class="eyebrow">How the market forms · demand first</div>
+        <div class="flow-strip">
+          <div class="step">Discover<br><small>Opportunity Lens</small></div>
+          <span class="arrow">→</span>
+          <div class="step">Signal interest<br><small>Bid on a dormant space</small></div>
+          <span class="arrow">→</span>
+          <div class="step">Reach the owner<br><small>In-app if registered, else local agents or referrals</small></div>
+          <span class="arrow">→</span>
+          <div class="step">Verify<br><small>Owner + verifier network</small></div>
+          <span class="arrow">→</span>
+          <div class="step">Tokenize &amp; fund<br><small>Buyers already waiting</small></div>
+          <span class="arrow">→</span>
+          <div class="step">Activate</div>
+        </div>
       </div>
+      <p class="market-thesis">We're not competing for the real estate market. We're creating a market for urban capacity that isn't marketable today.</p>
+      <div class="kicker"><span>0:25–0:40 · Then straight to the product</span><b>Space × Time × Usage × Rights</b></div>
     </section>
 
-    <section class="slide" id="s3">
+    <section class="slide demo-slide" id="s3">
       <div class="slide-index">03 <span>/</span> 05</div>
-      <div class="eyebrow">How it works</div>
-      <h1>We don't tokenize buildings. We tokenize what buildings can do.</h1>
-
-      <div class="flow-diagram">
-        <div class="flow-box">Physical asset</div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-box">Space + Time + Usage + Cash flow</div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-box right">URBAN RIGHT</div>
-      </div>
-
-      <div class="tree-panel">
-        <div class="tree-root">Building A</div>
-        <div class="tree-row"><span class="glyph">├</span><span>Rooftop</span><span class="tag">2027–2037</span><b>Solar usage right</b></div>
-        <div class="tree-row"><span class="glyph">├</span><span>Floor 2</span><span class="tag">2027–2030</span><b>Workshop usage right</b></div>
-        <div class="tree-row"><span class="glyph">└</span><span>Solar project</span><b>Revenue share</b></div>
-      </div>
-
-      <div class="conflict-bar">Overlapping exclusive space × time is rejected on-chain. Revenue rights can coexist with usage rights.</div>
+      <div class="eyebrow">Product demo · 0:40–2:55</div>
+      <h1>Search the city itself.</h1>
+      <div class="demo-preview"><img src="../screenshots/xray.png" alt="TOKENIZE TOKYO's current 3D city interface with the X-ray lens" /><span>Current browser demo · simulated assets and transactions</span></div>
+      <div class="demo-sequence"><span>01 Discover</span><span>02 Define a right</span><span>03 Reject a conflict</span><span>04 Fund &amp; activate</span></div>
+      <a class="demo-launch" href="http://127.0.0.1:3000" target="tokenize-tokyo-demo" rel="noopener">Open local demo ↗ <small>D</small></a>
+      <p class="demo-return">Return here at 2:55, then → · Local app must be running</p>
     </section>
 
     <section class="slide" id="s4">
       <div class="slide-index">04 <span>/</span> 05</div>
-      <div class="eyebrow">Innovation · target architecture</div>
-      <h1>From physical space<br>to an onchain namespace</h1>
+      <div class="eyebrow">What we invented · 2:55–3:25</div>
+      <h1>We don’t tokenize buildings.<br>We tokenize what a city can do.</h1>
       <div class="infra-body">
         <div class="infra-stack">
           <div class="infra-tier">
@@ -663,7 +708,7 @@
           <div class="infra-down">↓</div>
           <div class="infra-tier namespace">
             <div class="tier-name">ENSv2 · Spatial namespace</div>
-            <div class="tier-detail">Space identity + scoped authority · planned</div>
+            <div class="tier-detail">Hierarchy + scoped delegation · planned</div>
           </div>
           <div class="infra-down">↓</div>
           <div class="infra-tier protocol">
@@ -677,24 +722,19 @@
           </div>
         </div>
         <div class="infra-side">
-          <div class="tag">ILLUSTRATIVE NAMESPACE · NOT REGISTERED</div>
-          <div class="namespace-tree">tokenizetokyo.eth
-└─ chiyoda
-   └─ building-1024
-      ├─ <b>rooftop</b>
-      │  └─ solar-2037
-      └─ floor-2</div>
-          <p class="delegation">Building owner → Rooftop operator</p>
-          <p class="scope-note">Delegate the rooftop namespace.<br>Keep Floor 2 separate.<br>Right issuance needs a protocol adapter.</p>
+          <div class="tag">URBAN RIGHT</div>
+          <div class="right-dimensions"><p><span>SPACE</span> Rooftop</p><p><span>TIME</span> 2027–2037</p><p><span>USAGE</span> Solar generation</p><p><span>RIGHT</span> Exclusive use</p></div>
+          <p class="delegation">Same space. Overlapping time.<br>Conflicting use rejected.</p>
+          <p class="scope-note">A revenue share can coexist.<br>Namespace authority stays scoped.</p>
         </div>
       </div>
-      <p class="infra-status">Today: MapLibre / OpenStreetMap + locally tested contracts. MultiBaas integration awaits a live run.<br>ENSv2 delegation and PLATEAU are proposed. Namespace control does not prove property ownership.</p>
+      <p class="infra-status">Today: MapLibre / OpenStreetMap + locally tested contracts. MultiBaas is live on Curvegrid Testnet.<br>ENSv2 delegation and PLATEAU are proposed. Namespace control does not prove property ownership.</p>
     </section>
 
     <section class="slide with-photo" id="s5">
       <div class="slide-index">05 <span>/</span> 05</div>
-      <div class="eyebrow">Where this goes</div>
-      <h1>Turn the city into a market.</h1>
+      <div class="eyebrow">Why this matters at scale · 3:25–4:00</div>
+      <h1>Built for Tokyo. Designed for every city.</h1>
       <div class="roadmap-cols">
         <div>
           <div class="rmap-block">
@@ -709,9 +749,9 @@
         </div>
         <div>
           <div class="rmap-block">
-            <div class="tag">NEXT</div>
+            <div class="tag">MORE WAYS TO USE A SPACE</div>
             <div class="rmap-tags">
-              <span>EV charging</span><span>Operator proposals</span>
+              <span>Parking</span><span>EV charging</span><span>Advertising</span><span>Warehouses</span><span>After-hours floors</span><span>Unused farmland</span>
             </div>
           </div>
           <div class="rmap-block">
@@ -724,6 +764,8 @@
           </div>
         </div>
       </div>
+      <div class="portability-row"><span>Any 3D basemap</span><span>Any verifier network</span><span>Same rights protocol</span></div>
+      <p class="portability-caption">Tokyo is the first instance, not the product.</p>
       <div class="closing-line">We don't tokenize Tokyo to speculate on it. <b>We tokenize it to put dormant assets back to work.</b></div>
       <div class="footer-note">Demo data · simulated verification · no real property is sold</div>
     </section>
@@ -731,7 +773,7 @@
   </div>
 </div>
 
-<div id="hud">← → · Space · Home / End · N notes</div>
+<div id="hud">← → · N notes · D demo · T timer · R reset timer</div><div id="rehearsal" aria-label="Rehearsal timer"><b id="elapsed">0:00</b> / 4:00<span id="phase"></span></div>
 <div id="counter"><b id="counter-cur">01</b> / 05</div>
 
 <div id="notes-panel">
@@ -744,13 +786,13 @@
 (function(){
   var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
   var notes = [
-    "Tokyo doesn't have a shortage of physical assets. It has a massive amount of assets sitting idle. We call it dormant capital.",
-    "Rooftops exist but aren't connected to operators or equipment capital; vacant homes exist but don't reach users; idle land exists but can't meet short-term demand.",
-    "0:50–2:40: Opportunity Lens → X-ray → scoped right → conflict rejected → purchase → revenue → secondary sale → basket. Use prepared demo state and say that browser transactions are simulated. ENS delegation is not available in today's app; show its planned flow on slide 4, not as a completed transaction.",
-    "2:40–3:15. Our target architecture has four layers: PLATEAU tells us where. ENS tells us what space it is and who can control its namespace. Urban Rights define what that space can do. Curvegrid turns those rights into a market. Today our map is MapLibre/OpenStreetMap; PLATEAU and ENS are planned, and MultiBaas awaits live verification. Point to rooftop: the proposed owner delegates only this namespace; Floor 2 remains separate. An explicit protocol adapter must check the delegated scope before a right can be issued. ENS is not property verification. Official sources: https://docs.ens.domains/ensv2/permissioned-registry/ and https://docs.ens.domains/ensv2/enhanced-access-control/ . Full present-day and future live-demo scripts: ../PITCH_DEMO.md.",
-    "3:40–4:00. Six asset categories are available as fictional demo listings. Revenue, resale and baskets have local contract coverage; the fractional and rental market is a separate interactive mock. Collateral loans remain future work. We tokenize Tokyo to put dormant assets back to work."
-  ];
-  var current = 0;
+    "Tokyo issued its first-ever electricity supply crunch warning in March 2022, with reserve margin around 3%. Since April 2025 Tokyo requires solar on new houses built by large builders, but that does nothing for the roofs that already exist. Meanwhile 23-ward residential land rose 9% this year while 897 thousand homes stand vacant. Expensive land, idle assets, a grid with no margin: that is dormant capital.",
+    "Cold start is solved by flipping the order: demand first. An investor bids on a roof that has no owner on the platform yet. The owner hears 'twelve people want to fund your rooftop' through the app, a local agency, or a friend. Supply shows up because demand is already visible.",
+    "Time 0:40–2:55. Discover: Rooftop + Available, Opportunity Lens for fictional opportunity sites, then X-ray for registered-right scopes. Define: issue and verify one exclusive rooftop usage right on prepared Nihonbashi Solar Roof. Reject: overlapping RESTAURANT usage. Activate: Investor B buys the 100-unit revenue listing, Funded appears; Demo verifier activates revenue right #1 separately; return to the map to see panels. All browser actions are simulated; contracts were separately tested on Anvil. Do not claim ENS resolution or MultiBaas events in demo mode. The runbook specifies preparation, exact controls and dates. Return here at 2:55 and advance.",
+    "Time 2:55–3:25. We don’t tokenize buildings. We tokenize what a city can do: space, time, usage and rights. The protocol enforces verified issuance, conflicting-use rejection and revenue checkpoints when tokens move. Curvegrid provides the implemented indexing and transaction path, now verified live on Curvegrid Testnet. PLATEAU and ENSv2 are planned; ENS would give each rooftop its own namespace and bounded delegation. Current physical context is MapLibre/OpenStreetMap. ENS authority is not property ownership. Sources: https://docs.ens.domains/ensv2/permissioned-registry/ and https://docs.ens.domains/ensv2/enhanced-access-control/.",
+    "Nothing here is Tokyo-specific except the data. Swap the map tiles and the verifier network and the same contracts run for Osaka, Taipei or Lisbon."
+];
+  var current = Math.max(0, Math.min(slides.length - 1, Number(location.hash.slice(1)) - 1 || 0));
   var total = slides.length;
   var stage = document.getElementById('stage');
   var viewport = document.getElementById('viewport');
@@ -764,6 +806,7 @@
     });
     counterCur.textContent = String(current + 1).padStart(2, '0');
     notesText.textContent = notes[current] || '(no notes for this slide)';
+    history.replaceState(null, '', '#' + (current + 1));
   }
 
   function goTo(i){
@@ -782,13 +825,31 @@
   window.addEventListener('resize', scaleStage);
   scaleStage();
 
+  var elapsedMs = 0, startedAt = 0, running = false;
+  function showTime(){
+    var seconds = Math.floor((elapsedMs + (running ? performance.now() - startedAt : 0)) / 1000);
+    document.getElementById('elapsed').textContent = Math.floor(seconds / 60) + ':' + String(seconds % 60).padStart(2, '0');
+    document.getElementById('phase').textContent = (running ? '' : 'Paused · ') + (seconds < 25 ? 'Problem' : seconds < 40 ? 'Solution' : seconds < 175 ? 'Product demo' : seconds < 205 ? 'Innovation' : seconds < 230 ? 'Scale' : seconds < 240 ? 'Closing' : 'Time');
+    document.getElementById('rehearsal').classList.toggle('over', seconds >= 240);
+  }
+  setInterval(showTime, 250);
+  function openDemo(){window.open('http://127.0.0.1:3000', 'tokenize-tokyo-demo', 'noopener');}
   window.addEventListener('keydown', function(e){
+    if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.code === 'Space'){
       e.preventDefault();
       next();
     } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp'){
       e.preventDefault();
       prev();
+    } else if (e.key === 'd' || e.key === 'D'){
+      e.preventDefault(); openDemo();
+    } else if (e.key === 't' || e.key === 'T'){
+      e.preventDefault();
+      if (running) elapsedMs += performance.now() - startedAt; else startedAt = performance.now();
+      running = !running; document.getElementById('rehearsal').classList.add('visible'); showTime();
+    } else if (e.key === 'r' || e.key === 'R'){
+      e.preventDefault(); elapsedMs = 0; running = false; showTime();
     } else if (e.key === 'Home'){
       e.preventDefault();
       goTo(0);
@@ -804,6 +865,7 @@
   });
 
   viewport.addEventListener('click', function(e){
+    if (e.target.closest('a, button')) return;
     next();
   });
   notesPanel.addEventListener('click', function(e){
