@@ -1,0 +1,271 @@
+{
+  "chainId": 31337,
+  "testnetOnly": true,
+  "verifiedAt": "2026-09-26T06:17:04.298Z",
+  "checks": [
+    "register",
+    "verify",
+    "tokenize",
+    "buy",
+    "activate",
+    "fund vault",
+    "claim",
+    "secondary sale",
+    "basket custody",
+    "mint",
+    "redeem",
+    "spatial conflict rejected"
+  ],
+  "transactions": [
+    {
+      "action": "registry.grantRole",
+      "hash": "0x16249218cd20afc1dbb8789d4ed43d93b0740f4537c55d6ffb71e487242d59b7",
+      "block": "56"
+    },
+    {
+      "action": "settlement.mint",
+      "hash": "0x6dcfe6204897626d8a3735a5fd394b00ecc091afc301b28ce9c39d69f53ca2d4",
+      "block": "57"
+    },
+    {
+      "action": "settlement.approve",
+      "hash": "0x3bb824b0e06e0c2e124f0cd59da876e468e45210b30de042038deb1a330b6acf",
+      "block": "58"
+    },
+    {
+      "action": "settlement.approve",
+      "hash": "0x43537c90dc3c865cb216474fef31c0e962d696f578438f584f7d8082f1650c5c",
+      "block": "59"
+    },
+    {
+      "action": "rights.setApprovalForAll",
+      "hash": "0x0c2740eda15ba74a831f06fbd76f968cededffa8dd68c51356d1b317af70abc2",
+      "block": "60"
+    },
+    {
+      "action": "rights.setApprovalForAll",
+      "hash": "0x7a46595e69dbf87627de2a057cf0264c25c16bfe38b278b916ac56937102af2c",
+      "block": "61"
+    },
+    {
+      "action": "settlement.mint",
+      "hash": "0x7e72ca47a5efac13eec71f00c0b36a474cb1b99b93bee2c755fcf203972d857e",
+      "block": "62"
+    },
+    {
+      "action": "settlement.approve",
+      "hash": "0xec4c55cabe1aa75276b5af66a7f781642308eda363540150b9ef61cc81086d42",
+      "block": "63"
+    },
+    {
+      "action": "settlement.approve",
+      "hash": "0xa648133ceb3a266a7cb485bf04fe266622e1a335d1cc6f8f49065f29b723d47a",
+      "block": "64"
+    },
+    {
+      "action": "rights.setApprovalForAll",
+      "hash": "0x7823b73f377ca378d9b375b7c41dc04653a2a7441cc0f521d749afb4c9139e1f",
+      "block": "65"
+    },
+    {
+      "action": "rights.setApprovalForAll",
+      "hash": "0x88b0a6ee208ef420bc81e75a00d1801e65e3f7794f5bfdbb45950ce6b93da81f",
+      "block": "66"
+    },
+    {
+      "action": "settlement.mint",
+      "hash": "0x1189588df0eb4d81c7cb8724abf729bbf54599acc2b28c8ac3e8877b8d0a9f86",
+      "block": "67"
+    },
+    {
+      "action": "settlement.approve",
+      "hash": "0x6b7d856912af3c29569d309c72f86dcac29c6193a23398451fa1050e936920b0",
+      "block": "68"
+    },
+    {
+      "action": "settlement.approve",
+      "hash": "0x4c7630109a52549cd1300be455ab49ec168ec2edc1070d0b31830154e0c1dc11",
+      "block": "69"
+    },
+    {
+      "action": "rights.setApprovalForAll",
+      "hash": "0xf270fddbbdae8cdb46795b4db8d78c3e8728fecdb99ccbbbcf09ba30ee7f4fa1",
+      "block": "70"
+    },
+    {
+      "action": "rights.setApprovalForAll",
+      "hash": "0xe816f1f09a80752cb200d65d3710390e4741f2bbd6889b03a389fb2d15930489",
+      "block": "71"
+    },
+    {
+      "action": "settlement.mint",
+      "hash": "0x63671e75c74959ee4dd075169cb76e539509a98cd80bdac9fcc94f0e077b43c1",
+      "block": "72"
+    },
+    {
+      "action": "settlement.approve",
+      "hash": "0xd442a3ab6fe9cfcf73ed87b80f8b09fd76a4b099500b885263d67118c8267899",
+      "block": "73"
+    },
+    {
+      "action": "settlement.approve",
+      "hash": "0x96c9ee938b08dee93ebd77061af21d753a213eeb19cfeb4e05c09fcb43000327",
+      "block": "74"
+    },
+    {
+      "action": "rights.setApprovalForAll",
+      "hash": "0xd5c1d27206b9b300aa28631141c13f8d1f55c1240ea98d017d66551817476f59",
+      "block": "75"
+    },
+    {
+      "action": "rights.setApprovalForAll",
+      "hash": "0x9333f5e9b15d8a6cdb733e49b48d00dcb0f50a3bce65b4906299fe353de0a26e",
+      "block": "76"
+    },
+    {
+      "action": "registry.registerAsset",
+      "hash": "0x60f2d095bb7d16ba8ffc1650c61d7c2e5693a3ed67a8ea6900567626712b07ca",
+      "block": "77"
+    },
+    {
+      "action": "registry.requestVerification",
+      "hash": "0x01ad9350ae5e2a67ff9a7f010ab9d4e31e736f91b6e775dce937986f76c5ccd3",
+      "block": "78"
+    },
+    {
+      "action": "registry.verifyAsset",
+      "hash": "0x54684bc8f7bbb1e8fbda2087342e4d4c2bf8a0363506871990acea46ba2a6e4d",
+      "block": "79"
+    },
+    {
+      "action": "rights.createScopedRight",
+      "hash": "0xfa374bea0ac07aa0ed4738ca204713d2e15c71ce69bf6e180f57df5d8bec0c19",
+      "block": "80"
+    },
+    {
+      "action": "rights.verifyRight",
+      "hash": "0x03c7db1616e32bf2e0ecc888715de3e0e72b2b1d28d9605fb86e3a82c1d52e26",
+      "block": "81"
+    },
+    {
+      "action": "market.createListing",
+      "hash": "0xde4765982af0101b98cde257b51349af2125de4d7064233e1f29cc811843b40a",
+      "block": "82"
+    },
+    {
+      "action": "registry.registerAsset",
+      "hash": "0xf092162bc23fd19c88b7d83d21de5d18e4837d4280deba0af077fd152f4ef1e3",
+      "block": "83"
+    },
+    {
+      "action": "registry.requestVerification",
+      "hash": "0xaf3b960aa748504c866e31533a25864915d3fc8a808fdf4c176316f4586fdc6c",
+      "block": "84"
+    },
+    {
+      "action": "registry.verifyAsset",
+      "hash": "0x918caa40bbdef064f535a19e3bdfec4fb76945ab159443b6f929772bd6b486e0",
+      "block": "85"
+    },
+    {
+      "action": "rights.createScopedRight",
+      "hash": "0xfe4c97195c05ae45aa3310cad4b091e8cb528ad1976af11006290711f35f2816",
+      "block": "86"
+    },
+    {
+      "action": "rights.verifyRight",
+      "hash": "0xf7708e0a39cf45b6e91fd0683b97ecf672bcc22cc21b478e3ff583f8c0943778",
+      "block": "87"
+    },
+    {
+      "action": "market.createListing",
+      "hash": "0x53b3d81b86c68c81ecb2b45898b2e6f413f8c50ac38371162a84c02fade38b0f",
+      "block": "88"
+    },
+    {
+      "action": "registry.registerAsset",
+      "hash": "0x7d984c70793bd290fe78f425771cf338371caf45cf7ab46f94871440194d80a7",
+      "block": "89"
+    },
+    {
+      "action": "registry.requestVerification",
+      "hash": "0xebb2d2e8cff4fbdf3ed9f1235a1521a395b012358d8c8fb9285837627c669cc3",
+      "block": "90"
+    },
+    {
+      "action": "registry.verifyAsset",
+      "hash": "0xcb250981f26c94d22d7b3435a64671aeecc3a6400d1c3a508667ab9133e5f93e",
+      "block": "91"
+    },
+    {
+      "action": "rights.createScopedRight",
+      "hash": "0x2d3c874d1a5fbf81dd9a8d590068073109926ee89173ad77d0b2e67c1a98ae5f",
+      "block": "92"
+    },
+    {
+      "action": "rights.verifyRight",
+      "hash": "0x42985bd20a706d9632b094fbd1d80847895afb01d04394826d36328f7bacb41a",
+      "block": "93"
+    },
+    {
+      "action": "market.createListing",
+      "hash": "0x014840fe05ffa5ee1078d39d3ce1524dfd852c2abc6474466a74905edd3e4a98",
+      "block": "94"
+    },
+    {
+      "action": "market.purchase",
+      "hash": "0x2a571acd5c934f8e7b88286f67a483b4a41ef94a3bcbb1c5776ae7161d54a9ce",
+      "block": "95"
+    },
+    {
+      "action": "market.purchase",
+      "hash": "0x893c511a15685565f0b5016f0e7d485f589df824c326d1ba4270ae18c3fb648c",
+      "block": "96"
+    },
+    {
+      "action": "rights.activateRight",
+      "hash": "0x97a98ee1af0e42bbb0298f181ba764788d12e9ba88562b7abbeacea96d9a03c2",
+      "block": "97"
+    },
+    {
+      "action": "revenue.depositRevenue",
+      "hash": "0x32e2bb51a0ac3725822817ced165a301c715cbdc3d710d4874e7e29c03d7c0cf",
+      "block": "98"
+    },
+    {
+      "action": "revenue.claim",
+      "hash": "0xc2d235588003e36f34960cd37190909cb2c7ce133fabd79f9487bf21cbed5824",
+      "block": "99"
+    },
+    {
+      "action": "market.createListing",
+      "hash": "0x5f9c7eddbe6b40f507985c74fcb3e4c292580edd95a9a136d62deedd56fa866d",
+      "block": "100"
+    },
+    {
+      "action": "market.purchase",
+      "hash": "0x1bc76b56da31ef25521a1eae207f32324b54f8114f2acfba209e4525ced14b9d",
+      "block": "101"
+    },
+    {
+      "action": "market.purchase",
+      "hash": "0x1cd24ac751757771db938557d422287102f10aa4d79ad39558442ed4199696de",
+      "block": "102"
+    },
+    {
+      "action": "basket.createBasket",
+      "hash": "0x1abc8e6453ab26629768873981fd9ef85915ad3f4ae21008cdf055c8d413831b",
+      "block": "103"
+    },
+    {
+      "action": "basket.depositUnderlying",
+      "hash": "0xf9eec01e9a1270d91f8d50925294033a7119f1eb2f13a6d1f52982fcba7a33b7",
+      "block": "104"
+    },
+    {
+      "action": "basket.redeem",
+      "hash": "0x2280ac9ab796ab140c3e32034b3496e1f8dd5ef6c9908dc9f2c2721531543a17",
+      "block": "105"
+    }
+  ]
+}

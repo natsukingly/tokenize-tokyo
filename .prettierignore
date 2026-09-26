@@ -1,0 +1,11 @@
+node_modules
+.next
+contracts/lib
+contracts/out
+contracts/cache
+contracts/broadcast
+public/maplibre
+coverage
+package-lock.json
+playwright-report
+test-results
