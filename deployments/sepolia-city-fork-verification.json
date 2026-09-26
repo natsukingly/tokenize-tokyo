@@ -1,0 +1,26 @@
+{
+  "checkedAt": "2026-09-26T15:49:59.402Z",
+  "chainId": 31338,
+  "locallyForked": true,
+  "dataset": "sepolia-city-200-v1",
+  "assets": 18,
+  "rights": 12,
+  "preservedAssets": 4,
+  "targetAssets": 18,
+  "completedAdditionalScenarios": 14,
+  "complete": true,
+  "issuerRemainingETH": "100",
+  "protectedReserveETH": "0.003",
+  "newVolumeMockJPY": 237000,
+  "newIncomeMockJPY": 4700,
+  "confirmedTransactions": 79,
+  "gasUsed": "16708335",
+  "testETHIncludingActorFunding": "0.021956692757266027",
+  "onchainStatesAndBalancesMatched": true,
+  "multiBaasIndexVerified": false,
+  "limitations": [
+    "Fictional locations and simulated ownership verification",
+    "Transactions have their actual block timestamps; no backdated activity",
+    "Generated ENS names for new spaces remain previews"
+  ]
+}

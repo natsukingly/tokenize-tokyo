@@ -2,6 +2,12 @@
 
 更新: 2026-09-27。現状の根拠は[機能一覧](FEATURE_STATUS.md)、[実tx記録](../deployments/testnet-demo-receipts.json)。完了を判定する基準は機能数ではなく、Register → Verify → Tokenize → Trade → Earn → Composeの通し実演。
 
+## テストデータ拡充 — 2026-09-27
+
+200資産分の追加計画を用意し、予算内で**合計88資産・47権利・稼働中12件**まで実行済み。追加392取引、市場操作376件のMultiBaas照合が完了。7種類を各12件追加し、既存4資産とBasketを保持。残高は約0.00453 Sepolia ETH。
+
+**未完了**: 200件に到達する残り112資産の登録と、一部資産の発行・販売等の後続工程。追加ETHがあれば重複発行せず同じjournalから再開できる。[実行記録・再開手順](SEPOLIA_CITY_DATA.md)。
+
 ## 最新の接続状況 — 2026-09-27
 
 公開メインは **Sepolia (`11155111`)** へ切替済み。MultiBaasの9契約link、DApp権限、CORS、未署名取引の組み立て、ENS名と発行権限の読取りを確認。英語コミット `996ccf2` / `bb3c5a2`。公開deployment: `dpl_4cbF55bu8bXPukdkk8XT7boWmJqC`。旧Curvegrid Testnetの50資産・448取引は保持し、全件移行しない。初期記録の扱いと最新の実行証跡は [SEPOLIA_CUTOVER.md](SEPOLIA_CUTOVER.md) を参照。

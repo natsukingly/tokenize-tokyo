@@ -509,7 +509,21 @@ async function verify() {
     gasUsed: steps
       .reduce((s, p) => s + BigInt(p.gasCost || "0") / BigInt(p.gasPrice), 0n)
       .toString(),
-    testETHIncludingActorFunding: formatEther(spent()),
+    conservativeBudgetUsageETH: formatEther(spent()),
+    issuerOutflowETH: formatEther(
+      steps
+        .filter((s) => s.actor === "owner")
+        .reduce(
+          (sum, s) => sum + BigInt(s.gasCost || "0") + BigInt(s.value),
+          0n,
+        ),
+    ),
+    networkFeesETH: formatEther(
+      steps.reduce((sum, s) => sum + BigInt(s.gasCost || "0"), 0n),
+    ),
+    allocatedToTestInvestorsETH: formatEther(
+      steps.reduce((sum, s) => sum + BigInt(s.value), 0n),
+    ),
     onchainStatesAndBalancesMatched: true,
     multiBaasIndexVerified: false,
     limitations: [
@@ -748,8 +762,8 @@ async function main() {
       ),
     ),
   );
-  for (let offset = 0; offset < plan.length; offset += 7) {
-    const wave = plan.slice(offset, offset + 7);
+  for (let offset = 0; offset < plan.length; offset += 21) {
+    const wave = plan.slice(offset, offset + 21);
     await batch(
       "Register spaces",
       wave.map((p) =>

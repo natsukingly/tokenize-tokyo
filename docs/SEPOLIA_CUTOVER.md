@@ -2,6 +2,12 @@
 
 Updated 2026-09-27. The [hosted main application](https://tokenize-tokyo.vercel.app/) now uses Sepolia. Production deployment: `dpl_4cbF55bu8bXPukdkk8XT7boWmJqC`. This is a separate test deployment, not a bridge or migration of balances.
 
+## Additional city data — 2026-09-27
+
+The subsequent available-funds run expanded public Sepolia to **88 assets, 47 rights and 12 active rights** with 392 additional confirmed transactions. The 200-asset catalog is prepared but not fully issued; 112 registrations remain. The issuer retains approximately 0.00453 Sepolia ETH. See [current data and resume instructions](SEPOLIA_CITY_DATA.md). The small four-asset scenario below is the earlier baseline; its exact snapshot totals should not be rerun after this expansion.
+
+日本語: 追加実行後のSepoliaは88資産・47権利・稼働中12件です。追加392取引を確認し、約0.00453 Sepolia ETHを残しました。200資産までは未完了で、残り112資産は後から再開できます。以下の4資産の記録は拡充前の基準値です。
+
 ## What stays on Curvegrid Testnet
 
 The existing 50 assets and 448 scripted transactions remain on chain `2017072401`. The browser-only demo contains 265 fictional assets. Neither dataset is copied into Sepolia balances or presented as Sepolia activity.
