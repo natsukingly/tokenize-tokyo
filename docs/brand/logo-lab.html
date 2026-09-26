@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Logo Lab v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&family=DotGothic16&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+JP:wght@400;700;900&family=Shippori+Mincho:wght@600;800&family=Zen+Kaku+Gothic+New:wght@500;700&family=Zen+Old+Mincho:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --page:#0b0c0e; --panel:#141619; --line:#26292e; --text:#f1f2f3; --dim:#8b9098;
+    /* logo tokens (dark) */
+    --bg:#0b0c0e; --fg:#f1f2f3; --acc:#f0df37; --mute:#8b9098; --grid:#23262b; --grid2:#2e3238;
+  }
+  body.light{
+    --page:#e8e8e4; --panel:#f6f6f3; --line:#d4d4ce; --text:#0b0c0e; --dim:#5d626a;
+    --bg:#f6f6f3; --fg:#0b0c0e; --acc:#c9a900; --mute:#5d626a; --grid:#dcdcd5; --grid2:#cfcfc7;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--page);color:var(--text);font-family:"DM Sans",system-ui,sans-serif;transition:background .2s}
+  header{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between;
+    padding:14px 24px;background:var(--page);border-bottom:1px solid var(--line)}
+  header h1{margin:0;font:600 15px/1.2 "IBM Plex Mono",monospace;letter-spacing:.08em}
+  header h1 b{color:#f0df37;font-weight:600}
+  body.light header h1 b{color:#8a7400}
+  .note{font-size:12px;color:var(--dim);margin:0}
+  button{font:500 12px "IBM Plex Mono",monospace;letter-spacing:.06em;color:var(--text);background:transparent;
+    border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer}
+  button:hover{border-color:#f0df37}
+  main{max-width:1320px;margin:0 auto;padding:24px 16px 64px;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,600px),1fr));gap:20px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;margin:0}
+  .card svg{display:block;width:100%;height:auto;max-width:560px;margin:0 auto;border-radius:6px}
+  figcaption{margin-top:12px;display:grid;grid-template-columns:auto 1fr;gap:2px 10px;align-items:baseline}
+  .no{grid-row:span 2;font:600 13px "IBM Plex Mono",monospace;color:#f0df37;background:#0b0c0e;border-radius:4px;padding:2px 7px}
+  .cap{font-weight:600;font-size:14px}
+  .why{font-size:13px;color:var(--dim)}
+  /* logo token classes */
+  .bg{fill:var(--bg)} .fg{fill:var(--fg)} .ac{fill:var(--acc)} .mu{fill:var(--mute)}
+  .acs{stroke:var(--acc)} .fgs{stroke:var(--fg)} .gs{stroke:var(--grid)} .gs2{stroke:var(--grid2)}
+  .mk-ac{color:var(--acc)} .mk-fg{color:var(--fg)}
+  .bebas{font-family:"Bebas Neue",sans-serif}
+  .anton{font-family:"Anton",sans-serif}
+  .archivo{font-family:"Archivo Black",sans-serif}
+  .dm{font-family:"DM Sans","Noto Sans JP",sans-serif}
+  .plex{font-family:"IBM Plex Mono",monospace}
+  .zenkaku{font-family:"Zen Kaku Gothic New",sans-serif}
+  .noto{font-family:"Noto Sans JP",sans-serif}
+  .shippori{font-family:"Shippori Mincho",serif}
+  .dot{font-family:"DotGothic16",sans-serif}
+  .zenold{font-family:"Zen Old Mincho",serif}
+  .blink{animation:blink 1.06s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  @media (prefers-reduced-motion:reduce){.blink{animation:none}}
+</style>
+</head>
+<body>
+<header>
+  <h1>TOKENIZE TOKYO <b>·</b> logo lab v1</h1>
+  <p class="note">Fonts are Google Fonts placeholders. Final marks get outlined to paths before handoff.</p>
+  <button id="toggle" type="button" aria-pressed="false">Light background</button>
+</header>
+
+<!-- shared mark: map pin whose head is a house with a solar grid -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="mark" viewBox="0 0 64 64">
+      <path d="M32 61 20.5 46H14.5a2.5 2.5 0 0 1-2.5-2.5V25.5L32 8l20 17.5v18a2.5 2.5 0 0 1-2.5 2.5H43.5Z"
+            fill="none" stroke="currentColor" stroke-width="3.6" stroke-linejoin="round"/>
+      <g fill="currentColor">
+        <rect x="21.5" y="27" width="6" height="5"/><rect x="29" y="27" width="6" height="5"/><rect x="36.5" y="27" width="6" height="5"/>
+        <rect x="21.5" y="33.5" width="6" height="5"/><rect x="29" y="33.5" width="6" height="5"/><rect x="36.5" y="33.5" width="6" height="5"/>
+      </g>
+    </symbol>
+    <pattern id="iso" width="40" height="23.094" patternUnits="userSpaceOnUse">
+      <path d="M0 11.547 20 0 40 11.547 20 23.094Z" fill="none" class="gs2" stroke-width="1"/>
+    </pattern>
+    <filter id="glow" x="-10%" y="-40%" width="120%" height="180%">
+      <feGaussianBlur stdDeviation="2.2" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+</svg>
+
+<main>
+
+<!-- 1 -->
+<figure class="card">
+  <svg viewBox="0 0 560 220" role="img" aria-label="Variant 1">
+    <rect class="bg" width="560" height="220"/>
+    <use href="#mark" x="44" y="40" width="140" height="140" class="mk-ac"/>
+    <text class="bebas ac" x="206" y="108" font-size="76" letter-spacing="3">TOKENIZE</text>
+    <text class="bebas ac" x="206" y="180" font-size="76" letter-spacing="3">TOKYO</text>
+  </svg>
+  <figcaption><span class="no">01</span><span class="cap">Pin-roof mark + Bebas stack</span>
+  <span class="why">A pin that is also a solar rooftop says "place becomes asset" before anyone reads a word.</span></figcaption>
+</figure>
+
+<!-- 2 -->
+<figure class="card">
+  <svg viewBox="0 0 560 220" role="img" aria-label="Variant 2">
+    <rect class="bg" width="560" height="220"/>
+    <text class="archivo fg" x="454" y="128" font-size="42" text-anchor="end" letter-spacing="-.5">TOKENIZE TOKY</text>
+    <circle cx="476" cy="113" r="14" fill="none" class="acs" stroke-width="6"/>
+    <circle cx="476" cy="113" r="4" class="ac"/>
+  </svg>
+  <figcaption><span class="no">02</span><span class="cap">Heavy grotesk, target O</span>
+  <span class="why">One word-line with the last O turned into a locate ring: the only yellow, the only point on the map.</span></figcaption>
+</figure>
+
+<!-- 3 -->
+<figure class="card">
+  <svg viewBox="0 0 560 220" role="img" aria-label="Variant 3">
+    <rect class="bg" width="560" height="220"/>
+    <text class="bebas" x="280" y="112" font-size="80" text-anchor="middle" letter-spacing="4"><tspan class="fg">TOKENIZE </tspan><tspan class="ac">TOKYO</tspan></text>
+    <line x1="150" y1="136" x2="410" y2="136" class="acs" stroke-width="1.5"/>
+    <text class="zenkaku fg" x="285" y="172" font-size="19" font-weight="500" text-anchor="middle" letter-spacing="10">東京トークン化計画</text>
+  </svg>
+  <figcaption><span class="no">03</span><span class="cap">EN over JP, hairline rule</span>
+  <span class="why">Classic bilingual stack; the rule reads as a street line and keeps the JP as a quiet subtitle.</span></figcaption>
+</figure>
+
+<!-- 4 -->
+<figure class="card">
+  <svg viewBox="0 0 560 220" role="img" aria-label="Variant 4">
+    <rect fill="#f0df37" width="560" height="220"/>
+    <text class="noto" x="280" y="124" font-size="50" font-weight="900" text-anchor="middle" fill="#0b0c0e" letter-spacing="1">東京トークン化計画</text>
+    <text class="dm" x="284" y="168" font-size="13" font-weight="600" text-anchor="middle" fill="#0b0c0e" letter-spacing="8">TOKENIZE TOKYO</text>
+  </svg>
+  <figcaption><span class="no">04</span><span class="cap">JP dominant, inverted yellow</span>
+  <span class="why">Leads with the Japanese title like a public-works poster; English shrinks to a catalogue tag.</span></figcaption>
+</figure>
+
+<!-- 5 -->
+<figure class="card">
+  <svg viewBox="0 0 560 220" role="img" aria-label="Variant 5">
+    <rect class="bg" width="560" height="220"/>
+    <rect class="ac" x="36" y="14" width="40" height="192"/>
+    <text class="zenkaku" x="56" y="110" font-size="19" font-weight="700" fill="#0b0c0e" text-anchor="middle" letter-spacing="1" style="writing-mode:vertical-rl">東京トークン化計画</text>
+    <text class="bebas fg" x="104" y="106" font-size="92" letter-spacing="3">TOKENIZE</text>
+    <text class="bebas fg" x="104" y="190" font-size="92" letter-spacing="3">TOKYO</text>
+  </svg>
+  <figcaption><span class="no">05</span><span class="cap">Vertical JP column</span>
+  <span class="why">The tategaki strip works like a building sign on a Tokyo facade; English stays monumental and monochrome.</span></figcaption>
+</figure>
+
+<!-- 6 -->
+<figure class="card">
+  <svg viewBox="0 0 560 220" role="img" aria-label="Variant 6">
+    <rect fill="#040705" width="560" height="220"/>
+    <g filter="url(#glow)" fill="#39ff14">
+      <text class="plex" x="60" y="70" font-size="12" opacity=".55">&gt; resolve tokenizetokyo.eth</text>
+      <text class="plex" x="60" y="118" font-size="30" font-weight="500">[ TOKENIZE_TOKYO ]</text>
+      <rect class="blink" x="392" y="94" width="16" height="30"/>
+      <text class="dot" x="62" y="164" font-size="22" letter-spacing="5">東京トークン化計画</text>
+    </g>
+  </svg>
+  <figcaption><span class="no">06</span><span class="cap">Terminal (ENS deck)</span>
+  <span class="why">Lain-style phosphor prompt that matches the ENS deck; the dot-font JP reads like a CRT readout.</span></figcaption>
+</figure>
+
+<!-- 7 -->
+<figure class="card">
+  <svg viewBox="0 0 560 220" role="img" aria-label="Variant 7">
+    <rect fill="#ffffff" width="560" height="220"/>
+    <rect x="40" y="40" width="140" height="140" rx="10" fill="#e4412d"/>
+    <rect x="49" y="49" width="122" height="122" rx="5" fill="none" stroke="#fff" stroke-width="2"/>
+    <text class="shippori" x="57" y="103" font-size="17" font-weight="800" fill="#fff" textLength="106" lengthAdjust="spacing">東京トークン</text>
+    <text class="shippori" x="57" y="140" font-size="17" font-weight="800" fill="#fff" textLength="106" lengthAdjust="spacing">化計画</text>
+    <text class="dm" x="208" y="121" font-size="34" font-weight="500" fill="#0b0c0e" letter-spacing="1">TOKENIZE TOKYO</text>
+    <text class="dm" x="210" y="146" font-size="11" font-weight="500" fill="#e4412d" letter-spacing="3.5">URBAN RIGHTS, SEALED ON-CHAIN</text>
+  </svg>
+  <figcaption><span class="no">07</span><span class="cap">Hanko seal + DM Sans</span>
+  <span class="why">A seal is how Japan authorises property; here it doubles as the signature on an on-chain right.</span></figcaption>
+</figure>
+
+<!-- 8 -->
+<figure class="card">
+  <svg viewBox="0 0 560 220" role="img" aria-label="Variant 8">
+    <rect class="bg" width="560" height="220"/>
+    <text class="zenold fg" x="34" y="164" font-size="128" font-weight="900">東京</text>
+    <line x1="40" y1="196" x2="290" y2="28" class="acs" stroke-width="9" stroke-linecap="square"/>
+    <text class="dm fg" x="326" y="104" font-size="24" font-weight="600" letter-spacing="4">TOKENIZE</text>
+    <text class="dm fg" x="326" y="136" font-size="24" font-weight="600" letter-spacing="4">TOKYO</text>
+    <text class="noto mu" x="327" y="162" font-size="11" letter-spacing="3">東京トークン化計画</text>
+  </svg>
+  <figcaption><span class="no">08</span><span class="cap">東京 monogram, yellow slash</span>
+  <span class="why">Two brush-free mincho characters as the mark; the slash is the "rewrite" gesture across the city.</span></figcaption>
+</figure>
+
+<!-- 9 -->
+<figure class="card">
+  <svg viewBox="0 0 560 220" role="img" aria-label="Variant 9">
+    <rect class="bg" width="560" height="220"/>
+    <rect width="560" height="220" fill="url(#iso)"/>
+    <g>
+      <path d="M440 57.735 460 69.282V92.376L440 80.829Z" fill="#b3a520"/>
+      <path d="M480 57.735 460 69.282V92.376L480 80.829Z" fill="#8a7f18"/>
+      <path d="M440 57.735 460 46.188 480 57.735 460 69.282Z" class="ac"/>
+    </g>
+    <text class="anton fg" x="40" y="150" font-size="64" letter-spacing="1.5">TOKENIZE TOKYO</text>
+    <text class="noto mu" x="42" y="186" font-size="15" font-weight="700" letter-spacing="7">東京トークン化計画</text>
+  </svg>
+  <figcaption><span class="no">09</span><span class="cap">Iso city grid, one lit block</span>
+  <span class="why">The faint grid is the dormant city; one extruded yellow block is an activated asset, the product in one image.</span></figcaption>
+</figure>
+
+<!-- 10 -->
+<figure class="card">
+  <svg viewBox="0 0 560 220" role="img" aria-label="Variant 10">
+    <rect class="bg" width="560" height="220"/>
+    <rect x="28" y="46" width="504" height="128" rx="14" fill="#0b0c0e" stroke="#3a3e45" stroke-width="1.5"/>
+    <rect x="46" y="66" width="8" height="88" rx="2" fill="#f0df37"/>
+    <text class="dm" x="76" y="113" font-size="38" font-weight="700" fill="#f1f2f3" letter-spacing=".5">TOKENIZE TOKYO</text>
+    <text class="dm" x="77" y="143" font-size="11.5" font-weight="500" fill="#8b9098" letter-spacing="2">東京トークン化計画 · URBAN RIGHTS PROTOCOL 01</text>
+    <g fill="#3a3e45"><circle cx="512" cy="64" r="3"/><circle cx="512" cy="156" r="3"/></g>
+    <text class="plex" x="512" y="114" font-size="10" fill="#f0df37" text-anchor="middle" letter-spacing="1">01</text>
+  </svg>
+  <figcaption><span class="no">10</span><span class="cap">Data plate / ticker</span>
+  <span class="why">Reads like an asset tag bolted to infrastructure; also drops straight into the app header as a UI chip.</span></figcaption>
+</figure>
+
+<!-- 11 -->
+<figure class="card">
+  <svg viewBox="0 0 560 220" role="img" aria-label="Variant 11">
+    <rect class="bg" width="560" height="220"/>
+    <text class="noto fg" x="262" y="121" font-size="26" font-weight="700" text-anchor="end">東京トークン化計画</text>
+    <rect class="ac" x="277" y="76" width="6" height="68"/>
+    <text class="bebas fg" x="298" y="127" font-size="45" letter-spacing="1.5">TOKENIZE TOKYO</text>
+  </svg>
+  <figcaption><span class="no">11</span><span class="cap">Bilingual horizontal lockup</span>
+  <span class="why">Both languages at equal weight, split by one yellow bar: a local project with an international protocol.</span></figcaption>
+</figure>
+
+<!-- 12 -->
+<figure class="card">
+  <svg viewBox="0 0 560 220" role="img" aria-label="Variant 12">
+    <rect class="bg" width="560" height="220"/>
+    <use href="#mark" x="64" y="104" width="32" height="32" class="mk-ac"/>
+    <use href="#mark" x="188" y="72" width="64" height="64" class="mk-ac"/>
+    <use href="#mark" x="330" y="16" width="160" height="160" class="mk-ac"/>
+    <g class="plex mu" font-size="11" text-anchor="middle" letter-spacing="1">
+      <text x="80" y="204">32 · favicon</text>
+      <text x="220" y="204">64 · sidebar</text>
+      <text x="410" y="204">160 · hero</text>
+    </g>
+  </svg>
+  <figcaption><span class="no">12</span><span class="cap">Mark scale test</span>
+  <span class="why">The pin-roof mark from 01 at 32 / 64 / 160 px to check the solar grid still reads at favicon size.</span></figcaption>
+</figure>
+
+</main>
+<script>
+  const btn = document.getElementById('toggle');
+  btn.addEventListener('click', () => {
+    const on = document.body.classList.toggle('light');
+    btn.setAttribute('aria-pressed', String(on));
+    btn.textContent = on ? 'Dark background' : 'Light background';
+  });
+</script>
+</body>
+</html>
