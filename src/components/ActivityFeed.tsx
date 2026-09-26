@@ -29,6 +29,12 @@ export default function ActivityFeed({
   };
   return (
     <div>
+      {!demo && events.some((event) => event.source === "rpc-bootstrap") && (
+        <p className={styles.empty}>
+          Initial setup records are verified Sepolia logs. New activity is
+          indexed by MultiBaas.
+        </p>
+      )}
       {pending > 0 && (
         <button className={styles.newEvents} onClick={latest}>
           {pending} new events · Show latest
@@ -56,7 +62,15 @@ export default function ActivityFeed({
                     ? "Basket " + event.args.basketId
                     : "Protocol"}
             </span>
-            <span>{event.block}</span>
+            <span
+              title={
+                event.source === "rpc-bootstrap"
+                  ? "Verified Sepolia setup record"
+                  : undefined
+              }
+            >
+              {event.block}
+            </span>
             <span title={demo ? undefined : event.txHash}>
               {demo ? (
                 "Simulated"

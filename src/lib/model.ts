@@ -51,6 +51,8 @@ export interface Basket {
   name: string;
 }
 export interface ChainEvent {
+  source?: "rpc-bootstrap" | "multibaas";
+  logIndex?: number;
   name: string;
   contract:
     "registry" | "rights" | "market" | "revenue" | "basket" | "settlement";

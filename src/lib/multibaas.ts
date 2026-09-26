@@ -12,6 +12,11 @@ import { project } from "./projection";
 import { walletTransaction, type WalletProvider } from "./transactions";
 import { assertWallet, isTxHash, type TransactionProgress } from "./wallet";
 import type { ChainEvent, MarketState } from "./model";
+import {
+  indexBootstrap,
+  combineIndexedEvents,
+  combineIndexedTotal,
+} from "./index-bootstrap";
 export function clients(url = config.url, key = config.key) {
   if (!url || !key)
     throw new Error("Set the MultiBaas URL and DApp User key in .env.local.");
@@ -59,6 +64,7 @@ export async function queryRows(
   );
 }
 export async function loadMarket(account?: string): Promise<MarketState> {
+  const bootstrap = indexBootstrap(config.chainId, config.addresses);
   const all: ChainEvent[] = [];
   // Small bounded batches: avoid flooding the deployment while retaining SDK-indexed discovery.
   const names = Object.keys(events);
@@ -70,6 +76,7 @@ export async function loadMarket(account?: string): Promise<MarketState> {
           eventQuery(name, config.addresses[spec.contract]),
         );
         return rows.map((row) => ({
+          source: "multibaas" as const,
           name,
           contract: spec.contract,
           args: row,
@@ -81,15 +88,13 @@ export async function loadMarket(account?: string): Promise<MarketState> {
     );
     all.push(...streams.flat());
   }
-  const state = project(
-    all.sort((a, b) => a.block - b.block),
-    config.addresses.rights,
-  );
+  const combined = combineIndexedEvents(bootstrap, all);
+  const state = project(combined, config.addresses.rights);
   // Event Query exposes block order but no log index. Resolve tied lifecycle
   // transitions through the SDK so multiple transactions in one block cannot
   // make a revised/rejected asset appear verified (or vice versa).
   for (const asset of state.assets) {
-    const lifecycle = all.filter(
+    const lifecycle = combined.filter(
       (e) =>
         [
           "AssetRegistered",
@@ -126,7 +131,15 @@ export async function loadMarket(account?: string): Promise<MarketState> {
           op: "add",
         }),
       );
-      return String(rows[0]?.value || "0");
+      // When the initial archive contains monetary events, add only those absent
+      // from the live index. Keep MultiBaas' aggregate, even after a full backfill.
+      return combineIndexedTotal(
+        bootstrap,
+        all,
+        name,
+        field,
+        String(rows[0]?.value || "0"),
+      );
     }),
   );
   [state.metrics.volume, state.metrics.deposited, state.metrics.claimed] =
@@ -211,7 +224,7 @@ export async function sendVerifiedCallViaMultiBaas(
   );
 }
 
-async function sendAtMultiBaas(
+export async function sendAtMultiBaas(
   provider: WalletProvider,
   from: string,
   address: string,

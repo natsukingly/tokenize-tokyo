@@ -439,7 +439,11 @@ export default function EnsDelegation({
         </a>
       ))}
       <details>
-        <summary>Permission history · MultiBaas</summary>
+        <summary>Permission history</summary>
+        <p>
+          Initial setup is verified from Sepolia logs; new activity is indexed
+          by MultiBaas.
+        </p>
         {auditStatus && <p>{auditStatus}</p>}
         {audit.map((entry, i) => (
           <a

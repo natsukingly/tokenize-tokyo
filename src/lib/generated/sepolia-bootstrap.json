@@ -1,0 +1,143 @@
+{
+  "chainId": 11155111,
+  "source": "Sepolia RPC finalized logs",
+  "capturedAt": "2026-09-26T15:03:19.945Z",
+  "fromBlock": 11786720,
+  "toBlock": 11786879,
+  "blockHash": "0xfc3c9256f5026928e10cce215f560a54126e0e5753c302aeac5b50b1055262cd",
+  "addresses": {
+    "registry": "0x0e627aec81902fc6f0873a6bef8dda02eac78235",
+    "rights": "0x1126eb4a20c16e4ed1f28ed8c03a68b0be15975c",
+    "market": "0x14ac507bf41118613a257e7482aefe002ba87c3d",
+    "revenue": "0xd214afc228c0cf2f964c8c842bb0799524c1eb23",
+    "basket": "0x64717a76655bb831dd0f2bf806884fdad5fc1834",
+    "settlement": "0x86b71e71137648dc2c76958d73d75af3f968f67f",
+    "authority": "0x31547a29e5302c87cd59a3e812afbe777745de6b"
+  },
+  "events": [
+    {
+      "name": "AssetRegistered",
+      "contract": "registry",
+      "args": {
+        "assetId": "1",
+        "issuer": "0x71bE0c03F807Ad83F290aDddb842f14652c80554",
+        "geoReference": "0xa527097ecba95643b480f8b57170d1f017ebd94ec99bdd68d6d24fd8452dcc00",
+        "metadataURI": "data:application/json,%7B%22name%22%3A%22Chiyoda%20ENS%20Solar%20Roof%20%C2%B7%20Test%22%2C%22district%22%3A%22CHIYODA%22%2C%22kind%22%3A%22Rooftop%22%2C%22coordinates%22%3A%5B139.77%2C35.69%5D%2C%22area%22%3A240%2C%22capacity%22%3A35%2C%22simulated%22%3Atrue%2C%22description%22%3A%22Sepolia%20ENSv2%20delegation%20test%20space.%20Verification%20is%20simulated.%22%7D",
+        "assetType": 0
+      },
+      "block": 11786774,
+      "txHash": "0x559bfc3242d2568e764029e9cebffdc9662824585ebebf75357ae5dddee48314",
+      "timestamp": "2026-09-26T14:23:12.000Z",
+      "logIndex": 141,
+      "source": "rpc-bootstrap"
+    },
+    {
+      "name": "AssetVerificationRequested",
+      "contract": "registry",
+      "args": {
+        "assetId": "1"
+      },
+      "block": 11786775,
+      "txHash": "0x9d0475264b93316fa9e90d43076b1fe9c66a45f171693cc63e8f4f56827a8dc5",
+      "timestamp": "2026-09-26T14:23:24.000Z",
+      "logIndex": 143,
+      "source": "rpc-bootstrap"
+    },
+    {
+      "name": "AssetVerified",
+      "contract": "registry",
+      "args": {
+        "assetId": "1",
+        "verifier": "0x71bE0c03F807Ad83F290aDddb842f14652c80554"
+      },
+      "block": 11786776,
+      "txHash": "0xc7d9b2ff0ba9e5c8fe3476c23a34b1264a0e2cd17effb2b681f7eca53f4b16de",
+      "timestamp": "2026-09-26T14:23:36.000Z",
+      "logIndex": 139,
+      "source": "rpc-bootstrap"
+    },
+    {
+      "name": "RightCreated",
+      "contract": "rights",
+      "args": {
+        "rightId": "1",
+        "assetId": "1",
+        "issuer": "0x71bE0c03F807Ad83F290aDddb842f14652c80554",
+        "rightType": 1,
+        "supply": "10",
+        "termsURI": "data:application/json,%7B%22demo%22%3Atrue%7D",
+        "termsHash": "0x9efc86063dc265d756ed680971f9ad3e3c95d424e120ab8df6c8dd4907ce40e5",
+        "startAt": "1790432712",
+        "endAt": "1790519112",
+        "transferPolicy": 0
+      },
+      "block": 11786814,
+      "txHash": "0x10da73ed264c75e700f147fc687b0a4298a04cd818c1e72c18eca09df4cd0696",
+      "timestamp": "2026-09-26T14:31:36.000Z",
+      "logIndex": 269,
+      "source": "rpc-bootstrap"
+    },
+    {
+      "name": "RightScopeDefined",
+      "contract": "rights",
+      "args": {
+        "rightId": "1",
+        "assetId": "1",
+        "scope": 0,
+        "purpose": "0x823eb415ce6ca82bf1044b5c45f7c49b5b3d5c7186df10b86d66cb543ee1c38c",
+        "exclusive": false
+      },
+      "block": 11786814,
+      "txHash": "0x10da73ed264c75e700f147fc687b0a4298a04cd818c1e72c18eca09df4cd0696",
+      "timestamp": "2026-09-26T14:31:36.000Z",
+      "logIndex": 270,
+      "source": "rpc-bootstrap"
+    },
+    {
+      "name": "TransferSingle",
+      "contract": "rights",
+      "args": {
+        "operator": "0x9caf0D85d95b49B7465d10323b1Dd5eBAE502541",
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x71bE0c03F807Ad83F290aDddb842f14652c80554",
+        "id": "1",
+        "value": "10"
+      },
+      "block": 11786814,
+      "txHash": "0x10da73ed264c75e700f147fc687b0a4298a04cd818c1e72c18eca09df4cd0696",
+      "timestamp": "2026-09-26T14:31:36.000Z",
+      "logIndex": 271,
+      "source": "rpc-bootstrap"
+    }
+  ],
+  "audit": [
+    {
+      "name": "SpaceNamespaceBound",
+      "id": "0xada5013122d395ba3c54772283fb069b10426056ef8ca54750cb9bb552a59e7d",
+      "hash": "0xb6e13414008b877a8e3feb6332146869a7bacd257c170431f009b299a1535078",
+      "block": 11786777,
+      "logIndex": 119
+    },
+    {
+      "name": "IssuanceDelegated",
+      "id": "0xada5013122d395ba3c54772283fb069b10426056ef8ca54750cb9bb552a59e7d",
+      "hash": "0x38e61acc86c1d943e8c736949eff676b4ca2fd7babd8f64d562799eecf6a007d",
+      "block": 11786787,
+      "logIndex": 162
+    },
+    {
+      "name": "IssuanceConsumed",
+      "id": "0xada5013122d395ba3c54772283fb069b10426056ef8ca54750cb9bb552a59e7d",
+      "hash": "0x10da73ed264c75e700f147fc687b0a4298a04cd818c1e72c18eca09df4cd0696",
+      "block": 11786814,
+      "logIndex": 268
+    },
+    {
+      "name": "IssuanceRevoked",
+      "id": "0xada5013122d395ba3c54772283fb069b10426056ef8ca54750cb9bb552a59e7d",
+      "hash": "0xe25191c46c470b8e5ee24a01e0f96f39a460e499dc77195a9715170f29ab8a51",
+      "block": 11786817,
+      "logIndex": 222
+    }
+  ]
+}

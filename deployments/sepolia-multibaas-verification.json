@@ -1,0 +1,23 @@
+{
+  "checkedAt": "2026-09-26T15:05:29.792Z",
+  "chainId": 11155111,
+  "linkedContracts": 9,
+  "initialRecords": 6,
+  "initialSource": "Verified Sepolia RPC logs",
+  "multiBaasFromBlock": 11786880,
+  "assets": 1,
+  "rights": 1,
+  "baskets": 0,
+  "events": 6,
+  "volumeMockJPY": "0",
+  "depositedMockJPY": "0",
+  "ensAsset": "1",
+  "ensAuditRecords": 4,
+  "unsignedComposition": true,
+  "dappAdminAccessDenied": true,
+  "limitations": [
+    "Fictional assets and simulated ownership verification",
+    "Initial records use RPC bootstrap, not MultiBaas backfill",
+    "Browser wallet rehearsal is a separate check"
+  ]
+}

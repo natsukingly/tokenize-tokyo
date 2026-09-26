@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { loadEnvFile } from "node:process";
+import { createPublicClient, http } from "viem";
 import {
   Configuration,
   ContractsApi,
@@ -45,6 +46,74 @@ async function main() {
     ["building", "UserRegistryImpl", "ensuserregistry"],
     ["resolver", "PermissionedResolverImpl", "enspermissionedresolver"],
   ];
+  let startingBlock = d.startingBlock;
+  const bootstrapFlag = process.argv.indexOf("--bootstrap");
+  if (bootstrapFlag >= 0) {
+    const bootstrap = JSON.parse(
+      readFileSync(process.argv[bootstrapFlag + 1], "utf8"),
+    );
+    if (
+      bootstrap.chainId !== d.chainId ||
+      bootstrap.fromBlock !== d.startingBlock ||
+      !Number.isSafeInteger(bootstrap.toBlock) ||
+      bootstrap.toBlock < bootstrap.fromBlock
+    )
+      throw new Error("Bootstrap range does not match this deployment");
+    for (const name of [
+      "registry",
+      "rights",
+      "market",
+      "revenue",
+      "basket",
+      "settlement",
+      "authority",
+    ])
+      if (
+        String(bootstrap.addresses[name]).toLowerCase() !==
+        String(d[name]).toLowerCase()
+      )
+        throw new Error(`Bootstrap ${name} mismatch`);
+    const rpc = createPublicClient({
+      transport: http(process.env.ENSV2_RPC_URL),
+    });
+    if (
+      (await rpc.getChainId()) !== d.chainId ||
+      (await rpc.getBlock({ blockNumber: BigInt(bootstrap.toBlock) })).hash !==
+        bootstrap.blockHash
+    )
+      throw new Error("Bootstrap is not on canonical Sepolia");
+    startingBlock = bootstrap.toBlock + 1;
+    console.log(
+      `Initial records: verified RPC bootstrap through ${bootstrap.toBlock}. MultiBaas indexes from ${startingBlock}.`,
+    );
+  }
+  const linked = new Set<string>();
+  for (const [name, , label] of entries) {
+    try {
+      const address = (await addresses.getAddress(d[name])).data.result;
+      const existing = address.contracts?.find((c) => c.label === label);
+      if (existing) {
+        if (existing.version !== "2.0")
+          throw new Error(`Unexpected ${name} contract version`);
+        const sync = (await contracts.getEventIndexingStatus(d[name], label))
+          .data.result;
+        if (sync.startBlockNumber !== startingBlock)
+          throw new Error(
+            `Existing ${name} index has another starting block; preserve and inspect it`,
+          );
+        linked.add(name);
+      }
+    } catch (e) {
+      if ((e as { response?: { status: number } }).response?.status !== 404)
+        throw e;
+    }
+  }
+  if (linked.size === entries.length) {
+    console.log(
+      "All nine contracts already linked at the expected boundary; no indexing state changed.",
+    );
+    return;
+  }
   // Do not silently omit historical events or create a partial nine-contract setup.
   // A newly created Free deployment can have a restricted indexing lookback.
   const plan = (await new AdminApi(cfg).getPlan()).data.result;
@@ -57,12 +126,16 @@ async function main() {
   if (
     linkedLimit !== undefined &&
     linkedLimit !== null &&
-    linkedLimit < entries.length
+    linkedLimit <
+      (plan.limits.find((limit) => limit.name === "linked_contracts")?.count ||
+        0) +
+        entries.length -
+        linked.size
   )
     throw new Error(
       `Plan ${plan.name} supports ${linkedLimit} linked contracts; this deployment requires ${entries.length}. No contracts were linked.`,
     );
-  const requiredHistory = status.blockNumber - d.startingBlock;
+  const requiredHistory = status.blockNumber - startingBlock;
   if (
     historyLimit !== undefined &&
     historyLimit !== null &&
@@ -73,14 +146,16 @@ async function main() {
     );
   const published = new Set<string>();
   for (const [name, contractName, label] of entries) {
-    const abi = JSON.parse(
+    if (linked.has(name)) continue;
+    const artifact = JSON.parse(
       readFileSync(
         contractName.endsWith("Impl")
           ? `contracts/test/fixtures/ensv2/${contractName}.json`
           : `contracts/out/${contractName}.sol/${contractName}.json`,
         "utf8",
       ),
-    ).abi;
+    );
+    const abi = artifact.abi;
     if (!published.has(label)) {
       // Explicit version avoids replacing the old Curvegrid contract definitions.
       let existing;
@@ -100,6 +175,10 @@ async function main() {
           contractName,
           version: "2.0",
           rawAbi: JSON.stringify(abi),
+          bin:
+            typeof artifact.bytecode === "string"
+              ? artifact.bytecode
+              : artifact.bytecode.object,
         });
       published.add(label);
     }
@@ -107,7 +186,7 @@ async function main() {
     await contracts.linkAddressContract(d[name], {
       label,
       version: "2.0",
-      startingBlock: String(d.startingBlock),
+      startingBlock: String(startingBlock),
     });
     console.log(`Linked ${name}: ${d[name]}`);
   }
@@ -119,7 +198,12 @@ main().catch((e) => {
   console.error(
     e instanceof Error && e.constructor === Error
       ? e.message
-      : "MultiBaas linking failed; check deployment, permissions and existing contract versions.",
+      : `MultiBaas linking failed (${e.response?.status || "network"}): ${String(
+          e.response?.data?.message ||
+            "Check deployment, permissions and existing contract versions",
+        )
+          .replace(/https?:\/\/\S+/g, "[URL]")
+          .slice(0, 400)}`,
   );
   process.exitCode = 1;
 });
