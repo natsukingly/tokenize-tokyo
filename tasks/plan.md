@@ -9,15 +9,20 @@
 - 休眠地点は on-chain 資産ではなく「demo dataset のレイヤー」として描画する（Activity ledger を汚さない）
 
 ## Todo
-- [ ] 1. 初回 git コミット（.gitignore 確認済みのうえで）
-- [ ] 2. README.md（Curvegrid 5要件: 一文要約 / MultiBaas の使い方 / チームと SNS / setup & testing / MultiBaas の感想）
-- [ ] 3. Opportunity Lens: 休眠地点 ~150 件の demo dataset + フィルターで発光 + 「N dormant opportunities · demo dataset」表示 + Dormant/Tokenized/Activated カウンタ
-- [ ] 4. docs/showcase.md（one-liner / Project Description / How it's made）
-- [ ] 5. docs/qa-cheatsheet.md（想定 Q&A 10問）
-- [ ] 6. docs/pitch/index.html（5枚スライド、キーボード操作）
-- [ ] 7. typecheck / vitest / forge test / playwright を通す
+- [x] 1. 初回 git コミット（625a857、2026-09-26 15:15 JST）
+- [x] 2. README.md（チーム情報と MultiBaas 感想は natsuki 待ち）（Curvegrid 5要件: 一文要約 / MultiBaas の使い方 / チームと SNS / setup & testing / MultiBaas の感想）
+- [x] 3. Opportunity Lens: 休眠地点 ~150 件の demo dataset + フィルターで発光 + 「N dormant opportunities · demo dataset」表示 + Dormant/Tokenized/Activated カウンタ
+- [x] 4. docs/showcase.md（one-liner / Project Description / How it's made）
+- [x] 5. docs/qa-cheatsheet.md（想定 Q&A 10問）
+- [x] 6. docs/pitch/index.html（5枚スライド、キーボード操作）
+- [x] 7. typecheck / vitest / forge test / playwright を通す
 - [ ] 8. 2回目コミット + push（remote は natsuki 確認後）
 - [ ] 9. natsuki: チーム名と SNS、MultiBaas の実感、動画撮影
 
 ## 未決定
 - ENSv2: 現状コードに ENS は一切無い。要件は「Sepolia の ENSv2 が製品の中核、ハードコード不可、ライブデモ必須」。残り 18h で実装は非推奨。ピッチにも「実装していない技術」は載せない
+
+## 発見事項（2026-09-26 15:40）
+- この repo は Codex（ChatGPT アプリ）が構築・並行編集している。docs/IMPLEMENTATION_REPORT.md と docs/ENSV2_DESIGN.md は Codex 作。同じファイルを両者で触らないこと
+- MultiBaas は実サービスで一度も動かしていない（deployment 未作成）。Curvegrid 賞の最大リスク。締切前に deployment 作成 → `npm run multibaas:link` → `multibaas:verify` を通したい
+- deployer が VERIFIER_ROLE も持つ（ADMIN_ADDRESS 未指定時）。Q&A の「誰が検証するか」で正直に言う

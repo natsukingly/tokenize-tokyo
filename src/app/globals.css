@@ -1915,3 +1915,71 @@ textarea {
   top: 215px;
   z-index: 2;
 }
+.map-lenses button.lens-toggle.on {
+  background: #edff9c;
+  border-color: #f7ffd6;
+  box-shadow: 0 0 22px #d7f98566;
+}
+.lens-count {
+  margin-top: 4px;
+  padding: 11px 13px;
+  background: #121c16e8;
+  border: 1px solid #6f8f4f;
+  border-left: 3px solid var(--lime);
+  border-radius: 4px;
+  pointer-events: none;
+  box-shadow: 0 0 30px #d7f98522;
+}
+.lens-count strong {
+  display: block;
+  font-family: "Manrope", var(--font);
+  font-size: 17px;
+  font-weight: 500;
+  color: #edff9c;
+  letter-spacing: -0.3px;
+}
+.lens-count span {
+  display: block;
+  margin-top: 5px;
+  font-size: 8px;
+  letter-spacing: 0.6px;
+  color: #9eaf8f;
+}
+.lens-funnel {
+  position: absolute;
+  top: 64px;
+  right: 17px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 11px;
+  background: #172a20dd;
+  border: 1px solid #40543e;
+  border-radius: 4px;
+  pointer-events: none;
+  color: #7f9a86;
+}
+.lens-funnel span {
+  font-size: 8px;
+  letter-spacing: 1.2px;
+  color: #9eaf8f;
+}
+.lens-funnel b {
+  font-family: "Manrope", var(--font);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--text);
+  margin-right: 4px;
+}
+.lens-funnel span:last-child b {
+  color: var(--lime);
+}
+@media (max-width: 600px) {
+  .lens-funnel {
+    display: none;
+  }
+  .lens-count strong {
+    font-size: 14px;
+  }
+}

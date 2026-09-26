@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as maplibregl from "maplibre-gl";
 import type { Asset, Right } from "@/lib/model";
+import { lensMatch, type DormantSite, type LensKind } from "@/lib/dormant";
 import type { FeatureCollection, Feature, Polygon, LineString } from "geojson";
 maplibregl.setWorkerUrl("/maplibre/maplibre-gl-worker.mjs");
 const EMPTY: FeatureCollection = { type: "FeatureCollection", features: [] };
@@ -28,6 +29,10 @@ export default function TokyoMap({
   activated = [],
   scopes = [],
   onScope,
+  dormant = [],
+  lens = false,
+  lensKind = "All assets",
+  onDormantSelect,
 }: {
   assets: Asset[];
   selected?: string;
@@ -39,6 +44,10 @@ export default function TokyoMap({
   activated?: string[];
   scopes?: Right[];
   onScope?: (id: string, scope: string) => void;
+  dormant?: DormantSite[];
+  lens?: boolean;
+  lensKind?: LensKind;
+  onDormantSelect?: (site: DormantSite) => void;
 }) {
   const container = useRef<HTMLDivElement>(null),
     map = useRef<maplibregl.Map | null>(null),
@@ -46,8 +55,9 @@ export default function TokyoMap({
     [ready, setReady] = useState(false),
     [error, setError] = useState(""),
     [tileRevision, setTileRevision] = useState(0);
-  const actions = useRef({ pick, onPick, onSelect, onScope });
-  actions.current = { pick, onPick, onSelect, onScope };
+  const actions = useRef({ pick, onPick, onSelect, onScope, onDormantSelect });
+  actions.current = { pick, onPick, onSelect, onScope, onDormantSelect };
+  const dormantById = useRef(new Map<string, DormantSite>());
   const focused = useRef("");
   useEffect(() => {
     if (!container.current) return;
@@ -85,7 +95,7 @@ export default function TokyoMap({
             "fill-extrusion-opacity": 0.8,
           },
         });
-        for (const id of ["urban-spaces", "basket-links"])
+        for (const id of ["urban-spaces", "basket-links", "dormant-sites"])
           m.addSource(id, { type: "geojson", data: EMPTY });
         m.addLayer({
           id: "urban-scope",
@@ -121,6 +131,59 @@ export default function TokyoMap({
             "line-dasharray": [2, 2],
           },
         });
+        // Dormant sites sit on the ground; per-feature `lit`/`lens` props drive the look.
+        const lit: maplibregl.ExpressionSpecification = ["get", "lit"],
+          on: maplibregl.ExpressionSpecification = ["get", "lens"];
+        m.addLayer({
+          id: "dormant-glow",
+          type: "circle",
+          source: "dormant-sites",
+          paint: {
+            "circle-pitch-alignment": "map",
+            "circle-color": "#edff9c",
+            "circle-blur": 1,
+            "circle-radius": [
+              "interpolate",
+              ["linear"],
+              ["zoom"],
+              12,
+              ["case", lit, 16, 0],
+              16,
+              ["case", lit, 44, 0],
+            ],
+            "circle-opacity": ["case", lit, 0.75, 0],
+          },
+        });
+        m.addLayer({
+          id: "dormant-dots",
+          type: "circle",
+          source: "dormant-sites",
+          paint: {
+            "circle-pitch-alignment": "map",
+            "circle-color": ["case", lit, "#d7f985", "#8fae96"],
+            "circle-radius": [
+              "interpolate",
+              ["linear"],
+              ["zoom"],
+              12,
+              ["case", lit, 3.5, 2],
+              16,
+              ["case", lit, 9, 5],
+            ],
+            "circle-opacity": ["case", lit, 1, on, 0.05, 0.5],
+            "circle-stroke-color": "#f5ffd6",
+            "circle-stroke-width": ["case", lit, 1, 0],
+          },
+        });
+        m.on("mouseenter", "dormant-dots", (e) => {
+          if (e.features?.some((f) => f.properties.lit))
+            m.getCanvas().style.cursor = "pointer";
+        });
+        m.on(
+          "mouseleave",
+          "dormant-dots",
+          () => (m.getCanvas().style.cursor = ""),
+        );
         setReady(true);
         setError("");
         m.once("idle", () => setTileRevision((n) => n + 1));
@@ -133,6 +196,14 @@ export default function TokyoMap({
         const features = m.getLayer("urban-scope")
           ? m.queryRenderedFeatures(e.point, { layers: ["urban-scope"] })
           : [];
+        const lit = m.getLayer("dormant-dots")
+          ? m
+              .queryRenderedFeatures(e.point, { layers: ["dormant-dots"] })
+              .find((f) => f.properties.lit)
+          : undefined;
+        const site = lit && dormantById.current.get(String(lit.properties.id));
+        if (site && actions.current.onDormantSelect)
+          return actions.current.onDormantSelect(site);
         const f = features[0];
         if (f) {
           actions.current.onSelect(String(f.properties.assetId));
@@ -306,7 +377,7 @@ export default function TokyoMap({
     m.setPaintProperty(
       "tokyo-buildings",
       "fill-extrusion-opacity",
-      xray ? 0.13 : 0.8,
+      xray || lens ? 0.13 : 0.8,
     );
     const points = assets.filter((a) => highlighted.includes(a.id));
     const links: Feature<LineString>[] = [];
@@ -366,10 +437,30 @@ export default function TokyoMap({
     highlighted,
     ready,
     xray,
+    lens,
     activated,
     scopes,
     tileRevision,
   ]);
+  useEffect(() => {
+    if (!ready || !map.current) return;
+    dormantById.current = new Map(dormant.map((s) => [s.id, s]));
+    (
+      map.current.getSource("dormant-sites") as maplibregl.GeoJSONSource
+    ).setData({
+      type: "FeatureCollection",
+      features: dormant.map((s) => ({
+        type: "Feature",
+        properties: {
+          id: s.id,
+          kind: s.kind,
+          lens,
+          lit: lens && lensMatch(s, lensKind),
+        },
+        geometry: { type: "Point", coordinates: s.coordinates },
+      })),
+    });
+  }, [dormant, lens, lensKind, ready]);
   return (
     <div className={"map-stage" + (pick ? " picking" : "")}>
       <div className="map-canvas" ref={container} />
@@ -382,7 +473,13 @@ export default function TokyoMap({
       {error && <div className="map-error">{error}</div>}
       <div className="map-label">
         <span>35°41′ N · 139°46′ E</span>
-        <strong>{xray ? "URBAN RIGHTS / X-RAY" : "TOKYO / 東京"}</strong>
+        <strong>
+          {xray
+            ? "URBAN RIGHTS / X-RAY"
+            : lens
+              ? "DORMANT CITY / LENS"
+              : "TOKYO / 東京"}
+        </strong>
       </div>
       <div className="map-disclaimer">
         {pick

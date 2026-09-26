@@ -20,6 +20,7 @@ import {
   Leaf,
   Menu,
   ExternalLink,
+  Sparkles,
 } from "lucide-react";
 import { formatEther, parseEther, keccak256, stringToHex } from "viem";
 import { config, type ContractKey } from "@/lib/config";
@@ -40,6 +41,13 @@ import {
   type Right,
 } from "@/lib/model";
 import { assetStage } from "@/lib/lifecycle";
+import {
+  DORMANT_DATASET_LABEL,
+  DORMANT_SITES,
+  dormantCount,
+  type DormantSite,
+  type LensKind,
+} from "@/lib/dormant";
 import { loadMarket, sendViaMultiBaas } from "@/lib/multibaas";
 import type { WalletProvider } from "@/lib/transactions";
 const TokyoMap = dynamic(() => import("./TokyoMap"), {
@@ -68,6 +76,7 @@ export default function Dashboard() {
     [error, setError] = useState(""),
     [showTokenize, setShowTokenize] = useState(false),
     [xray, setXray] = useState(false),
+    [lens, setLens] = useState(false),
     [ownedOnly, setOwnedOnly] = useState(false),
     [refreshing, setRefreshing] = useState(false),
     [lastSync, setLastSync] = useState(""),
@@ -275,6 +284,31 @@ export default function Dashboard() {
     setQuantity("1");
   }, []);
   const activeAssets = state.assets.filter((a) => stage(a) === "Active");
+  const activatedCount = state.assets.filter((a) =>
+    state.rights.some((r) => r.assetId === a.id && r.status === "Active"),
+  ).length;
+  const openDormant = (site: DormantSite) => {
+    setForm((f) => ({
+      ...f,
+      name: site.name,
+      district: site.district,
+      kind: site.kind,
+      right: site.kind === "Vacant Home" ? "Usage Right" : "Revenue Share",
+      supply: site.kind === "Vacant Home" ? "1" : "100",
+      scope:
+        site.kind === "Rooftop"
+          ? "Rooftop"
+          : site.kind === "Vacant Home"
+            ? "Interior"
+            : "Land",
+      area: String(site.area),
+      capacity: String(site.capacity),
+      lng: String(site.coordinates[0]),
+      lat: String(site.coordinates[1]),
+    }));
+    setShowTokenize(true);
+    setTab("Tokenize");
+  };
   const compatible = state.rights.filter(
     (r) =>
       r.kind === "Revenue Share" &&
@@ -679,6 +713,10 @@ export default function Dashboard() {
                     onSelect={select}
                     highlighted={highlighted}
                     xray={xray}
+                    dormant={DORMANT_SITES}
+                    lens={lens}
+                    lensKind={kind as LensKind}
+                    onDormantSelect={openDormant}
                     activated={activeAssets.map((a) => a.id)}
                     scopes={state.rights}
                     onScope={(id, scope) => {
@@ -698,12 +736,41 @@ export default function Dashboard() {
                       <Layers3 size={13} /> City overview
                     </button>
                   </div>
+                  <div
+                    className="lens-funnel"
+                    aria-label="Dormant to activated"
+                  >
+                    <span>
+                      <b>{DORMANT_SITES.length}</b> DORMANT
+                    </span>
+                    <ArrowRight size={11} />
+                    <span>
+                      <b>{state.assets.length}</b> TOKENIZED
+                    </span>
+                    <ArrowRight size={11} />
+                    <span>
+                      <b>{activatedCount}</b> ACTIVATED
+                    </span>
+                  </div>
                   <div className="map-lenses">
                     <button
                       className={xray ? "on" : ""}
-                      onClick={() => setXray(!xray)}
+                      onClick={() => {
+                        setXray(!xray);
+                        setLens(false);
+                      }}
                     >
                       <Layers3 size={13} /> City X-ray
+                    </button>
+                    <button
+                      className={"lens-toggle" + (lens ? " on" : "")}
+                      aria-pressed={lens}
+                      onClick={() => {
+                        setLens(!lens);
+                        setXray(false);
+                      }}
+                    >
+                      <Sparkles size={13} /> Opportunity Lens
                     </button>
                     <button
                       className={ownedOnly ? "on" : ""}
@@ -716,10 +783,22 @@ export default function Dashboard() {
                         setKind("Rooftop");
                         setStatus("Active");
                         setXray(true);
+                        setLens(false);
                       }}
                     >
                       Active solar lens
                     </button>
+                    {lens && (
+                      <div className="lens-count" aria-live="polite">
+                        <strong>
+                          {dormantCount(kind)} dormant opportunities
+                        </strong>
+                        <span>
+                          {kind === "All assets" ? "All kinds" : kind} ·{" "}
+                          {DORMANT_DATASET_LABEL}
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <div className="map-stats">
                     <span>
