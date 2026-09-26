@@ -2,7 +2,10 @@
 import { useState } from "react";
 import { ArrowRight, MapPin } from "lucide-react";
 import { formatEther } from "viem";
-import type { Basket, Listing, MarketState } from "@/lib/model";
+import type { Basket, ChainEvent, Listing, MarketState } from "@/lib/model";
+import { SPACE_TYPES } from "@/lib/catalog";
+import type { AssetKind } from "@/lib/catalog";
+import AssetIcon from "./AssetIcon";
 import styles from "./BasketCards.module.css";
 import CardPaymentOption from "./CardPaymentOption";
 
@@ -11,11 +14,167 @@ const money = (value: bigint) =>
   Number(formatEther(value)).toLocaleString("en-US", {
     maximumFractionDigits: 2,
   });
-function rightName(state: MarketState, id: string) {
+
+function rightInfo(state: MarketState, id: string) {
   const right = state.rights.find((r) => r.id === id);
+  const asset = state.assets.find((a) => a.id === right?.assetId);
+  return {
+    name: asset?.name || `Revenue right #${id}`,
+    kind: asset?.kind || ("Other" as AssetKind),
+    supply: right ? BigInt(right.supply || "0") : 0n,
+  };
+}
+
+function depositedForRight(events: ChainEvent[], id: string) {
+  return events
+    .filter(
+      (e) =>
+        e.name === "RevenueDeposited" && String(e.args.rightId ?? "") === id,
+    )
+    .reduce(
+      (total, e) => total + BigInt(String(e.args.amount ?? "") || "0"),
+      0n,
+    );
+}
+
+function incomePerShare(state: MarketState, basket: Basket) {
+  return basket.rightIds.reduce((total, id, i) => {
+    const { supply } = rightInfo(state, id);
+    if (supply === 0n) return total;
+    const units = BigInt(basket.units[i] || "0");
+    return total + (depositedForRight(state.events, id) * units) / supply;
+  }, 0n);
+}
+
+function compositionIntro(entries: { units: bigint }[]) {
+  const first = entries[0]?.units ?? 1n;
+  const uniform = entries.every((e) => e.units === first);
+  const wording = uniform
+    ? `${String(first)} unit${first === 1n ? "" : "s"} of each right below`
+    : "a fixed number of units of each right below";
+  return `1 share = ${wording}, held in the BasketVault. Revenue from all of them is paid out to share holders.`;
+}
+
+function RightRow({
+  state,
+  id,
+  units,
+}: {
+  state: MarketState;
+  id: string;
+  units: bigint;
+}) {
+  const { name, kind } = rightInfo(state, id);
   return (
-    state.assets.find((a) => a.id === right?.assetId)?.name ||
-    `Revenue right #${id}`
+    <li>
+      <span className={styles.rightLabel}>
+        <i
+          className={styles.dot}
+          style={{ background: SPACE_TYPES[kind].color }}
+          aria-hidden="true"
+        />
+        <AssetIcon kind={kind} size={16} />
+        <span className={styles.rightName}>
+          <span>{name}</span>
+          <small>{kind}</small>
+        </span>
+      </span>
+      <b>
+        {String(units)} {units === 1n ? "unit" : "units"} / share
+      </b>
+    </li>
+  );
+}
+
+function CompositionDonut({
+  state,
+  entries,
+}: {
+  state: MarketState;
+  entries: { id: string; units: bigint }[];
+}) {
+  const rows = entries.map((e) => ({ ...e, ...rightInfo(state, e.id) }));
+  const total = rows.reduce((a, r) => a + r.units, 0n);
+  let offset = 0;
+  return (
+    <div className={styles.donutWrap}>
+      <svg
+        viewBox="0 0 120 120"
+        role="img"
+        aria-label="Basket composition by asset type"
+      >
+        <circle
+          cx="60"
+          cy="60"
+          r="48"
+          fill="none"
+          stroke="var(--line)"
+          strokeWidth="16"
+        />
+        {total > 0n &&
+          rows.map((r) => {
+            const share = Number((r.units * 1000000n) / total) / 10000;
+            const start = offset;
+            offset += share;
+            return (
+              <circle
+                key={r.id}
+                cx="60"
+                cy="60"
+                r="48"
+                fill="none"
+                pathLength="100"
+                stroke={SPACE_TYPES[r.kind].color}
+                strokeWidth="16"
+                strokeDasharray={`${share} ${100 - share}`}
+                strokeDashoffset={-start}
+                transform="rotate(-90 60 60)"
+              >
+                <title>
+                  {r.name} ({r.kind}): {String(r.units)} unit
+                  {r.units === 1n ? "" : "s"} / share
+                </title>
+              </circle>
+            );
+          })}
+      </svg>
+      <div className={styles.donutCenter} aria-hidden="true">
+        <strong>{rows.length}</strong>
+        <span>{rows.length === 1 ? "right" : "rights"}</span>
+      </div>
+    </div>
+  );
+}
+
+function BasketIncome({
+  state,
+  basket,
+  listing,
+}: {
+  state: MarketState;
+  basket: Basket;
+  listing?: Listing;
+}) {
+  const perShare = incomePerShare(state, basket);
+  const price = listing ? BigInt(listing.unitPrice) : 0n;
+  const pct =
+    listing && price > 0n ? Number((perShare * 1000n) / price) / 10 : undefined;
+  return (
+    <div className={styles.income}>
+      <p>
+        Income deposited so far:{" "}
+        <b className={styles.highlight}>{money(perShare)} mJPY</b> per share
+      </p>
+      {listing && pct !== undefined && (
+        <p>
+          = <b className={styles.highlight}>{pct.toFixed(1)}%</b> of the current
+          share price ({money(price)} mJPY)
+        </p>
+      )}
+      <p className={styles.note}>
+        Realized income from actual deposits. Not a yield forecast.
+      </p>
+    </div>
   );
 }
 
@@ -46,28 +205,36 @@ export function BasketPoolCard({
   const count = whole(quantity) ? BigInt(quantity) : 0n;
   const amounts = basket.rightIds.map((id, i) => ({
     id,
-    units: BigInt(basket.units[i]),
+    units: BigInt(basket.units[i] || "0"),
     held: ready ? BigInt(state.balances[`rights:${id}`] || "0") : 0n,
   }));
   const sufficient =
     count > 0n &&
     count <= 10n ** 12n &&
     amounts.every((a) => a.held >= a.units * count);
+  const activeListing = state.listings.find(
+    (l) =>
+      l.token === "basket" &&
+      l.rightId === basket.id &&
+      !l.cancelled &&
+      BigInt(l.remaining) > 0n,
+  );
   return (
     <article className={`basket-pool ${styles.card}`}>
       <small>INCOME BASKET · #{basket.id}</small>
-      <h3>{basket.name}</h3>
-      <p>Every share contains:</p>
+      <div className={styles.head}>
+        <div className={styles.headText}>
+          <h3>{basket.name}</h3>
+          <p className={styles.intro}>{compositionIntro(amounts)}</p>
+        </div>
+        <CompositionDonut state={state} entries={amounts} />
+      </div>
       <ul className={styles.contents}>
         {amounts.map(({ id, units }) => (
-          <li key={id}>
-            <span>{rightName(state, id)}</span>
-            <b>
-              {String(units)} {units === 1n ? "unit" : "units"}
-            </b>
-          </li>
+          <RightRow key={id} state={state} id={id} units={units} />
         ))}
       </ul>
+      <BasketIncome state={state} basket={basket} listing={activeListing} />
       <button className="text-button" onClick={onView}>
         <MapPin size={14} /> Show these assets on the map
       </button>
@@ -97,7 +264,7 @@ export function BasketPoolCard({
             <ul className={styles.contents}>
               {amounts.map(({ id, units, held }) => (
                 <li key={id}>
-                  <span>{rightName(state, id)}</span>
+                  <span>{rightInfo(state, id).name}</span>
                   <small>
                     {String(units * count)} needed ·{" "}
                     {ready ? String(held) : "…"} owned
@@ -160,23 +327,37 @@ export function BasketOfferCard({
   const count = whole(quantity) ? BigInt(quantity) : 0n;
   const valid = count > 0n && count <= BigInt(listing.remaining);
   const ownListing = account.toLowerCase() === listing.seller.toLowerCase();
+  const entries = basket
+    ? basket.rightIds.map((id, i) => ({
+        id,
+        units: BigInt(basket.units[i] || "0"),
+      }))
+    : [];
   return (
     <article className={`basket-pool ${styles.card}`}>
       <small>FOR SALE · BASKET #{listing.rightId}</small>
-      <h3>{basket?.name || `Income basket #${listing.rightId}`}</h3>
-      <p>
-        {money(BigInt(listing.unitPrice))} mJPY per share · {listing.remaining}{" "}
-        available
-      </p>
+      <div className={styles.head}>
+        <div className={styles.headText}>
+          <h3>{basket?.name || `Income basket #${listing.rightId}`}</h3>
+          {basket && (
+            <p className={styles.intro}>{compositionIntro(entries)}</p>
+          )}
+          <p>
+            {money(BigInt(listing.unitPrice))} mJPY per share ·{" "}
+            {listing.remaining} available
+          </p>
+        </div>
+        {basket && <CompositionDonut state={state} entries={entries} />}
+      </div>
       {basket && (
-        <ul className={styles.contents}>
-          {basket.rightIds.map((id, i) => (
-            <li key={id}>
-              <span>{rightName(state, id)}</span>
-              <small>{basket.units[i]} per share</small>
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className={styles.contents}>
+            {entries.map(({ id, units }) => (
+              <RightRow key={id} state={state} id={id} units={units} />
+            ))}
+          </ul>
+          <BasketIncome state={state} basket={basket} listing={listing} />
+        </>
       )}
       <label>
         Shares to buy
@@ -204,19 +385,26 @@ export function BasketOfferCard({
         />{" "}
         I reviewed the basket and underlying terms.
       </label>
-      <CardPaymentOption listing={listing} quantity={quantity} account={account}
-        accepted={accepted} demo={demo} busy={busy} onConnect={onConnect}>
-      <button
-        className="secondary wide"
-        disabled={busy || (!!account && (!accepted || !valid || ownListing))}
-        onClick={async () => {
-          if (!account) return onConnect();
-          if (await onPurchase(quantity)) setAccepted(false);
-        }}
+      <CardPaymentOption
+        listing={listing}
+        quantity={quantity}
+        account={account}
+        accepted={accepted}
+        demo={demo}
+        busy={busy}
+        onConnect={onConnect}
       >
-        {account ? "Acquire basket shares" : "Connect wallet to buy"}{" "}
-        <ArrowRight size={15} />
-      </button>
+        <button
+          className="secondary wide"
+          disabled={busy || (!!account && (!accepted || !valid || ownListing))}
+          onClick={async () => {
+            if (!account) return onConnect();
+            if (await onPurchase(quantity)) setAccepted(false);
+          }}
+        >
+          {account ? "Acquire basket shares" : "Connect wallet to buy"}{" "}
+          <ArrowRight size={15} />
+        </button>
       </CardPaymentOption>
       <p className={styles.note}>
         {ownListing
