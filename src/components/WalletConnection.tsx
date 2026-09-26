@@ -10,6 +10,7 @@ export type WalletConnection = Omit<
   disconnect: () => void | Promise<void>;
   access?: {
     ready: boolean;
+    modalOpen: boolean;
     login: () => void;
     connectExternal: () => void;
     error: string;

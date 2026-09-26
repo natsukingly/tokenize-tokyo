@@ -50,6 +50,7 @@ import {
   short,
   type Asset,
   type MarketState,
+  type Listing,
   type Right,
 } from "@/lib/model";
 import { assetStage } from "@/lib/lifecycle";
@@ -148,6 +149,7 @@ function DashboardContent({ demo }: { demo: boolean }) {
   const [verifierRoles, setVerifierRoles] = useState({
     registry: false,
     rights: false,
+    account: "",
   });
   const actionLock = useRef(false);
   useEffect(() => {
@@ -172,7 +174,7 @@ function DashboardContent({ demo }: { demo: boolean }) {
     }
   }, []);
   useEffect(() => {
-    setVerifierRoles({ registry: false, rights: false });
+    setVerifierRoles({ registry: false, rights: false, account: "" });
     if (DEMO || !account) return;
     let cancelled = false;
     const role = keccak256(stringToHex("VERIFIER_ROLE"));
@@ -185,6 +187,7 @@ function DashboardContent({ demo }: { demo: boolean }) {
           setVerifierRoles({
             registry: registry === true,
             rights: rights === true,
+            account,
           });
       })
       .catch(() => {
@@ -606,6 +609,48 @@ function DashboardContent({ demo }: { demo: boolean }) {
       addresses[spender],
       token === "settlement" ? amount : true,
     ]);
+  const purchaseListing = (
+    listing: Listing,
+    amount: string,
+    accepted: boolean,
+  ) =>
+    run("Purchase rights", async () => {
+      if (!active || !accountReady)
+        throw new Error("Wait for your wallet balances to load.");
+      if (!accepted)
+        throw new Error("Review and accept the right’s terms first.");
+      const current = state.listings.find((item) => item.id === listing.id);
+      const right = state.rights.find((item) => item.id === listing.rightId);
+      if (
+        !current ||
+        current.cancelled ||
+        current.unitPrice !== listing.unitPrice ||
+        current.token !== "rights" ||
+        !right ||
+        !available(right) ||
+        same(current.seller, active)
+      )
+        throw new Error("This offer is no longer available to your wallet.");
+      if (
+        !/^[1-9]\d{0,11}$/.test(amount) ||
+        BigInt(amount) > BigInt(current.remaining)
+      )
+        throw new Error("Enter a whole quantity within the available supply.");
+      await approve(
+        "settlement",
+        "market",
+        (BigInt(amount) * BigInt(current.unitPrice)).toString(),
+      );
+      if (activeRef.current !== active)
+        throw new Error("Wallet changed. Review this purchase again.");
+      await send("market", "purchase", [current.id, amount]);
+    });
+  const canVerifyAsset = DEMO
+    ? actor === "Demo verifier"
+    : same(verifierRoles.account, active) && verifierRoles.registry;
+  const canVerifyRight = DEMO
+    ? actor === "Demo verifier"
+    : same(verifierRoles.account, active) && verifierRoles.rights;
   const createAsset = () =>
     run("Register asset", async () => {
       if (!form.name.trim()) throw new Error("Enter an asset name.");
@@ -1651,31 +1696,10 @@ function DashboardContent({ demo }: { demo: boolean }) {
                                     }
                                     onClick={() => {
                                       if (!active) return connect();
-                                      return run(
-                                        "Purchase rights",
-                                        async () => {
-                                          if (
-                                            !/^\d+$/.test(quantity) ||
-                                            BigInt(quantity) <= 0n ||
-                                            BigInt(quantity) >
-                                              BigInt(l.remaining)
-                                          )
-                                            throw new Error(
-                                              "Enter a whole quantity within the available supply.",
-                                            );
-                                          await approve(
-                                            "settlement",
-                                            "market",
-                                            (
-                                              BigInt(quantity) *
-                                              BigInt(l.unitPrice)
-                                            ).toString(),
-                                          );
-                                          await send("market", "purchase", [
-                                            l.id,
-                                            quantity,
-                                          ]);
-                                        },
+                                      return purchaseListing(
+                                        l,
+                                        quantity,
+                                        termsAccepted,
                                       );
                                     }}
                                   >
@@ -2149,6 +2173,82 @@ function DashboardContent({ demo }: { demo: boolean }) {
                   listingsFor={listingFor}
                   stage={stage}
                   demo={DEMO}
+                  onOpenDetails={() => {
+                    if (!busy) {
+                      setError("");
+                      setNotice("");
+                      setTransaction(null);
+                    }
+                  }}
+                  actions={{
+                    account: active,
+                    ready: accountReady,
+                    demo: DEMO,
+                    busy: !!busy,
+                    canVerifyAsset,
+                    canVerifyRight,
+                    balances: state.balances,
+                    walletControl,
+                    feedback,
+                    onConnect: connect,
+                    onPurchase: purchaseListing,
+                    onRequestVerification: (asset) =>
+                      run("Submit for verification", () => {
+                        if (
+                          !accountReady ||
+                          !same(asset.issuer, active) ||
+                          asset.status !== "Draft"
+                        )
+                          throw new Error(
+                            "Only the draft issuer can request verification.",
+                          );
+                        return send("registry", "requestVerification", [
+                          asset.id,
+                        ]);
+                      }),
+                    onReviewAsset: (asset, approved) =>
+                      run(approved ? "Approve asset" : "Reject asset", () => {
+                        if (
+                          !accountReady ||
+                          !canVerifyAsset ||
+                          asset.status !== "Pending verification"
+                        )
+                          throw new Error(
+                            "An authorized asset verifier is required.",
+                          );
+                        return send("registry", "verifyAsset", [
+                          asset.id,
+                          approved,
+                        ]);
+                      }),
+                    onReviewRight: (right, approved) =>
+                      run(approved ? "Approve right" : "Reject right", () => {
+                        if (
+                          !accountReady ||
+                          !canVerifyRight ||
+                          right.status !== "Pending verification"
+                        )
+                          throw new Error(
+                            "An authorized rights verifier is required.",
+                          );
+                        return send("rights", "verifyRight", [
+                          right.id,
+                          approved,
+                        ]);
+                      }),
+                    onActivateRight: (right) =>
+                      run("Activate right", () => {
+                        if (
+                          !accountReady ||
+                          !canVerifyRight ||
+                          right.status !== "Verified"
+                        )
+                          throw new Error(
+                            "An authorized rights verifier is required.",
+                          );
+                        return send("rights", "activateRight", [right.id]);
+                      }),
+                  }}
                   onView={(id) => {
                     setKind("All assets");
                     setStatus("All stages");

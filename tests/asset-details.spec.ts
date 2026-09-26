@@ -1,6 +1,151 @@
 import { test, expect } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 
+test("buy from space details with quantity validation and account-specific consent", async ({
+  page,
+}) => {
+  await page.goto("/demo");
+  await page.getByLabel("Demo role").selectOption("Investor B");
+  await page
+    .getByRole("navigation")
+    .getByRole("button", { name: "Markets", exact: true })
+    .click();
+  const directory = page.getByRole("region", { name: "Asset directory" });
+  await directory.getByLabel("Find a space").fill("Akihabara Parking Bay");
+  await directory.getByRole("button", { name: /^View details for/ }).click();
+  const dialog = page.getByRole("dialog");
+  const buy = dialog.getByRole("button", {
+    name: "Acquire right",
+    exact: true,
+  });
+  await expect(buy).toBeDisabled();
+  await dialog.getByLabel("I have reviewed this right and its terms.").check();
+  await dialog.getByLabel("Purchase quantity").fill("2");
+  await expect(buy).toBeDisabled();
+  await dialog.getByLabel("Purchase quantity").fill("1");
+  await expect(buy).toBeEnabled();
+  await dialog.getByLabel("Demo role").selectOption("Investor C");
+  await expect(
+    dialog.getByLabel("I have reviewed this right and its terms."),
+  ).not.toBeChecked();
+  await expect(buy).toBeDisabled();
+  await dialog.getByLabel("Demo role").selectOption("Owner A");
+  await expect(
+    dialog.getByRole("button", { name: "Your listing" }),
+  ).toBeDisabled();
+  await dialog.getByLabel("Demo role").selectOption("Investor B");
+  await dialog.getByLabel("I have reviewed this right and its terms.").check();
+  await buy.click();
+  await expect(dialog.locator(".feedback[role='status']")).toContainText(
+    "Purchase rights · simulated successfully",
+  );
+  await expect(dialog).toContainText("You hold 1 unit");
+  await expect(
+    dialog.getByRole("button", { name: "Acquire right", exact: true }),
+  ).toHaveCount(0);
+  await expect(dialog).toBeVisible();
+  await expect(page.locator(".map-wrap")).toHaveCount(0);
+});
+
+for (const approved of [true, false]) {
+  test(`review assets and rights in the modal with verifier permissions (${approved ? "approve" : "reject"})`, async ({
+    page,
+  }) => {
+    await page.goto("/demo");
+    await page.waitForFunction(
+      () => localStorage.getItem("tokenize-tokyo-demo-v2") !== null,
+    );
+    // Put one existing demo asset back into review, without changing the role checks.
+    await page.evaluate(() => {
+      const key = "tokenize-tokyo-demo-v2";
+      const data = JSON.parse(localStorage.getItem(key)!);
+      const asset = data.events.find(
+        (event: { name: string; args: { metadataURI?: string } }) =>
+          event.name === "AssetRegistered" &&
+          decodeURIComponent(event.args.metadataURI || "").includes(
+            "Akihabara Parking Bay",
+          ),
+      );
+      const aid = asset.args.assetId;
+      const rid = data.events.find(
+        (event: { name: string; args: { assetId?: string } }) =>
+          event.name === "RightCreated" && event.args.assetId === aid,
+      ).args.rightId;
+      data.events = data.events.filter(
+        (event: {
+          name: string;
+          args: { assetId?: string; rightId?: string };
+        }) =>
+          !(
+            event.args.assetId === aid &&
+            ["AssetVerificationRequested", "AssetVerified"].includes(event.name)
+          ) &&
+          !(
+            event.args.rightId === rid &&
+            ["RightVerified", "RightActivated"].includes(event.name)
+          ),
+      );
+      localStorage.setItem(key, JSON.stringify(data));
+    });
+    await page.reload();
+    await page.getByLabel("Demo role").selectOption("Investor B");
+    await page
+      .getByRole("navigation")
+      .getByRole("button", { name: "Markets", exact: true })
+      .click();
+    const directory = page.getByRole("region", { name: "Asset directory" });
+    await directory.getByLabel("Find a space").fill("Akihabara Parking Bay");
+    await directory.getByRole("button", { name: /^View details for/ }).click();
+    const dialog = page.getByRole("dialog");
+    await expect(
+      dialog.getByRole("button", {
+        name: "Submit for verification",
+        exact: true,
+      }),
+    ).toHaveCount(0);
+    await dialog.getByLabel("Demo role").selectOption("Owner A");
+    await dialog
+      .getByRole("button", { name: "Submit for verification", exact: true })
+      .click();
+    await expect(
+      dialog.getByRole("button", { name: "Approve asset", exact: true }),
+    ).toHaveCount(0);
+    await dialog.getByLabel("Demo role").selectOption("Demo verifier");
+    const approveAsset = dialog.getByRole("button", {
+      name: "Approve asset",
+      exact: true,
+    });
+    await expect(approveAsset).toBeDisabled();
+    await dialog
+      .getByLabel("I have reviewed the asset details and evidence.")
+      .check();
+    await approveAsset.click();
+    await expect(dialog.locator(".feedback[role='status']")).toContainText(
+      "Approve asset · simulated successfully",
+    );
+    const action = dialog.getByRole("button", {
+      name: approved ? "Approve right" : "Reject right",
+      exact: true,
+    });
+    await expect(action).toBeDisabled();
+    await dialog
+      .getByLabel("I have reviewed the right terms, scope and period.")
+      .check();
+    await action.click();
+    await expect(dialog.locator(".feedback[role='status']")).toContainText(
+      `${approved ? "Approve" : "Reject"} right · simulated successfully`,
+    );
+    await expect(
+      dialog.getByRole("button", { name: "Approve right", exact: true }),
+    ).toHaveCount(0);
+    if (approved)
+      await expect(
+        dialog.getByRole("button", { name: "Activate right", exact: true }),
+      ).toBeVisible();
+    else await expect(dialog).toContainText("Rejected");
+  });
+}
+
 test("directory rows open details without losing filters; the map action remains separate", async ({
   page,
 }) => {

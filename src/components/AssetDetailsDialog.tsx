@@ -6,6 +6,13 @@ import { formatEther } from "viem";
 import type { Asset, Listing, Right } from "@/lib/model";
 import { parseMetadata } from "@/lib/model";
 import MapThumbnail from "./MapThumbnail";
+import { useWalletConnection } from "./WalletConnection";
+import {
+  AssetReview,
+  RightReview,
+  OfferPurchase,
+  type AssetDetailsActions,
+} from "./AssetDetailsActions";
 import styles from "./AssetDetailsDialog.module.css";
 
 export default function AssetDetailsDialog({
@@ -15,6 +22,7 @@ export default function AssetDetailsDialog({
   status,
   onClose,
   onView,
+  actions,
 }: {
   asset: Asset;
   rights: Right[];
@@ -22,24 +30,36 @@ export default function AssetDetailsDialog({
   status: string;
   onClose: () => void;
   onView: () => void;
+  actions: AssetDetailsActions;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const title = useRef<HTMLHeadingElement>(null);
   const backdropPress = useRef(false);
+  const wallet = useWalletConnection();
+  const walletModalOpen = wallet.access?.modalOpen === true;
   useEffect(() => {
     const element = dialog.current;
     if (!element) return;
     const opener = document.activeElement as HTMLElement | null;
     const previousOverflow = document.body.style.overflow;
-    element.showModal();
     document.body.style.overflow = "hidden";
-    title.current?.focus();
     return () => {
       element.close();
       document.body.style.overflow = previousOverflow;
       opener?.focus({ preventScroll: true });
     };
   }, []);
+  // Native dialogs sit above portals. Temporarily yield the top layer to Privy
+  // for login/signing, then restore the same review form when it closes.
+  useEffect(() => {
+    const element = dialog.current;
+    if (!element) return;
+    if (walletModalOpen) element.close();
+    else if (!element.open) {
+      element.showModal();
+      title.current?.focus();
+    }
+  }, [walletModalOpen]);
   const date = (seconds: number) =>
     new Date(seconds * 1000).toISOString().slice(0, 10);
   return (
@@ -85,12 +105,25 @@ export default function AssetDetailsDialog({
           </button>
         </header>
         <div className={styles.body}>
+          <div className={styles.account}>{actions.walletControl}</div>
+          <div className={styles.feedback}>{actions.feedback}</div>
           <section>
             <h3>About this space</h3>
             <p className={styles.description}>
               {asset.description ||
                 "No project description has been added yet."}
             </p>
+            <details className={styles.evidence}>
+              <summary>Asset evidence & issuer</summary>
+              <p>
+                {String(
+                  parseMetadata(asset.metadataURI).evidence ||
+                    "No evidence reference provided.",
+                )}
+              </p>
+              <code>{asset.issuer}</code>
+            </details>
+            <AssetReview asset={asset} actions={actions} />
           </section>
           <section>
             <h3>Rights & offers</h3>
@@ -113,26 +146,97 @@ export default function AssetDetailsDialog({
                       {date(right.endAt)} (UTC)
                     </span>
                     <p>
-                      {typeof terms.description === "string"
-                        ? terms.description
-                        : right.kind === "Revenue Share"
-                          ? "A share of income deposited by this project. Returns are not guaranteed."
-                          : "Permission to use this space under the right’s terms."}
+                      {typeof terms.purpose === "string"
+                        ? terms.purpose
+                        : typeof terms.description === "string"
+                          ? terms.description
+                          : right.kind === "Revenue Share"
+                            ? "A share of income deposited by this project. Returns are not guaranteed."
+                            : "Permission to use this space under the right’s terms."}
                     </p>
+                    <dl className={styles.terms}>
+                      <div>
+                        <dt>Scope</dt>
+                        <dd>
+                          {[
+                            "Rooftop",
+                            "Interior",
+                            "Wall",
+                            "Land",
+                            "Whole asset",
+                          ][right.scope] || "Unspecified"}{" "}
+                          · {right.exclusive ? "Exclusive" : "Non-exclusive"}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt>Transfer policy</dt>
+                        <dd>{right.policy}</dd>
+                      </div>
+                      <div>
+                        <dt>Total supply</dt>
+                        <dd>{right.supply} units</dd>
+                      </div>
+                    </dl>
+                    <details className={styles.evidence}>
+                      <summary>Full terms & evidence</summary>
+                      {Object.entries(terms).map(([key, value]) => (
+                        <p key={key}>
+                          <b>{key}:</b>{" "}
+                          {typeof value === "string"
+                            ? value
+                            : JSON.stringify(value)}
+                        </p>
+                      ))}
+                      <p>
+                        Issuer: <code>{right.issuer}</code>
+                      </p>
+                      <p>
+                        Terms hash: <code>{right.termsHash}</code>
+                      </p>
+                      {!Object.keys(terms).length && (
+                        <p>
+                          Terms reference: <code>{right.termsURI}</code>
+                        </p>
+                      )}
+                    </details>
+                    {actions.ready && (
+                      <p>
+                        You hold {actions.balances[`rights:${right.id}`] || "0"}{" "}
+                        {actions.balances[`rights:${right.id}`] === "1"
+                          ? "unit"
+                          : "units"}{" "}
+                        of this right.
+                      </p>
+                    )}
+                    <RightReview
+                      right={right}
+                      actions={actions}
+                      assetVerified={asset.status === "Verified"}
+                    />
                     {offers.length ? (
                       offers.map((offer) => (
-                        <div className={styles.offer} key={offer.id}>
-                          <b>
-                            {Number(
-                              formatEther(BigInt(offer.unitPrice)),
-                            ).toLocaleString("en")}{" "}
-                            mJPY <small>/ unit</small>
-                          </b>
-                          <span>
-                            {offer.remaining}{" "}
-                            {offer.remaining === "1" ? "unit" : "units"}{" "}
-                            available
-                          </span>
+                        <div className={styles.offerCard} key={offer.id}>
+                          <div className={styles.offer}>
+                            <b>
+                              {Number(
+                                formatEther(BigInt(offer.unitPrice)),
+                              ).toLocaleString("en")}{" "}
+                              mJPY <small>/ unit</small>
+                            </b>
+                            <span>
+                              {offer.remaining}{" "}
+                              {offer.remaining === "1" ? "unit" : "units"}{" "}
+                              available
+                            </span>
+                          </div>
+                          <p className={styles.seller}>
+                            Seller: <code>{offer.seller}</code>
+                          </p>
+                          <OfferPurchase
+                            key={`${actions.account}:${offer.id}:${offer.unitPrice}:${right.termsHash}`}
+                            listing={offer}
+                            actions={actions}
+                          />
                         </div>
                       ))
                     ) : (
@@ -150,7 +254,7 @@ export default function AssetDetailsDialog({
           </p>
         </div>
         <footer>
-          <span>Explore the location and review available actions.</span>
+          <span>Explore this space in its neighborhood.</span>
           <button onClick={onView}>
             View on map <ArrowUpRight size={16} />
           </button>

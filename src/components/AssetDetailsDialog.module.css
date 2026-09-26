@@ -89,6 +89,100 @@
 .body .note {
   font-size: 11px;
 }
+.account {
+  display: flex;
+  justify-content: flex-end;
+}
+.feedback {
+  position: sticky;
+  top: 8px;
+  z-index: 1;
+  background: var(--panel);
+  border-radius: 6px;
+}
+.feedback:empty {
+  display: none;
+}
+.actions {
+  display: grid;
+  gap: 14px;
+  margin-top: 14px;
+}
+.actions button {
+  min-height: 42px;
+}
+.check {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.check input {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  accent-color: var(--lime);
+}
+.quantity {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 12px;
+}
+.quantity input {
+  width: 100px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--bg);
+  color: var(--text);
+}
+.buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.offerCard {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  min-width: 0;
+}
+.evidence {
+  margin: 12px 0;
+  font-size: 12px;
+}
+.evidence summary {
+  cursor: pointer;
+  color: var(--muted);
+}
+.evidence code,
+.seller code {
+  overflow-wrap: anywhere;
+  font-size: 11px;
+}
+.terms {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  font-size: 12px;
+}
+.terms > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.terms dt {
+  color: var(--muted);
+}
+.terms dd {
+  margin: 0;
+  text-align: right;
+}
 .surface footer {
   display: flex;
   align-items: center;

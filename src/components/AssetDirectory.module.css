@@ -115,8 +115,7 @@
 .clickableRow:hover .detailLink,
 .detailLink:focus-visible {
   color: var(--lime);
-  text-decoration: underline;
-  text-underline-offset: 4px;
+  text-decoration: none;
 }
 .identity {
   display: flex;

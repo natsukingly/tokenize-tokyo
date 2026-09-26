@@ -7,6 +7,7 @@ import { ASSET_KINDS } from "@/lib/catalog";
 import type { Asset, Listing, Right } from "@/lib/model";
 import MapThumbnail from "./MapThumbnail";
 import AssetDetailsDialog from "./AssetDetailsDialog";
+import type { AssetDetailsActions } from "./AssetDetailsActions";
 import styles from "./AssetDirectory.module.css";
 
 export type DirectoryFilters = {
@@ -31,6 +32,8 @@ export default function AssetDirectory({
   stage,
   onView,
   demo,
+  actions,
+  onOpenDetails,
 }: {
   assets: Asset[];
   rights: Right[];
@@ -40,8 +43,14 @@ export default function AssetDirectory({
   stage: (asset: Asset) => string;
   onView: (id: string) => void;
   demo: boolean;
+  actions: AssetDetailsActions;
+  onOpenDetails: () => void;
 }) {
   const [detailId, setDetailId] = useState<string | null>(null);
+  const openDetails = (id: string) => {
+    onOpenDetails();
+    setDetailId(id);
+  };
   const detailAsset = assets.find((asset) => asset.id === detailId);
   const search = filters.search.trim().toLocaleLowerCase();
   const rows = assets
@@ -215,7 +224,7 @@ export default function AssetDirectory({
                   event.currentTarget
                     .querySelector("button")
                     ?.focus({ preventScroll: true });
-                  setDetailId(asset.id);
+                  openDetails(asset.id);
                 }}
               >
                 <td className={styles.space}>
@@ -229,7 +238,7 @@ export default function AssetDirectory({
                       <button
                         className={styles.detailLink}
                         aria-label={`View details for ${asset.name}`}
-                        onClick={() => setDetailId(asset.id)}
+                        onClick={() => openDetails(asset.id)}
                       >
                         <strong>{asset.name}</strong>
                       </button>
@@ -303,6 +312,7 @@ export default function AssetDirectory({
       {detailAsset && (
         <AssetDetailsDialog
           asset={detailAsset}
+          actions={actions}
           rights={rights.filter((right) => right.assetId === detailAsset.id)}
           listings={listingsFor(detailAsset)}
           status={

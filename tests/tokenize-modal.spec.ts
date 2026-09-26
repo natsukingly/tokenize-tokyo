@@ -111,7 +111,8 @@ for (const width of [390, 1512]) {
       .getByRole("button", { name: "Register demo asset", exact: true })
       .click();
     await dialog
-      .getByRole("button", { name: "Verify asset", exact: true })
+      .getByRole("region", { name: "Quick tour" })
+      .getByRole("button", { name: "Continue", exact: true })
       .click();
     await expect(
       dialog.getByRole("heading", { name: "Verify the asset" }),

@@ -3,6 +3,7 @@ import {
   PrivyProvider,
   useConnectWallet,
   useLogin,
+  useModalStatus,
   usePrivy,
   useWallets,
 } from "@privy-io/react-auth";
@@ -88,6 +89,7 @@ function Session({
   children: ReactNode;
 }) {
   const { ready, authenticated, logout } = usePrivy();
+  const { isOpen: modalOpen } = useModalStatus();
   const { wallets, ready: walletsReady } = useWallets();
   const [waitingForEmbedded, setWaitingForEmbedded] = useState(false);
   const [connecting, setConnecting] = useState(false);
@@ -201,6 +203,7 @@ function Session({
         },
         access: {
           ready: ready && walletsReady,
+          modalOpen,
           error,
           login: () => {
             setError("");
