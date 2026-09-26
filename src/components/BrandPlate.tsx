@@ -29,7 +29,7 @@ function PinRoof({ x, y, s, color = Y, grid = color }: { x: number; y: number; s
     </g>
   );
 }
-export function BrandMark({ size = 32, className = "", variant = "stack" }: { size?: number; className?: string; variant?: BrandVariant }) {
+export function BrandMark({ size = 32, className = "", variant = "monow" }: { size?: number; className?: string; variant?: BrandVariant }) {
   return (
     <svg className={className} width={size} height={size} viewBox="0 0 64 64" aria-hidden="true" style={{ color: Y }}>
       {variant === "mono" || variant === "monow" ? <Ring cx={32} cy={32} r={22} color={variant === "monow" ? INK : Y} /> : variant === "stack" ? <PinRoof x={0} y={0} s={64} /> : variant === "stackw" ? <PinRoof x={0} y={0} s={64} color={INK} grid={Y} /> : <Steps x={0} y={0} s={64} />}
@@ -37,7 +37,7 @@ export function BrandMark({ size = 32, className = "", variant = "stack" }: { si
   );
 }
 const upright = { fontStyle: "normal" as const };
-export default function BrandPlate({ className = "", width = 190, variant = "stack" }: { className?: string; width?: number; variant?: BrandVariant }) {
+export default function BrandPlate({ className = "", width = 190, variant = "monow" }: { className?: string; width?: number; variant?: BrandVariant }) {
   const label = "TOKENIZE TOKYO 東京トークン化計画";
   if (variant === "stack" || variant === "stackw") {
     const height = Math.round((width * 64) / 190);

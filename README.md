@@ -1,10 +1,14 @@
 # TOKENIZE TOKYO
 
+<img src="docs/brand/wordmark-monow.png" alt="TOKENIZE TOKYO 東京トークン化計画" width="520">
+
 ![3D opportunity map](docs/screenshots/explore.png)
 
 ## (a) One-sentence summary
 
 **TOKENIZE TOKYO turns Tokyo's dormant urban spaces into scoped, time-bounded ERC-1155 rights (usage and revenue share) that can be verified, funded, traded and bundled into baskets, with every market view built from Curvegrid MultiBaas event queries and every transaction composed by MultiBaas and signed in the user's own wallet.**
+
+**Initial launch / 初期提供:** asset registration is intended for pre-approved companies only. Registration is open in this demo so anyone can try it; real company and ownership checks are not performed. 初期提供は事前審査を通過した法人企業に限定する方針です。デモでは誰でも登録を体験でき、実際の法人審査・所有権確認は行いません。See [Operational readiness / 本番運用に必要な工程](#operational-readiness--本番運用に必要な工程).
 
 ## Status at a glance
 
@@ -84,17 +88,16 @@ This is a bounded, canonical-scope engine, not an arbitrary polygon intersection
 
 ## Product
 
-Sidebar navigation (`src/components/Dashboard.tsx`): **Explore, Dashboard, Assets, Portfolio, Compose, Markets, Tokenize, Activity**, plus **Quick tour**.
+Sidebar navigation (`src/components/Dashboard.tsx`): **Explore, Dashboard, Markets, Portfolio, Compose, Activity**, plus **Quick tour**. The header **Tokenize** action opens the creation dialog from any page.
 
 - **Explore**: 3D Tokyo (MapLibre GL, OpenFreeMap vector tiles from OpenStreetMap data, extruded buildings), map-first. **Filters** and **Map tools** expand on demand; clicking a space opens its terms and purchase panel.
   - Filters highlight every matching space without selecting a result or moving the camera. **Reset filters** clears category, lifecycle and **My spaces** together while preserving the current map position and zoom. At city scale, compact markers replace full labels; hover or focus reveals the name.
   - **City X-ray**: a layer that shows right scopes (roof, interior, wall, land) on each building.
   - **Opportunity Lens**: lights up about 150 client-side, clearly labeled demo sites representing the kind of dormant supply the statistics describe. These are a visual demo dataset, not on-chain assets and not claims about real properties.
-- **Dashboard**: an analysis view, not an asset table. Seven-day trade/deposit chart; primary, secondary and Basket turnover; activation by asset type; deposited versus withdrawn revenue; pending-review and activation signals linked to actions. Clicking an asset type filters the map. Figures come from the current mode's event stream; fictional metadata is never presented as measured impact.
-- **Assets**: a directory of registered spaces with name/district search, category and state filters, and offer-price sorting (cards on small screens). **View on map** opens the selected space; directory filters persist while navigating.
+- **Dashboard**: an analysis view, not an asset table. Seven-day trade/deposit chart; primary, secondary and Basket turnover; activation by asset type; deposited versus withdrawn revenue; pending-review and activation signals linked to actions. The dashboard contains no embedded map or asset-detail panel. Clicking an asset type opens Explore with that filter applied. Figures come from the current mode's event stream; fictional metadata is never presented as measured impact.
 - **Portfolio**: holdings, claimable revenue, resale listings, basket redemption. Each holding shows **Claim revenue** (enabled only when something is claimable), **List for resale** and **Redeem** for basket shares.
 - **Compose**: bundle 2 to 8 compatible revenue rights into a Tokyo Solar Basket (ERC-1155 shares backed by custody of the underlying rights).
-- **Markets**: **Launchpad** (fixed-price issuer offers on the real marketplace contract) and **Fractional market / Rental market** (an interactive mock with separate mock credits). See the two sections below.
+- **Markets**: one entry point with **All assets / Funding / Fractional / Rental** tabs. **All assets** is the searchable directory, with category/state filters and offer-price sorting; filters persist across tabs and navigation. **View on map** opens the selected space in Explore. **Funding** contains the launchpad’s fixed-price issuer offers (marketplace contracts in live mode). **Fractional / Rental** remain explicitly labeled mock markets with separate mock credits. Tokenize’s **View campaign** opens Funding directly; Portfolio’s mock-market action opens Fractional.
 - **Tokenize**: a modal over the current screen with three steps, **Space → Right → Publish**. Register an asset, request verification, verifier approves, issuer defines a scoped right, verifier approves, issuer lists it. **Working on** resumes a registered asset; **＋ New space** creates one. The map and draft stay in place.
 - **Activity**: urban activity ledger built from MultiBaas Event Queries (or the simulated stream in `demo` mode); 20 events per page, newest first, with Previous / Next and Latest controls. It paginates the loaded history in the UI, not the SDK queries. Links to the MultiBaas deployment.
 - **Quick tour**: an optional English walkthrough. Floating cards highlight the next control with an arrow while the map stays visible. Choose buying a right or listing a space; the guide waits for the real app action, can be closed or restarted, and never signs or submits a transaction for you.
@@ -102,7 +105,15 @@ Sidebar navigation (`src/components/Dashboard.tsx`): **Explore, Dashboard, Asset
 
 **Theme.** Cyberpunk is the main theme (`http://127.0.0.1:3000/` or `?theme=cyberpunk`): charcoal surfaces, one yellow accent, a custom brush wordmark. The header has no theme switch. The earlier green design is available only through `?theme=original` for comparison. See [design variants and logo attribution](docs/DESIGN_VARIANTS.md).
 
-**Catalog.** The browser catalog has **49 fictional spaces across seven categories**: rooftop solar, vacant-home workshops, idle-land pop-ups, parking, storage, wall advertising and community spaces. Non-solar examples are single, exclusive **usage rights** with purpose-specific terms and dates. Parking, storage and advertising use the contract's `Other` type with a validated metadata subtype. Explore's **More spaces** filter exposes the additional categories.
+**Catalog.** The browser catalog has **53 fictional spaces across seven categories**: rooftop solar, vacant-home workshops, idle-land pop-ups, parking, storage, wall advertising and community spaces. Non-solar examples are single, exclusive **usage rights** with purpose-specific terms and dates. Parking, storage and advertising use the contract's `Other` type with a validated metadata subtype. Explore presents all seven categories together in one asset-type filter, with a single visible selection.
+
+Four examples start **Active**: Kodenmacho Operating Solar Roof, Okachimachi Operating Solar Roof, Bakurocho Reopened Makers House and Higashi-kanda Operating Storage. Explore → Filters → Active shows them; the dashboard counts 720 m² of simulated active space and 100 kWp of estimated solar capacity. They represent already-operating projects, not projects funded through this platform. No purchases, deposits or returns are fabricated by activation. Catalog upgrades append the examples without resetting existing browser holdings or user-created assets. Nihonbashi and Kanda remain available for the funding/activation walkthrough.
+
+**稼働サンプル。** 屋根2件・再開した空き家1件・倉庫1件をActiveの模擬データとして用意しています。実際の現地稼働や収益を示すものではありません。以前のデモ履歴を残して追加され、地図のActiveフィルターとダッシュボードで稼働前後を比較できます。
+
+**ENS namespace dashboard.** Open **Namespaces** in the sidebar or `/?view=namespaces`. Search and expand City → District → Asset → Space → Right, inspect the full example name, and return to the corresponding map space. Paths derive from the current asset/right data and the validated local namespace builder. All names are **unregistered previews** under the illustrative `tokenizetokyo.eth` parent; its ownership is not verified. The issuer address belongs to the Urban Rights record, not a verified ENS controller. Scoped delegation is shown as a planned flow, with no grant or registration transaction performed. See [ENSv2 design and remaining implementation](docs/ENSV2_DESIGN.md).
+
+**ENS階層画面。** メニューのNamespacesで都市・区・アセット・空間・権利の関係を確認できます。実発行されたENSの一覧ではなく、現在のアセット情報から生成した名前空間のプレビューです。ENSの登録・解決・権限委譲は未接続で、画面でもその状態を明示しています。
 
 ### Scripted activity on Curvegrid Testnet
 
@@ -177,7 +188,7 @@ The city is the discovery interface. **Urban Rights contracts enforce ownership 
 flowchart TB
     User["Owner / Investor / Demo verifier"] --> UI
     Map["3D Tokyo: MapLibre + OpenFreeMap / OpenStreetMap\nSimulated asset scopes; PLATEAU not used"] --> UI
-    UI["Next.js application\nExplore / Dashboard / Assets / Portfolio\nCompose / Markets / Tokenize / Activity"]
+    UI["Next.js application\nExplore / Dashboard / Markets / Portfolio\nCompose / Tokenize / Activity"]
     UI -->|"DApp User key: reads, Event Queries, unsigned composition"| MB
     subgraph Backend["Curvegrid MultiBaas — connected on Curvegrid Testnet"]
         MB["TypeScript SDK / Contracts API"]
@@ -382,7 +393,7 @@ Keep `NEXT_PUBLIC_APP_MODE=demo`.
 npm run dev            # http://127.0.0.1:3000
 ```
 
-Use the **Demo actor** selector (Owner A, Investor B, Investor C, Demo verifier). State is simulated in localStorage and the header shows **SIMULATED DEMO**. **Reset demo** clears it.
+Use the **Demo role** selector (Owner A, Investor B, Investor C, Demo verifier). State is simulated in localStorage and the header shows **SIMULATED DEMO**. **Reset demo** clears it.
 
 ### Mode 2: local contracts on Anvil (no MultiBaas)
 
@@ -493,9 +504,57 @@ Based on the live run on 2026-09-26: a MultiBaas Free-plan deployment on Curvegr
 
 **Not exercised live yet:** webhook delivery, Cloud Wallet signing, TXM, and browser-wallet signing of a purchase in `multibaas` mode (the on-chain scenario used scripted signers). The webhook receiver and Cloud Wallet operator are implemented and covered only by local tests.
 
+## Operational readiness / 本番運用に必要な工程
+
+### English
+
+**Initial launch policy:** only companies that have passed prior screening will be allowed to register assets. Company approval must be followed by separate verification of authority over each asset and each right being offered.
+
+**Demo exception:** registration is open so anyone can try the flow. Company screening and real ownership/authority checks are not performed. The current prototype contract accepts draft registrations from any address; a company eligibility gate is **not implemented**. The policy notice is not access control.
+
+The protocol implements approval states, token transfers and payment accounting. These controls rely on reviewers' decisions; they do not establish the truth of an applicant's real-world claims. The hosted demo simulates these operations in browser storage. The Solidity controls described below refer to the protocol implementation, not on-chain transactions by the hosted demo.
+
+| Important process | Current state | Required before production |
+| --- | --- | --- |
+| Company screening and registration eligibility | Planned policy only; demo registration is open. No company screening or company allowlist is implemented. | Screen corporate applicants and authorized representatives; bind approved companies to authorized accounts and enforce eligibility at registration. |
+| Asset and issuance authority | Asset approval requires `VERIFIER_ROLE`; only a verified asset's registered issuer can create rights. No real evidence is reviewed. | Check identity, ownership or delegated authority, and whether that authority covers the proposed space, purpose and period. |
+| Duplicate places and conflicting rights | One verified asset per exact `geoReference`; exclusive-use conflicts are checked within the same asset and canonical scope. The form hashes coordinates, so changed coordinates can produce a different ID for the same real location. | Establish canonical place/space identities, reconcile duplicate claims and existing off-platform agreements, and review spatial boundaries. |
+| Terms and token-to-contract relationship | Terms URI/hash and transfer policies are recorded; each right needs separate approval before trading. | Establish the real-world agreement, the holder's entitlements, performance obligations, transfer conditions and remedies. Recorded terms do not by themselves establish enforceability. |
+| Funding and protection of proceeds | The Launchpad displays fixed-price primary sales. Payments go directly to the seller. No minimum-goal refund or funding escrow exists. | Define funding deadlines, cancellation/refund rules, escrow and milestone-based release where required by the offering. |
+| Activation | A verifier marks a right Active. Solidity checks lifecycle eligibility and start time; the demo simulator uses a simpler check. No physical inspection or funding-goal check is performed. | Confirm installation, handover or service commencement with dated evidence. Keep funded, activated and revenue-producing states separate. |
+| Revenue verification | The vault distributes settlement tokens actually deposited and preserves accrued claims across transfers. It does not verify the source or completeness of project income. | Reconcile external receipts, expenses and deposits; define reporting responsibilities and responses to missing payments. |
+| Reverification, disputes and recovery | Individual live rights can be closed. There is no complete asset-wide revocation, ownership-change review, appeal, compensation or recovery process. | Define review expiry, change notifications, suspension/revocation, dispute handling and consequences for holders, accrued revenue and baskets. |
+| Governance and production readiness | Admin/verifier roles and selected transfer restrictions exist. Independent review is not enforced; the initial admin also receives the verifier role. Production legal structuring, compliance workflows and an external security audit are not implemented/completed. | Define accountable reviewers, separation of duties, evidence protection, recovery and incident response; complete the applicable professional and security reviews before handling real assets or funds. |
+
+**ENS names do not prove property ownership. MultiBaas indexes contract activity; it does not validate ownership documents, physical operation or the origin of revenue.** See [the detailed trust model and code references](docs/TRUST_MODEL.md).
+
+### 日本語
+
+**初期提供方針：資産を登録できるのは、事前審査を通過した法人企業に限定します。** 法人審査を通過した場合も、個々の資産に対する権限と、販売する権利の内容は別途確認します。
+
+**デモでの例外：登録フローを体験できるよう、誰でも操作できます。** 実際の法人審査・所有権・発行権限の確認は行いません。現在のプロトタイプのコントラクトは任意のアドレスから下書き登録を受け付け、法人の登録資格を制限する仕組みは**未実装**です。注意書きの表示だけでアクセス制御を実施しているわけではありません。
+
+実装しているのは承認状態、トークン移転、代金・分配金の計算です。これらは審査担当者の判断を前提としており、申請者の現実世界での申告が真実かどうかを自動的に証明しません。公開デモはブラウザ内で処理を模擬します。以下のコントラクト上の制御はプロトコル実装の説明であり、公開デモの操作がオンチェーンで実行されることを意味しません。
+
+| 重要な工程 | 現在の状態 | 本番化に必要な対応 |
+| --- | --- | --- |
+| 法人審査・登録資格 | 初期提供の方針のみ。デモは登録可能で、法人審査・承認済み法人の登録制限は未実装。 | 法人と担当者の権限を審査し、承認済み法人と操作アカウントを紐付け、登録時に資格を確認する。 |
+| 資産・権利の発行権限 | 資産の承認には `VERIFIER_ROLE` が必要。承認済み資産の登録者だけが権利を発行できるが、実際の証拠審査は行わない。 | 本人・所有権または委任権限を確認し、対象空間・用途・期間についてその権利を設定できるか審査する。 |
+| 場所の重複・権利の競合 | 同じ `geoReference` の二重承認と、同一資産・空間区分内の排他的利用の競合は防ぐ。フォームは座標からIDを作るため、座標を変えると同じ実在場所でも別IDになり得る。 | 場所・空間の正規IDを整備し、重複申請、既存の外部契約、空間の境界を照合する。 |
+| 契約条件とトークンの対応 | 条件のURI・ハッシュ、譲渡方針を記録。取引前に権利単位の承認が必要。 | 保有者が現実に得る権利、履行義務、譲渡条件、不履行時の対応を契約で定義する。条件の記録だけで実効性を保証しない。 |
+| 資金募集・代金の保全 | Launchpadは固定価格の一次販売を集計する。代金は売り手に直接渡り、目標未達時の返金・資金預託は未実装。 | 募集期限、中止・返金条件、必要な資金預託、事業進捗に応じた資金解放を定義する。 |
+| 稼働確認（Activated） | 確認担当がActiveへ変更。コントラクトは状態・開始時刻を確認するが、デモは簡略化。現地確認や調達目標達成の確認はない。 | 設備設置・引渡し・利用開始を日付付き証拠で確認する。資金調達完了、稼働開始、収益発生を分けて扱う。 |
+| 収益確認 | Vaultへ実際に入金されたテストトークンを分配し、譲渡前後の未受取額を管理する。事業収益の出所・全額入金は確認しない。 | 外部の売上・経費・入金を照合し、報告責任と未入金時の対応を定義する。 |
+| 再審査・紛争・復旧 | 個別の権利を終了する機能はあるが、資産全体の承認取消、所有者変更時の審査、異議申立て、補償・復旧は未整備。 | 審査期限、変更通知、停止・取消、紛争処理と、保有者・未受取収益・バスケットへの影響を定義する。 |
+| 審査体制・本番運用 | 管理者・確認担当のロールと一部の譲渡制限はある。独立審査は強制せず、初期管理者が確認担当を兼ねる。法的構成・コンプライアンス業務・外部セキュリティ監査は未整備または未実施。 | 審査責任者、職務分離、証拠情報の保護、復旧・事故対応を整備し、実在資産・実資金を扱う前に必要な専門家確認とセキュリティ評価を行う。 |
+
+**ENSの名前は不動産の所有権証明ではありません。MultiBaasはコントラクトの活動を記録・集計しますが、所有権資料、現地の稼働、収益の出所は検証しません。** [詳細な信頼モデルとコード参照](docs/TRUST_MODEL.md)も確認してください。
+
 ## Disclaimers
 
-The app banner (Dashboard, Portfolio, Compose and Activity) shows: **"Test assets only. Verification is simulated. Map data does not prove ownership. Mock JPY has no monetary value."** In the map-first Explore view the banner is replaced by the **About this map** panel: **"Test assets only. Verification, highlighted spaces and dimensions are simulated. Map data does not prove property ownership."** and **"3D basemap: OpenStreetMap / OpenFreeMap. Mock JPY has no monetary value."** The vacant-home demo site states: **"No residential or property ownership is sold."** The Markets sandbox states that mock credits are separate from MockJPY.
+See [Trust model and missing production processes](docs/TRUST_MODEL.md) for the boundary between contract permission checks and real-world authority verification, duplicate-place review, funding protection, activation evidence and dispute handling.
+
+The app banner (Dashboard, Portfolio and Activity) shows: **"Test assets only. Verification is simulated. Map data does not prove ownership. Mock JPY has no monetary value."** In the map-first Explore view the banner is replaced by the **About this map** panel: **"Test assets only. Verification, highlighted spaces and dimensions are simulated. Map data does not prove property ownership."** and **"3D basemap: OpenStreetMap / OpenFreeMap. Mock JPY has no monetary value."** The vacant-home demo site states: **"No residential or property ownership is sold."** The Markets sandbox states that mock credits are separate from MockJPY.
 
 - All demo sites, including Opportunity Lens sites, are fictional positions on a real basemap. They do not assert that any real property is vacant, available or owned by anyone.
 - `VERIFIER_ROLE` stands in for evidence review; no real ownership or authority is checked.
@@ -515,6 +574,8 @@ Status and evidence:
 - [Design variants](docs/DESIGN_VARIANTS.md): Cyberpunk and Original themes, logo attribution.
 
 Pitch and judging material:
+
+- [Latest four-minute demo: Concept → Map → Tokenize → Funding](docs/DEMO_SCENARIO.md): current screen names, issuer/buyer actions, funding example and honest demo boundaries.
 
 - Decks: [general five-slide deck](docs/pitch/index.html), [Curvegrid track deck](docs/pitch/curvegrid.html), [ENS track deck](docs/pitch/ens.html) (written on the premise that the ENS integration ships). The decks include an optional rehearsal clock (T), notes (N) and a local-demo shortcut (D).
 - [Four-minute pitch script](docs/pitch-script.md) and [pitch runbook with exact demo actions](docs/PITCH_DEMO.md). Statistics are dated and sourced in the runbook.
