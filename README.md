@@ -6,9 +6,39 @@
 
 **TOKENIZE TOKYO turns Tokyo's dormant urban spaces into scoped, time-bounded ERC-1155 rights (usage and revenue share) that can be verified, funded, traded and bundled into baskets, with every market view built from Curvegrid MultiBaas event queries and every transaction composed by MultiBaas and signed in the user's own wallet.**
 
-> **Integration status (read first).** The MultiBaas path was verified live on 2026-09-26 on a MultiBaas Free-plan deployment on **Curvegrid Testnet (chain ID 2017072401)**: Foundry deploy of all six contracts, Forge MultiBaas linking, event indexing, Event Queries (including `add` aggregation), SDK reads and unsigned transaction composition all passed `npm run multibaas:verify`. **Not yet exercised live:** webhook delivery, Cloud Wallet, TXM, and the browser UI in `multibaas` mode. In `multibaas` mode the app fails visibly instead of falling back to simulated data.
+## Status at a glance
+
+Checked on 2026-09-26.
+
+| Status | What |
+| --- | --- |
+| **Live on Curvegrid Testnet** (chain ID `2017072401`) | All six contracts deployed, linked and indexed by a Curvegrid MultiBaas deployment. `npm run multibaas:verify` passes end to end (chain, linking, indexing, SDK read, unsigned composition, Event Query with `add` aggregation, admin-endpoint denial for the DApp key). 448 scripted transactions are on chain: 50 assets, 44 rights, 69 sales, 20 revenue deposits, 630 indexed events, 2,269,800 mJPY traded volume ([verification report](deployments/testnet-demo-verification.json)). |
+| **Live in the browser (`multibaas` mode)** | Built with `NEXT_PUBLIC_APP_MODE=multibaas` and the origin registered in MultiBaas CORS, the app renders Explore stats, the analytics panel and the Activity ledger from MultiBaas Event Queries with zero console errors, loading in about 5 s over 32 requests. See [Screenshots](#screenshots). |
+| **Simulated** | Default `demo` mode and the hosted demo (localStorage events, no chain transactions). Asset/right verification (a `VERIFIER_ROLE` test key, no real evidence review). All sites are fictional positions on a real basemap. **Markets → Fractional market / Rental market** use separate mock credits. MockJPY has no monetary value. |
+| **Implemented, not exercised live** | Webhook delivery from MultiBaas, Cloud Wallet operator, TXM, and browser-wallet signing of a purchase in `multibaas` mode (the 448 on-chain transactions used scripted signers). |
+| **Pending** | ENSv2: local adapter tested · Sepolia pending (details in [ENSv2](#ensv2-spatial-namespaces-and-delegated-authority)). |
+| **Not used** | PLATEAU 3D city data (a possible future data source). The map is MapLibre with OpenFreeMap / OpenStreetMap tiles. |
+
+In `multibaas` mode the app fails visibly instead of falling back to simulated data.
 
 ---
+
+## Hosted demo
+
+**Public URL: https://tokenize-tokyo.vercel.app/** (responds with the **SIMULATED DEMO** build as of 2026-09-26.)
+
+Deployed on Vercel in `demo` mode. It creates no blockchain transactions. Demo events and holdings are stored per browser in localStorage and are not shared between visitors. The Curvegrid Testnet deployment described below is not connected to this URL. ENS, Cloud Wallet and live webhook delivery are not enabled here.
+
+Deploy from the linked project directory:
+
+```bash
+vercel deploy --prod --yes --scope natsukiyamaguchi-8631s-projects \
+  --build-env NEXT_PUBLIC_APP_MODE=demo --env NEXT_PUBLIC_APP_MODE=demo
+```
+
+`.vercelignore` allows only application source, public assets and required build inputs. It excludes all local environment files, `.data/` signer material, deployment receipts, contract artifacts and research files. No admin key or private key is needed for this deployment. `vercel.json` selects Next.js, `npm ci`, `npm run build`, and the Tokyo function region. The MapLibre worker is copied from the pinned dependency during `prebuild`.
+
+Deployment currently uses the CLI; GitHub automatic deployment is not connected. Before enabling live MultiBaas on Vercel, configure only the DApp User key for client use, add the public origin to MultiBaas CORS, and replace the filesystem webhook store with a durable database. The hosted webhook endpoint deliberately returns 503 while its secret is absent.
 
 ## Pitch: Dormant Capital
 
@@ -54,37 +84,36 @@ This is a bounded, canonical-scope engine, not an arbitrary polygon intersection
 
 ## Product
 
-- **Explore**: 3D Tokyo (MapLibre GL, OpenFreeMap vector tiles from OpenStreetMap data, extruded buildings) with category and lifecycle filters and a **City X-ray** layer that shows right scopes on each building.
-- **Assets**: a separate directory of registered spaces, with name/district search, category and state filters, and offer-price sorting. Desktop rows become cards on smaller screens. **View on map** opens the selected space and its existing terms/purchase panel; directory filters persist while navigating. The homepage no longer includes the asset-card list.
-- **Opportunity Lens**: a filter that lights up about 150 client-side, clearly labeled demo sites representing the kind of dormant supply the statistics describe. These are a visual demo dataset, not on-chain assets and not claims about real properties.
-- **Tokenize**: register an asset, request verification, verifier approves, issuer defines a scoped right, verifier approves, issuer lists it.
-- **Portfolio**: holdings, claimable revenue, resale listings, basket redemption. Each holding shows its units and claimable mJPY next to the actions available on it (**Claim revenue**, enabled only when something is claimable; **List for resale**; **Redeem** for basket shares).
+Sidebar navigation (`src/components/Dashboard.tsx`): **Explore, Dashboard, Assets, Portfolio, Compose, Markets, Tokenize, Activity**, plus **Quick tour**.
+
+- **Explore**: 3D Tokyo (MapLibre GL, OpenFreeMap vector tiles from OpenStreetMap data, extruded buildings), map-first. **Filters** and **Map tools** expand on demand; clicking a space opens its terms and purchase panel.
+  - Filters highlight every matching space without selecting a result or moving the camera. **Reset filters** clears category, lifecycle and **My spaces** together while preserving the current map position and zoom. At city scale, compact markers replace full labels; hover or focus reveals the name.
+  - **City X-ray**: a layer that shows right scopes (roof, interior, wall, land) on each building.
+  - **Opportunity Lens**: lights up about 150 client-side, clearly labeled demo sites representing the kind of dormant supply the statistics describe. These are a visual demo dataset, not on-chain assets and not claims about real properties.
+- **Dashboard**: an analysis view, not an asset table. Seven-day trade/deposit chart; primary, secondary and Basket turnover; activation by asset type; deposited versus withdrawn revenue; pending-review and activation signals linked to actions. Clicking an asset type filters the map. Figures come from the current mode's event stream; fictional metadata is never presented as measured impact.
+- **Assets**: a directory of registered spaces with name/district search, category and state filters, and offer-price sorting (cards on small screens). **View on map** opens the selected space; directory filters persist while navigating.
+- **Portfolio**: holdings, claimable revenue, resale listings, basket redemption. Each holding shows **Claim revenue** (enabled only when something is claimable), **List for resale** and **Redeem** for basket shares.
 - **Compose**: bundle 2 to 8 compatible revenue rights into a Tokyo Solar Basket (ERC-1155 shares backed by custody of the underlying rights).
-- **Activity**: urban activity ledger built from MultiBaas event queries; 20 events per page, newest first, with Previous / Next and Latest controls. Older pages keep their position while new events arrive. This paginates the loaded event history in the UI, not the underlying SDK queries. Links to the MultiBaas Transaction Explorer.
-- Lifecycle stage per asset (`src/lib/lifecycle.ts`): Dormant, Available, Funding, Funded, Active. "Funded" means the issuer sold its full supply; it is not a certification of project economics.
+- **Markets**: **Launchpad** (fixed-price issuer offers on the real marketplace contract) and **Fractional market / Rental market** (an interactive mock with separate mock credits). See the two sections below.
+- **Tokenize**: a modal over the current screen with three steps, **Space → Right → Publish**. Register an asset, request verification, verifier approves, issuer defines a scoped right, verifier approves, issuer lists it. **Working on** resumes a registered asset; **＋ New space** creates one. The map and draft stay in place.
+- **Activity**: urban activity ledger built from MultiBaas Event Queries (or the simulated stream in `demo` mode); 20 events per page, newest first, with Previous / Next and Latest controls. It paginates the loaded history in the UI, not the SDK queries. Links to the MultiBaas deployment.
+- **Quick tour**: an optional English walkthrough. Floating cards highlight the next control with an arrow while the map stays visible. Choose buying a right or listing a space; the guide waits for the real app action, can be closed or restarted, and never signs or submits a transaction for you.
+- **Lifecycle stage** per asset (`src/lib/lifecycle.ts`): Dormant, Available, Funding, Funded, Active. "Funded" means the issuer sold its full supply; it is not a certification of project economics.
 
-## Guided experience and broader asset types
+**Theme.** Cyberpunk is the main theme (`http://127.0.0.1:3000/` or `?theme=cyberpunk`): charcoal surfaces, one yellow accent, a custom brush wordmark. The header has no theme switch. The earlier green design is available only through `?theme=original` for comparison. See [design variants and logo attribution](docs/DESIGN_VARIANTS.md).
 
-**Main theme — Cyberpunk:** open `http://127.0.0.1:3000/` (or `?theme=cyberpunk`). Tokenize opens a modal over the current screen, keeping the map and draft in place. A custom brush wordmark and a map-first Explore layout put Tokyo in the foreground; The sidebar **Dashboard** opens market analysis. Map controls are grouped into **Filters** and **Map tools**; large promotional page headings have been removed. The sidebar shows the brush logo when expanded and a compact mark when collapsed; **Tokenize** is available in the header. The header has no theme switch. The old green design remains available through `?theme=original` for development comparison; normal visits always use Cyberpunk. See [design variants and logo attribution](docs/DESIGN_VARIANTS.md).
-
-Use **Quick tour** in the sidebar for an optional English walkthrough. Small floating cards highlight the next control and point to it with an arrow; the map stays visible. Choose buying a right or listing a space. The guide waits for the relevant app action and can be closed or restarted; Escape dismisses the guide outside the tokenization modal and closes the modal when inside it. It never signs or submits a transaction for you.
-
-**Tokenize** has three focused steps: **Space → Right → Publish**. Only one selected space is shown. Location details, evidence, terms and transfer settings expand on demand. Publish shows the next lifecycle action and the required demo role. Use **Working on** to resume a registered asset; choose **＋ New space** to create one.
-
-The browser catalog has **49 fictional spaces across seven categories**: rooftop solar, vacant-home workshops, idle-land pop-ups, parking, storage, wall advertising and community spaces. Non-solar examples are single, exclusive **usage rights** with purpose-specific terms and dates. Parking, storage and advertising use the existing contract's `Other` type with a validated metadata subtype. New examples are appended without clearing existing holdings or custom assets. Explore's **More spaces** filter exposes the additional categories.
-
-**Dashboard is an analysis view, not an asset table.** It shows a seven-day trade/deposit chart, separates primary rights, secondary rights and Basket turnover, compares activation by asset type, traces deposited versus withdrawn revenue, and links pending-review/activation signals to actions. Clicking an asset type filters the map. Figures come from the current mode's event stream; fictional metadata is never presented as measured social impact.
+**Catalog.** The browser catalog has **49 fictional spaces across seven categories**: rooftop solar, vacant-home workshops, idle-land pop-ups, parking, storage, wall advertising and community spaces. Non-solar examples are single, exclusive **usage rights** with purpose-specific terms and dates. Parking, storage and advertising use the contract's `Other` type with a validated metadata subtype. Explore's **More spaces** filter exposes the additional categories.
 
 ### Scripted activity on Curvegrid Testnet
 
-On 2026-09-26, `demo:seed:testnet` added 49 fictional assets using **448 confirmed transactions** through MultiBaas unsigned composition and four local test signers. Including the pre-existing asset, Event Queries returned **50 assets, 44 rights, 72 listings, 69 sales, 3 baskets and 630 indexed events**. Volume was **2,269,800 MockJPY**, deposits **117,000 MockJPY**, and withdrawals from RevenueVault **25,800 MockJPY**. These are scripted test quantities, not adoption, real capital or realized investment returns.
+On 2026-09-26, `demo:seed:testnet` added 49 fictional assets using **448 confirmed transactions** through MultiBaas unsigned composition and four local test signers. Including the pre-existing asset, Event Queries returned **50 assets, 44 rights, 72 listings, 69 sales, 3 baskets and 630 indexed events**. The scenario made 20 revenue deposits. Volume was **2,269,800 MockJPY**, deposits **117,000 MockJPY**, and withdrawals from RevenueVault **25,800 MockJPY**. These are scripted test quantities, not adoption, real capital or realized investment returns.
 
 - [Transaction hashes and actors](deployments/testnet-demo-receipts.json) — public metadata only; private signer keys remain in ignored `.data/` with restricted permissions.
 - [Verification report](deployments/testnet-demo-verification.json) — 426 scenario actions matched by transaction hash and event name, SDK custody/balance checks for every basket, event totals reconciled against server-side Event Query aggregates.
 - `npm run demo:verify:testnet` — read-only verification. The Free-plan indexer took time to catch up; rerun after syncing rather than treating partial rows as complete market state.
 - `npm run demo:seed:testnet` — sends a bounded scenario on chain `2017072401` only. Maximum 650 transactions and 0.7 test ETH including actor funding; current run used about 0.333. It journals signed hashes before submission and resumes without repeating confirmed actions. Never delete its journal to rerun a completed scenario.
 
-The browser at port 3000 remains in `demo` mode. These on-chain scenarios are not silently imported into browser localStorage. A browser-wallet rehearsal is separate from scripted signing.
+A browser built in `multibaas` mode reads these transactions from Event Queries (see [Screenshots](#screenshots)). `demo` mode never imports them into localStorage. Scripted signing is not a browser-wallet rehearsal; a browser-wallet purchase in `multibaas` mode has not been performed yet.
 
 ### How to inspect TOKENIZE TOKYO transactions in MultiBaas
 
@@ -95,15 +124,43 @@ The browser at port 3000 remains in `demo` mode. These on-chain scenarios are no
 
 The current Activity link opens the deployment, not a validated per-hash deep link. Curvegrid Testnet RPC requires a provisioned endpoint/API key; do not publish that URL or invent Etherscan transaction URLs for this chain. The planned Sepolia deployment will have separate addresses and Sepolia explorer links. See the official [Transaction Explorer guide](https://docs.curvegrid.com/multibaas/tx-explorer/) and [Curvegrid Testnet description](https://docs.curvegrid.com/multibaas/networks/curvegrid-testnet/).
 
+## RWA launchpad — fixed-price issuer offers
+
+**Markets → Launchpad** is the entry point for primary funding. After a Revenue Share is issued and verified, **Tokenize → Publish** lets the issuer choose units to offer and a unit price, previews the full-subscription target, and launches the offer through the existing marketplace transaction. The issuer can retain part of the supply. Usage rights can also be offered, but exclusive usage remains indivisible.
+
+Each card shows the offered right, unit price, gross amount raised, full-subscription amount, supporting wallet count and subscription progress. **Review rights & participate** opens the map's terms and purchase panel. The same funding progress appears there. `fundingCampaigns()` uses `ListingCreated` for the original offer quantity and `ListingPurchased` for payments and wallet counts; secondary investor sales do not increase the issuer campaign total. In MultiBaas mode these events come from Event Queries; in demo mode they come from the explicitly simulated event stream.
+
+This is **keep-what-you-raise fixed-price funding**, not all-or-nothing crowdfunding. Payments transfer directly to the seller when rights transfer atomically. There is no campaign escrow, funding deadline, automatic refund, milestone disbursement or independent use-of-funds enforcement. The displayed target is offered units × price, not a claim that the project has enough capital to operate. Fully subscribed and activated are separate states. Contracts have not changed for this UI addition.
+
 ## Secondary financial markets — interactive mock
 
-**Markets** is a separate, clearly marked sandbox. Each offer includes a small 3D map crop centered on its demo location, with a category badge. Previews load lazily and release their WebGL renderer after capture; a category icon remains available if external map tiles fail. Shared attribution is shown below the list. Market explanations are expandable:
+**Markets → Fractional market / Rental market** is a separate, clearly marked sandbox. Each offer includes a small 3D map crop centered on its demo location, with a category badge. Previews load lazily and release their WebGL renderer after capture; a category icon remains available if external map tiles fail. Shared attribution is shown below the list. Market explanations are expandable:
 
 - **Fractional market:** acquire shares of a mock right pool's economic interest, reserve shares for resale, and explicitly simulate a buyer settling the resale. Inventory checks prevent duplicate simulated sales.
 - **Rental market:** choose a duration, preview the price, confirm a mock access pass, and return access. The original token stays with its owner. Early return does not simulate a refund.
 - **Portfolio → Fractionalize / lend · mock:** use a held protocol right as a reference for a new fraction pool or rental offer. Creating a mock market does not move or encumber the token.
 
+**Return scenarios:** selected quantities feed an interactive calculator. For fractional interests, users enter holding months, annual distributable income for the whole pool, exit price per share, and their fees/costs. Income is allocated pro rata, and holding-period ROI is `(income + resale proceeds − purchase cost − costs) / (purchase cost + costs)`. This is not an annualized rate. For rental access, the calculation models the renter's business revenue minus rental and operating costs, not a passive return to a token investor. Both show a cost/proceeds chart, net profit or loss, and a break-even price. No income assumption is prefilled; the no-income/no-resale stress case shows a total loss. Calculators never accrue income, change credits or submit transactions.
+
 This sandbox has its own **mock credits** and localStorage. It does not use MockJPY, MultiBaas, token custody or protocol balances. Fractional economic interests do not grant simultaneous exclusive use of a physical space. No actual income, enforceable access, collateral loan or production fractionalization contract is implemented. The sandbox demonstrates the next market layer separately from the tested Solidity workflows.
+
+## Screenshots
+
+**`multibaas` mode, live on Curvegrid Testnet.** Explore stats and the analytics panel rendered from MultiBaas Event Queries after the scripted scenario (50 assets, 2,269,800 mJPY volume, 117,000 mJPY deposited):
+
+![Explore in multibaas mode with live Event Query data](docs/screenshots/multibaas-explore-live.png)
+
+The Activity ledger from MultiBaas Event Queries. This capture was taken before the scripted scenario, so it shows the first seeded asset and its lifecycle events:
+
+![Activity ledger in multibaas mode](docs/screenshots/multibaas-activity.png)
+
+**`demo` mode.** The 3D Explore map and the City X-ray layer:
+
+![3D Explore map](docs/screenshots/explore.png)
+
+![City X-ray layer](docs/screenshots/xray.png)
+
+These four captures come from earlier builds with the green (Original) styling; the sidebar labels and header controls have changed since. Captures of the current Cyberpunk UI: [Explore](docs/screenshots/cyberpunk-explore.png), [Tokenize](docs/screenshots/cyberpunk-tokenize.png), [Markets](docs/screenshots/cyberpunk-markets.png), [mobile](docs/screenshots/cyberpunk-mobile.png).
 
 ## Architecture
 
@@ -111,11 +168,16 @@ The city is the discovery interface. **Urban Rights contracts enforce ownership 
 
 ### Product and infrastructure
 
+![TOKENIZE TOKYO architecture: people and signing, Next.js application, Curvegrid MultiBaas, and Urban Rights contracts on Curvegrid Testnet](docs/screenshots/architecture.png)
+
+<details>
+<summary>Diagram source (Mermaid)</summary>
+
 ```mermaid
 flowchart TB
     User["Owner / Investor / Demo verifier"] --> UI
-    Map["3D Tokyo: MapLibre + OpenStreetMap\nSimulated asset scopes; PLATEAU planned"] --> UI
-    UI["Next.js application\nExplore / Assets / Tokenize\nPortfolio / Compose / Activity"]
+    Map["3D Tokyo: MapLibre + OpenFreeMap / OpenStreetMap\nSimulated asset scopes; PLATEAU not used"] --> UI
+    UI["Next.js application\nExplore / Dashboard / Assets / Portfolio\nCompose / Markets / Tokenize / Activity"]
     UI -->|"DApp User key: reads, Event Queries, unsigned composition"| MB
     subgraph Backend["Curvegrid MultiBaas — connected on Curvegrid Testnet"]
         MB["TypeScript SDK / Contracts API"]
@@ -146,12 +208,14 @@ flowchart TB
     Management --- Chain
     Index -.->|"Signed webhook; external delivery pending"| Hook["Next.js webhook endpoint\nHMAC + timestamp + delivery deduplication"]
     Hook -.->|"Activity revision polling → rerun Event Queries"| UI
-    ENS["ENSv2 on Sepolia\nRead adapter implemented locally\nRegistration + issuance delegation pending"] -.->|"Future same-chain authority adapter"| Rights
+    ENS["ENSv2 on Sepolia\nLocal adapter tested · Sepolia pending"] -.->|"Future same-chain authority adapter"| Rights
     Operator["Cloud Wallet + TXM adapter\nImplemented, not configured / live-tested"] -.-> MB
     Lab["Markets: fractional / rental sandbox\nSeparate mock credits, no chain transactions"] --- UI
 ```
 
-Solid paths describe implemented architecture; dotted paths are pending live connection or implementation as labelled. **The current default browser mode is `demo`**: it substitutes localStorage events for MultiBaas and does not broadcast transactions. The separate testnet seed script uses MultiBaas composition with local test signers; it does not prove a browser-wallet or Cloud Wallet rehearsal.
+</details>
+
+Solid paths describe implemented architecture; dotted paths are pending live connection or implementation as labelled. **The default browser mode is `demo`**: it substitutes localStorage events for MultiBaas and does not broadcast transactions. A `multibaas` build reads live Event Queries from Curvegrid Testnet. The testnet seed script uses MultiBaas composition with local test signers; it does not prove a browser-wallet or Cloud Wallet rehearsal.
 
 ### What happens after tokenization?
 
@@ -211,7 +275,9 @@ The receiver is implemented for a single persistent Node server. A changed webho
 
 The [feature status matrix](docs/FEATURE_STATUS.md) separates tested contracts, browser simulation, live service checks and mocks. The [remaining tasks](docs/REMAINING_TASKS.md) identify what is still needed for the full submitted demo.
 
-### ENSv2: spatial namespaces and delegated authority (prototype)
+### ENSv2: spatial namespaces and delegated authority
+
+**Status: local adapter tested · Sepolia pending.**
 
 Target hierarchy:
 
@@ -227,11 +293,11 @@ flowchart LR
     Roof -.-> Operator["Solar operator\nNo authority over interior or wall"]
 ```
 
-`src/lib/ens/` now builds namespace paths, reads name state and canonical parent/subregistry pointers at one Sepolia block, checks expiry, reads an operator's explicit EAC roles, and prepares a narrow unsigned grant/revoke call descriptor. Unit fixtures pass; **no live ENS registration, delegation or Universal Resolver verification has been performed**. `npm run ens:inspect` uses explicitly configured Sepolia RPC and registry values, with no fabricated fallback names or addresses. This diagnostic uses direct read-only RPC; product transaction integration remains MultiBaas-first.
+`src/lib/ens/` now builds namespace paths, reads name state and canonical parent/subregistry pointers at one Sepolia block, checks expiry, reads an operator's explicit EAC roles, and prepares a narrow unsigned grant/revoke call descriptor. Its 9 unit tests pass (`src/lib/ens/registry.test.ts`); **no live ENS registration, delegation or Universal Resolver verification has been performed**. `npm run ens:inspect` uses explicitly configured Sepolia RPC and registry values, with no fabricated fallback names or addresses. This diagnostic uses direct read-only RPC; product transaction integration remains MultiBaas-first.
 
 Authoritative ENS issuance needs a **Sepolia deployment of both Urban Rights and MultiBaas**; Curvegrid Testnet cannot directly enforce a Sepolia namespace. The existing testnet stays available. `UrbanNamespaceAuthority` and the delegated issuance contract entry point remain to be implemented. A resolver edit or EAC namespace grant must not confer issuance or verifier authority on its own.
 
-See the [ENSv2 specification and milestones](docs/ENSV2_DESIGN.md), [ENS pitch deck](docs/pitch/ens.html) and [four-minute pitch runbook](docs/PITCH_DEMO.md).
+The [ENS-track deck](docs/pitch/ens.html) is written on the premise that the Sepolia integration ships; until then the status above is the accurate one. See the [ENSv2 specification and milestones](docs/ENSV2_DESIGN.md) and [ENS implementation notes](docs/pitch/ENS_IMPLEMENTATION.md).
 
 ## Smart contracts
 
@@ -246,7 +312,7 @@ Solidity 0.8.28, Paris EVM, via-IR, OpenZeppelin 5, Foundry. `contracts/src/`.
 | `BasketVault`        | ERC-1155 basket shares. Fixed-ratio custody of 2 to 8 revenue rights; deposit and mint are atomic (no unbacked shares); redeem returns the underlying; harvests revenue from `RevenueVault` and redistributes per share. One basket per underlying right.                                         |
 | `MockJPY`            | "Mock JPY - TEST ONLY" (mJPY), 18 decimals, public faucet capped at 1,000,000 per call. No monetary value.                                                                                                                                                                                        |
 
-**Tests:** 25 Foundry tests in 3 suites (`Protocol.t.sol` 13 including a rounding fuzz test, `Spatial.t.sol` 5, `EdgeCases.t.sol` 7), 43 Vitest tests in 9 files, 12 Playwright end-to-end tests. The original local Anvil run recorded 50 real transactions with assertions (`deployments/local-demo-receipts.json`). The expanded `demo:seed` now includes all seven catalog sites and will send additional transactions on a fresh deployment.
+**Tests (counted 2026-09-26):** 25 Foundry tests in 3 suites (`Protocol.t.sol` 13 including a rounding fuzz test, `Spatial.t.sol` 5, `EdgeCases.t.sol` 7), 64 Vitest tests in 13 files, 24 Playwright end-to-end tests in 10 files. The original local Anvil run recorded 50 real transactions with assertions (`deployments/local-demo-receipts.json`). The expanded `demo:seed` now includes all seven catalog sites and will send additional transactions on a fresh deployment.
 
 Local Anvil addresses (chain 31337, not a public network) are in `deployments/31337.json`.
 
@@ -295,7 +361,7 @@ MultiBaas is the app's only data and transaction backend in `multibaas` mode. Th
 | natsuki | Product, protocol design, full-stack | [@natsukingly](https://github.com/natsukingly) | [@0x_natto](https://x.com/0x_natto) |
 
 - Repository: <https://github.com/natsukingly/tokenize-tokyo>
-- Live demo: `TODO before submission`
+- Live demo: <https://tokenize-tokyo.vercel.app/> (simulated demo mode; the MultiBaas-mode build is run locally, see Mode 3)
 - Demo video: `TODO before submission`
 
 ## (d) Setup and testing
@@ -363,16 +429,28 @@ These are the steps we ran against Curvegrid Testnet (chain ID 2017072401) on th
     npm run operator -- status <txHash>
     ```
 
-### Tests
+### Tests and scripts
 
-| Command                    | What it runs                                                                                                                                                                                                        |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `npm run typecheck`        | `tsc --noEmit`                                                                                                                                                                                                      |
-| `npm run test`             | Vitest, 43 tests: projection, lifecycle, SDK adapter with controlled responses, tx validation, webhook HMAC/replay/dedup, activity revision, asset catalog and mock financial markets |
-| `npm run test:contracts`   | Foundry, 25 tests: authorization, lifecycle, atomic trades, revenue accounting, fuzzed rounding, conflicts, baskets, expiry                                                                                         |
-| `npm run test:e2e`         | Playwright, 12 tests on demo mode (starts `npm run dev` itself): trade, revenue and baskets; verification and conflicts; onboarding and mock markets; pitch flow; 3D map filters, mobile layout and reversible themes |
-| `npm run demo:seed`        | Real-contract flow on Anvil (after `anvil` + `deploy:local`)                                                                                                                                                        |
-| `npm run multibaas:verify` | Live MultiBaas readiness (Mode 3 only)                                                                                                                                                                              |
+Test counts on 2026-09-26: `npm run typecheck` passes; Vitest **64 tests in 13 files** pass; Foundry **25 tests in 3 suites** pass; Playwright lists **24 tests in 10 files** (`npx playwright test --list`).
+
+| Command | What it runs |
+| --- | --- |
+| `npm run dev` / `npm run build` / `npm run start` | Next.js dev server, production build, production server on `127.0.0.1` (`predev`/`prebuild` copy the MapLibre worker) |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm run test` | Vitest, 64 tests: projection, lifecycle, analytics, funding, SDK adapter with controlled responses, tx validation, webhook HMAC/replay/dedup and route, asset catalog, Opportunity Lens sites, mock markets, return scenarios, ENSv2 registry adapter |
+| `npm run test:coverage` | Vitest with coverage (used by CI) |
+| `npm run test:contracts` | Foundry, 25 tests: authorization, lifecycle, atomic trades, revenue accounting, fuzzed rounding, conflicts, baskets, expiry |
+| `npm run test:e2e` | Playwright, 24 tests on `demo` mode (starts `npm run dev` itself): trade, revenue and baskets; verification and conflicts; Assets directory; Activity paging; analytics; Opportunity Lens and filters; Launchpad and return scenarios; onboarding, Quick tour and mock markets; Tokenize modal; pitch flow; Cyberpunk/Original themes and mobile layout |
+| `npm run anvil` | Local Anvil node on `127.0.0.1:8545` |
+| `npm run deploy:local` | Deploys the six contracts to Anvil, writes `deployments/31337.json` |
+| `npm run demo:seed` | Real-contract flow on Anvil with assertions (after `anvil` + `deploy:local`) |
+| `npm run multibaas:link` | Links all six contracts to MultiBaas through Forge MultiBaas (Mode 3) |
+| `npm run multibaas:verify` | Live MultiBaas readiness check (Mode 3) |
+| `npm run demo:seed:testnet` | Sends the bounded scripted scenario on Curvegrid Testnet only (sends real test transactions) |
+| `npm run demo:verify:testnet` | Read-only check of the scripted scenario against Event Queries and SDK reads |
+| `npm run ens:inspect` | Read-only ENSv2 diagnostic against explicitly configured Sepolia values (`ENSV2_RPC_URL`, `ENSV2_PARENT_REGISTRY`, `ENSV2_NAMESPACE_PATH`) |
+| `npm run operator` | Optional Cloud Wallet + TXM operator CLI (not exercised live) |
+| `npx tsx scripts/write-public-env.ts <deployment.json>` | Writes `deployments/frontend-addresses.env` with the public `NEXT_PUBLIC_*_ADDRESS` lines (not an npm script) |
 
 CI (`.github/workflows/ci.yml`) runs typecheck, Vitest with coverage, Foundry, build and Playwright.
 
@@ -411,27 +489,36 @@ Based on the live run on 2026-09-26: a MultiBaas Free-plan deployment on Curvegr
 6. **Return `bytes32` values as hex in Event Query results,** or document the byte-array form.
 7. **Expose a log index** (or a per-transaction ordinal) as an Event Query field.
 
-**Not exercised live yet:** webhook delivery, Cloud Wallet signing, TXM, and the browser UI in `multibaas` mode. The webhook receiver, Cloud Wallet operator and browser path are implemented and covered only by local tests.
+**Browser UI in `multibaas` mode (exercised live):** after the CORS entry, a `NEXT_PUBLIC_APP_MODE=multibaas` build rendered Explore stats, the analytics panel and the Activity ledger from Event Queries with zero console errors, loading in about 5 s over 32 requests.
+
+**Not exercised live yet:** webhook delivery, Cloud Wallet signing, TXM, and browser-wallet signing of a purchase in `multibaas` mode (the on-chain scenario used scripted signers). The webhook receiver and Cloud Wallet operator are implemented and covered only by local tests.
 
 ## Disclaimers
 
-The app shows: **"Test assets only. Verification is simulated. Map data does not prove ownership. Mock JPY has no monetary value."** The vacant-home demo site states: **"No residential or property ownership is sold."**
+The app banner (Dashboard, Portfolio, Compose and Activity) shows: **"Test assets only. Verification is simulated. Map data does not prove ownership. Mock JPY has no monetary value."** In the map-first Explore view the banner is replaced by the **About this map** panel: **"Test assets only. Verification, highlighted spaces and dimensions are simulated. Map data does not prove property ownership."** and **"3D basemap: OpenStreetMap / OpenFreeMap. Mock JPY has no monetary value."** The vacant-home demo site states: **"No residential or property ownership is sold."** The Markets sandbox states that mock credits are separate from MockJPY.
 
 - All demo sites, including Opportunity Lens sites, are fictional positions on a real basemap. They do not assert that any real property is vacant, available or owned by anyone.
 - `VERIFIER_ROLE` stands in for evidence review; no real ownership or authority is checked.
 - MockJPY is a valueless test token. No yield is promised; revenue is only what is actually deposited.
 - This is not a securities offering. Legal structuring, KYC, tax and enforceable real-world agreements are not implemented.
-- The map uses MapLibre with OpenFreeMap/OpenStreetMap tiles. No 3D city model dataset is integrated.
+- The map uses MapLibre with OpenFreeMap/OpenStreetMap tiles. No 3D city model dataset is integrated; PLATEAU is not used (a possible future data source).
 - No external security audit has been performed.
 
 ## Project documents
 
-- [Implementation report](docs/IMPLEMENTATION_REPORT.md): what was built, what was executed locally, what remains unverified.
-- [Feature implementation matrix](docs/FEATURE_STATUS.md): local, on-chain, mock and pending status.
+Status and evidence:
+
+- [Feature implementation matrix](docs/FEATURE_STATUS.md): local, on-chain, mock and pending status per feature.
 - [Remaining tasks](docs/REMAINING_TASKS.md): submission gates and Sepolia/ENS milestones.
-- [ENSv2 specification](docs/ENSV2_DESIGN.md): local read adapter implemented; live delegation and issuance pending, no ENS prize claimed.
-- [ENS pitch material](docs/pitch/ENS_IMPLEMENTATION.md): evidence-based slide content and target demo.
-- [Showcase copy](docs/showcase.md), [Q&A cheat sheet](docs/qa-cheatsheet.md), adversarial Q&A ([EN](docs/qa-adversarial.en.md) / [JA](docs/qa-adversarial.ja.md)), [five-slide finalist pitch](docs/pitch/index.html), [four-minute narration and exact demo actions](docs/PITCH_DEMO.md). The deck includes an optional rehearsal clock (T), notes (N) and a local-demo shortcut (D). Statistics are dated and sourced in the runbook.
+- [Implementation report](docs/IMPLEMENTATION_REPORT.md): what was built, what was executed, what remains unverified.
+- [ENSv2 specification](docs/ENSV2_DESIGN.md) and [ENS implementation notes](docs/pitch/ENS_IMPLEMENTATION.md): local adapter tested · Sepolia pending.
+- [Design variants](docs/DESIGN_VARIANTS.md): Cyberpunk and Original themes, logo attribution.
+
+Pitch and judging material:
+
+- Decks: [general five-slide deck](docs/pitch/index.html), [Curvegrid track deck](docs/pitch/curvegrid.html), [ENS track deck](docs/pitch/ens.html) (written on the premise that the ENS integration ships). The decks include an optional rehearsal clock (T), notes (N) and a local-demo shortcut (D).
+- [Four-minute pitch script](docs/pitch-script.md) and [pitch runbook with exact demo actions](docs/PITCH_DEMO.md). Statistics are dated and sourced in the runbook.
+- [Showcase copy](docs/showcase.md), [Q&A cheat sheet](docs/qa-cheatsheet.md), adversarial Q&A ([EN](docs/qa-adversarial.en.md) / [JA](docs/qa-adversarial.ja.md)).
 
 ## References
 
