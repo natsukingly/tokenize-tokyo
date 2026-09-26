@@ -1,0 +1,124 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  padding: 4px 7px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.titleRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.titleRow h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 650;
+}
+.icon {
+  flex: none;
+  color: var(--lime);
+}
+.preview {
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+.preview p,
+.teaser p {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 28px;
+}
+.options article {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
+}
+.options article > svg {
+  color: var(--muted);
+}
+.options h3 {
+  margin: 18px 0 0;
+  font-size: 17px;
+}
+.options p {
+  flex: 1;
+  margin-bottom: 24px;
+}
+.options button {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  opacity: 1;
+}
+.preview .availability {
+  margin-top: 20px;
+  font-size: 12px;
+}
+.teaser {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: 24px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+.teaser > div {
+  flex: 1;
+  min-width: 0;
+}
+.teaser h2 {
+  font-size: 17px;
+}
+.previewButton {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  gap: 8px;
+  padding: 10px 0;
+  color: var(--lime);
+  font-size: 12px;
+}
+@media (max-width: 700px) {
+  .preview {
+    padding: 20px;
+  }
+  .options {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .teaser {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding: 20px;
+  }
+  .previewButton {
+    margin-left: 38px;
+  }
+}

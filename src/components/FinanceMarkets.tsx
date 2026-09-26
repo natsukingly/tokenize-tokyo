@@ -8,11 +8,13 @@ import {
   KeyRound,
   Plus,
   ListFilter,
+  Landmark,
 } from "lucide-react";
 import MapThumbnail from "./MapThumbnail";
 import ReturnScenario from "./ReturnScenario";
 import Launchpad from "./Launchpad";
 import RightsFinance from "./RightsFinance";
+import LendingPreview, { ComingSoonBadge } from "./LendingPreview";
 import type { WalletProvider } from "@/lib/transactions";
 import { DEMO_SITES } from "@/lib/demo-catalog";
 import {
@@ -36,7 +38,8 @@ const SAMPLE_SPACES: Record<string, string> = {
   "rental-land": "Yaesu Weekend Market",
 };
 const STORAGE = "tokenize-tokyo-finance-lab-v1";
-export type MarketView = "assets" | "funding" | "fraction" | "rental";
+export type MarketView =
+  "assets" | "funding" | "fraction" | "rental" | "lending";
 export default function FinanceMarkets({
   market,
   sourceId,
@@ -183,6 +186,14 @@ export default function FinanceMarkets({
           <KeyRound size={18} />
           Rental
         </button>
+        <button
+          role="tab"
+          aria-selected={view === "lending"}
+          onClick={() => onViewChange("lending")}
+        >
+          <Landmark size={18} aria-hidden="true" />
+          Lending <ComingSoonBadge />
+        </button>
         {mockMarket && demo && (
           <button className="text-button" onClick={() => setCreate(!create)}>
             <Plus size={14} />
@@ -199,6 +210,8 @@ export default function FinanceMarkets({
           onView={onView}
           onCreate={onCreate}
         />
+      ) : view === "lending" ? (
+        <LendingPreview />
       ) : !demo ? (
         <RightsFinance
           market={market}

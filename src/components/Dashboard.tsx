@@ -86,6 +86,7 @@ import AssetDirectory, {
   type DirectoryFilters,
 } from "./AssetDirectory";
 import FinanceMarkets, { type MarketView } from "./FinanceMarkets";
+import LendingPreview from "./LendingPreview";
 import { FundingProgress } from "./Launchpad";
 import { fundingCampaigns, openFundingProjects } from "@/lib/funding";
 import TokenizeFlow from "./TokenizeFlow";
@@ -1956,6 +1957,14 @@ function DashboardContent({ demo }: { demo: boolean }) {
                   </div>
                 ))}
             </section>
+          )}
+          {tab === "Portfolio" && (
+            <LendingPreview
+              onPreview={() => {
+                setMarketView("lending");
+                setTab("Markets");
+              }}
+            />
           )}
           {marketLoaded && tab === "Compose" && (
             <section className="compose-layout">
