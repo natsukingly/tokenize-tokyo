@@ -1,3 +1,5 @@
+"use client";
+import { useLayoutEffect, useRef, useState } from "react";
 /** Logo lab picks, rendered inline so app fonts apply. variant: "plate" (10-A1), "stack" (01-A1), "grid" (09-x3). */
 export type BrandVariant = "plate" | "stack" | "stackw" | "grid" | "jp" | "bar" | "mono" | "terminal";
 export const BRAND_VARIANTS: BrandVariant[] = ["stack", "stackw", "plate", "grid", "jp", "bar", "mono", "terminal"];
@@ -77,16 +79,7 @@ export default function BrandPlate({ className = "", width = 190, variant = "sta
       </svg>
     );
   }
-  if (variant === "mono") {
-    const height = Math.round((width * 64) / 190);
-    return (
-      <svg className={className} width={width} height={height} viewBox="0 0 190 64" role="img" aria-label={label}>
-        <text x="0" y="30" fontFamily="'Manrope', 'DM Sans', sans-serif" fontWeight="800" fontSize="21" fill={INK} style={{ ...upright, letterSpacing: "-0.4px" }}>TOKENIZE TOKY</text>
-        <circle cx="178" cy="22.5" r="7.5" fill="none" stroke={Y} strokeWidth="3" /><circle cx="178" cy="22.5" r="2.2" fill={Y} />
-        <text x="0.5" y="50" fontFamily="'DM Sans', 'Noto Sans JP', sans-serif" fontWeight="500" fontSize="7" fill={MUTED} style={{ ...upright, letterSpacing: "2.4px" }}>東京トークン化計画 · URBAN RIGHTS</text>
-      </svg>
-    );
-  }
+  if (variant === "mono") return <MonoWordmark className={className} width={width} label={label} />;
   if (variant === "terminal") {
     const height = Math.round((width * 64) / 190);
     return (
@@ -109,6 +102,29 @@ export default function BrandPlate({ className = "", width = 190, variant = "sta
       <text x="62.5" y="47" fontFamily="'DM Sans', 'Noto Sans JP', sans-serif" fontWeight="500" fontSize="6.6" fill={MUTED} style={{ ...upright, letterSpacing: "0.9px" }}>東京トークン化計画 · URBAN RIGHTS PROTOCOL</text>
       <g fill="#3a3e45"><circle cx="240" cy="10" r="1.6" /><circle cx="240" cy="54" r="1.6" /></g>
       <text x="240" y="34.5" fontFamily="'IBM Plex Mono', ui-monospace, monospace" fontSize="6" fill={Y} textAnchor="middle" style={{ ...upright, letterSpacing: "0" }}>01</text>
+    </svg>
+  );
+}
+
+/** "TOKENIZE TOKY" + a target ring standing in for the last O; the ring is placed from the measured text width. */
+function MonoWordmark({ className, width, label }: { className: string; width: number; label: string }) {
+  const textRef = useRef<SVGTextElement>(null);
+  const [end, setEnd] = useState(150);
+  useLayoutEffect(() => {
+    const el = textRef.current;
+    if (!el) return;
+    const measure = () => setEnd(el.getComputedTextLength());
+    measure();
+    if (typeof document !== "undefined" && "fonts" in document) document.fonts.ready.then(measure);
+  }, []);
+  const r = 7.2, cx = end + 3 + r;
+  const height = Math.round((width * 64) / 190);
+  return (
+    <svg className={className} width={width} height={height} viewBox="0 0 190 64" role="img" aria-label={label}>
+      <text ref={textRef} x="0" y="30" fontFamily="'Manrope', 'DM Sans', sans-serif" fontWeight="800" fontSize="21" fill={INK} style={{ ...upright, letterSpacing: "-0.4px" }}>TOKENIZE TOKY</text>
+      <circle cx={cx} cy="22.6" r={r} fill="none" stroke={Y} strokeWidth="3" />
+      <circle cx={cx} cy="22.6" r="2.1" fill={Y} />
+      <text x="0.5" y="50" fontFamily="'DM Sans', 'Noto Sans JP', sans-serif" fontWeight="500" fontSize="7" fill={MUTED} style={{ ...upright, letterSpacing: "2.4px" }}>東京トークン化計画 · URBAN RIGHTS</text>
     </svg>
   );
 }
