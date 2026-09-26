@@ -51,14 +51,15 @@
   align-items: center;
   gap: 12px;
   width: 100%;
-  min-height: 50px;
-  padding: 12px 14px;
+  min-height: 56px;
+  padding: 14px 16px;
   border: 1px solid #3a3e43;
   border-radius: 6px;
   background: #1d2024;
   color: #f1f2f3;
   font-size: 14px;
   font-weight: 500;
+  line-height: 1.4;
   text-align: left;
   transition:
     border-color 120ms ease,
@@ -72,6 +73,17 @@
 .provider svg {
   flex-shrink: 0;
   color: #aeb2b8;
+}
+.providers .recommendedProvider {
+  border-color: #77733d;
+  background: rgb(238 232 58 / 5%);
+}
+.recommendedProvider svg:first-child {
+  color: #eee83a;
+}
+.providerHint {
+  padding: 4px 0;
+  font-size: 11px !important;
 }
 .providers .provider:hover:not(:disabled) {
   background: #24272b;

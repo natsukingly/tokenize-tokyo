@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { ArrowUpRight, Copy, LogOut, Wallet, X } from "lucide-react";
+import { ArrowUpRight, Copy, LogOut, Mail, Wallet, X } from "lucide-react";
 import { formatEther, stringToHex } from "viem";
 import { config } from "@/lib/config";
 import type { WalletConnection } from "./WalletConnection";
@@ -180,14 +180,16 @@ export default function WalletPanel({
             {wallet.access && (
               <div className={styles.providers}>
                 <button
-                  className="primary"
+                  className={`${styles.provider} ${styles.recommendedProvider}`}
                   disabled={blocked || !wallet.access.ready}
                   onClick={() => {
                     onClose();
                     wallet.access!.login();
                   }}
                 >
-                  Continue with email / Google
+                  <Mail size={18} aria-hidden="true" />
+                  <span>Continue with email / Google</span>
+                  <ArrowUpRight size={16} aria-hidden="true" />
                 </button>
                 <button
                   className={styles.provider}
@@ -205,7 +207,7 @@ export default function WalletPanel({
                   </span>
                   <ArrowUpRight size={16} aria-hidden="true" />
                 </button>
-                <p className={styles.hint}>
+                <p className={styles.providerHint}>
                   Email and Google login are powered by Privy. You review
                   transactions before sending.
                 </p>

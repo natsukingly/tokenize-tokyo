@@ -212,9 +212,15 @@
   line-height: 18px;
 }
 .topbar .header-tokenize {
-  padding: 0 14px;
+  gap: 8px;
+  padding: 0 16px;
   font-size: 12px;
+  line-height: 1;
   white-space: nowrap;
+}
+.topbar .header-tokenize > svg {
+  display: block;
+  flex: none;
 }
 /* Explanatory copy is available on demand; map-provider attribution stays visible. */
 .city-view .map-wrap .map-disclaimer {

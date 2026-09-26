@@ -28,7 +28,7 @@ export default function LoadingOverlay({
       aria-live="polite"
       aria-atomic="true"
     >
-      <div className={styles.card}>
+      <div className={styles.content}>
         <LoaderCircle className={styles.spinner} size={28} aria-hidden="true" />
         <div>
           <strong>{title}</strong>
