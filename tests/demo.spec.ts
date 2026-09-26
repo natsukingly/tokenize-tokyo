@@ -166,7 +166,22 @@ test("3D map mounts, scoped opportunity filters and X-ray remain interactive", a
   await page.getByRole("button", { name: "City X-ray" }).click();
   await expect(page.getByText("URBAN RIGHTS / X-RAY")).toBeVisible();
   await page.getByRole("button", { name: "Vacant Home", exact: true }).click();
-  const marker = page.locator(".map-pin:visible").first();
+  const markers = page.locator(".map-pin:visible");
+  // MapLibre can keep projected markers mounted outside the clipped map.
+  // Pick a marker the user can actually hit instead of forcing a hidden one.
+  const index = await markers.evaluateAll((elements) =>
+    elements.findIndex((element) => {
+      const box = element.getBoundingClientRect();
+      return element.contains(
+        document.elementFromPoint(
+          box.x + box.width / 2,
+          box.y + box.height / 2,
+        ),
+      );
+    }),
+  );
+  expect(index).toBeGreaterThanOrEqual(0);
+  const marker = markers.nth(index);
   const name = (await marker.getAttribute("aria-label"))!.replace(
     /^Explore /,
     "",

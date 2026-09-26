@@ -4,12 +4,9 @@ test("namespace dashboard shows a searchable hierarchy, honest status and the li
   page,
 }) => {
   await page.goto("/demo", { waitUntil: "domcontentloaded" });
-  // The initial server-rendered navigation precedes client hydration and demo loading.
+  // Wait for client hydration; individual map pins may be inside a cluster.
   await expect(
-    page.getByRole("button", {
-      name: "Explore Nihonbashi Solar Roof",
-      exact: true,
-    }),
+    page.getByRole("region", { name: "Map", exact: true }),
   ).toBeVisible();
   await page
     .getByRole("navigation")

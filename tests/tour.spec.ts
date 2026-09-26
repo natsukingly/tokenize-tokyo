@@ -7,17 +7,13 @@ test("demo purchase tour follows a real simulation action and remains restartabl
 }) => {
   await page.goto("/demo?tour=1");
   await expect(
-    page.getByRole("button", {
-      name: "Explore Nihonbashi Solar Roof",
-      exact: true,
-    }),
+    page.getByRole("dialog", { name: "Welcome to TOKENIZE TOKYO" }),
   ).toBeVisible();
   await guide(page)
     .getByRole("button", { name: "Buy a right", exact: true })
     .click();
-  await page
-    .getByRole("button", { name: "Explore Nihonbashi Solar Roof", exact: true })
-    .click();
+  // Featured offers remain visible when the other spaces are clustered.
+  await page.locator(".map-pin.featured:visible").first().click();
   await guide(page)
     .getByRole("button", { name: "Inspect right", exact: true })
     .click();
@@ -51,10 +47,7 @@ test("demo owner tour reaches the Funding campaign after separate asset and righ
 }) => {
   await page.goto("/demo?tour=1");
   await expect(
-    page.getByRole("button", {
-      name: "Explore Nihonbashi Solar Roof",
-      exact: true,
-    }),
+    page.getByRole("dialog", { name: "Welcome to TOKENIZE TOKYO" }),
   ).toBeVisible();
   await guide(page)
     .getByRole("button", { name: "List my space", exact: true })

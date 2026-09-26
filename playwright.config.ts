@@ -7,6 +7,8 @@ export default defineConfig({
   timeout: 120000,
   workers: process.env.CI ? 2 : undefined,
   use: {
+    // Full Chromium's headless mode keeps WebGL map interactions responsive.
+    channel: "chromium",
     baseURL: process.env.PLAYWRIGHT_BASE_URL || "http://127.0.0.1:3000",
     viewport: { width: 1512, height: 1050 },
     screenshot: "only-on-failure",

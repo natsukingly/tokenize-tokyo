@@ -4,6 +4,7 @@ export default defineConfig({
   workers: 1,
   timeout: 180000,
   use: {
+    channel: "chromium",
     baseURL: process.env.FINANCE_APP_URL,
     viewport: { width: 1440, height: 1000 },
     screenshot: "only-on-failure",
