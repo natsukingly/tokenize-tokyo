@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Logo Lab v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Bebas+Neue&family=DM+Sans:wght@500;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@500;700&family=Manrope:wght@800&family=Noto+Sans+JP:wght@500;700&family=Zen+Kaku+Gothic+New:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{--page:#0b0c0e;--panel:#141619;--line:#26292e;--text:#f1f2f3;--dim:#8b9098;--hl:#f0df37}
+  body.light{--page:#e8e8e4;--panel:#f6f6f3;--line:#d4d4ce;--text:#0b0c0e;--dim:#5d626a;--hl:#8a7400}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--page);color:var(--text);font-family:"DM Sans",system-ui,sans-serif;transition:background .2s}
+  header{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between;padding:14px 24px;background:var(--page);border-bottom:1px solid var(--line)}
+  header h1{margin:0;font:600 15px/1.2 "IBM Plex Mono",monospace;letter-spacing:.08em}
+  header h1 b{color:var(--hl);font-weight:600}
+  .note{font-size:12px;color:var(--dim);margin:0}
+  button{font:500 12px "IBM Plex Mono",monospace;letter-spacing:.06em;color:var(--text);background:transparent;border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer}
+  button:hover{border-color:#f0df37}
+  main{max-width:1360px;margin:0 auto;padding:8px 16px 64px}
+  section{margin-top:28px}
+  section h2{margin:0 0 4px;font:600 20px "DM Sans",sans-serif}
+  section h2 span{font-family:"IBM Plex Mono",monospace;color:var(--hl);margin-right:8px}
+  .legend{margin:0 0 14px;font-size:13px;color:var(--dim)}
+  .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+  @media (max-width:900px){.grid{grid-template-columns:1fr}}
+  h3{margin:22px 0 10px;font:500 12px "IBM Plex Mono",monospace;letter-spacing:.1em;color:var(--dim);text-transform:uppercase}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;margin:0}
+  .card svg{display:block;width:100%;height:auto;border-radius:6px}
+  figcaption{margin-top:10px;display:grid;grid-template-columns:auto 1fr;gap:2px 10px;align-items:baseline}
+  .no{grid-row:span 2;font:600 12px "IBM Plex Mono",monospace;color:#f0df37;background:#0b0c0e;border-radius:4px;padding:2px 7px}
+  .cap{font-weight:600;font-size:13px}
+  .why{font-size:12.5px;color:var(--dim)}
+  .ticker{animation:tick 14s linear infinite}
+  @keyframes tick{to{transform:translateX(-360px)}}
+  @media (prefers-reduced-motion:reduce){.ticker{animation:none}}
+</style>
+</head>
+<body>
+<header>
+  <h1>TOKENIZE TOKYO <b>·</b> logo lab v2 <b>·</b> 01 / 09 / 10</h1>
+  <p class="note">Fonts are Google Fonts placeholders. Colours are fixed per card; the toggle changes only the page around them.</p>
+  <button id="toggle" type="button" aria-pressed="false">Light background</button>
+</header>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="m-grid" viewBox="0 0 64 64">
+      <path d="M32 61 20.5 46H14.5a2.5 2.5 0 0 1-2.5-2.5V25.5L32 8l20 17.5v18a2.5 2.5 0 0 1-2.5 2.5H43.5Z" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linejoin="round"/>
+      <g style="fill:var(--sg,currentColor)">
+        <rect x="21.5" y="27" width="6" height="5"/><rect x="29" y="27" width="6" height="5"/><rect x="36.5" y="27" width="6" height="5"/>
+        <rect x="21.5" y="33.5" width="6" height="5"/><rect x="29" y="33.5" width="6" height="5"/><rect x="36.5" y="33.5" width="6" height="5"/>
+      </g>
+    </symbol>
+    <symbol id="m-step" viewBox="0 0 64 64">
+      <g fill="currentColor">
+        <path d="M24 6h16l3 9H21Z"/>
+        <rect x="16" y="19" width="32" height="10" rx="1"/>
+        <path d="M10 33h44v11a2 2 0 0 1-2 2H42L32 61 22 46H12a2 2 0 0 1-2-2Z"/>
+      </g>
+    </symbol>
+    <symbol id="m-cut" viewBox="0 0 64 64">
+      <path fill="currentColor" fill-rule="evenodd" d="M32 61 20.5 46H14.5a2.5 2.5 0 0 1-2.5-2.5V25.5L32 8l20 17.5v18a2.5 2.5 0 0 1-2.5 2.5H43.5Z M21 24h22v7h-7.5v12h-7V31H21Z"/>
+    </symbol>
+    <pattern id="iso-k" width="40" height="23.094" patternUnits="userSpaceOnUse"><path d="M0 11.547 20 0 40 11.547 20 23.094Z" fill="none" stroke="#2c3036"/></pattern>
+    <pattern id="iso-g" width="40" height="23.094" patternUnits="userSpaceOnUse"><path d="M0 11.547 20 0 40 11.547 20 23.094Z" fill="none" stroke="#223127"/></pattern>
+    <clipPath id="tick-clip"><rect x="76" y="126" width="416" height="24"/></clipPath>
+  </defs>
+</svg>
+
+<main>
+<section>
+  <h2><span>01</span>Pin-roof mark + stacked wordmark</h2>
+  <p class="legend">Rows = typeface (A Bebas Neue · B Anton · C Archivo Black condensed). Columns = colour (1 yellow/black · 2 lime/green-black · 3 mono, yellow only on the solar grid).</p>
+  <div class="grid">
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="01-A1"><rect width="560" height="220" fill="#0b0c0e"/><use href="#m-grid" x="40" y="36" width="140" height="140" style="color:#f0df37;--sg:#f0df37"/>
+  <text x="204" y="94" font-family="Bebas Neue" font-size="71.68" letter-spacing="3" fill="#f0df37">TOKENIZE</text><text x="204" y="156" font-family="Bebas Neue" font-size="71.68" letter-spacing="3" fill="#f0df37">TOKYO</text>
+  <text x="206" y="188" font-family="Zen Kaku Gothic New" font-weight="500" font-size="14" letter-spacing="7" fill="#b9ad3a">東京トークン化計画</text></svg>
+<figcaption><span class="no">01-A1</span><span class="cap">Bebas Neue · Cyberpunk yellow</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="01-A2"><rect width="560" height="220" fill="#0d1310"/><use href="#m-grid" x="40" y="36" width="140" height="140" style="color:#d7f985;--sg:#d7f985"/>
+  <text x="204" y="94" font-family="Bebas Neue" font-size="71.68" letter-spacing="3" fill="#d7f985">TOKENIZE</text><text x="204" y="156" font-family="Bebas Neue" font-size="71.68" letter-spacing="3" fill="#d7f985">TOKYO</text>
+  <text x="206" y="188" font-family="Zen Kaku Gothic New" font-weight="500" font-size="14" letter-spacing="7" fill="#8fa65c">東京トークン化計画</text></svg>
+<figcaption><span class="no">01-A2</span><span class="cap">Bebas Neue · Lime on green-black</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="01-A3"><rect width="560" height="220" fill="#0b0c0e"/><use href="#m-grid" x="40" y="36" width="140" height="140" style="color:#f1f2f3;--sg:#f0df37"/>
+  <text x="204" y="94" font-family="Bebas Neue" font-size="71.68" letter-spacing="3" fill="#f1f2f3">TOKENIZE</text><text x="204" y="156" font-family="Bebas Neue" font-size="71.68" letter-spacing="3" fill="#f1f2f3">TOKYO</text>
+  <text x="206" y="188" font-family="Zen Kaku Gothic New" font-weight="500" font-size="14" letter-spacing="7" fill="#8b9098">東京トークン化計画</text></svg>
+<figcaption><span class="no">01-A3</span><span class="cap">Bebas Neue · Mono + yellow solar grid</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="01-B1"><rect width="560" height="220" fill="#0b0c0e"/><use href="#m-grid" x="40" y="36" width="140" height="140" style="color:#f0df37;--sg:#f0df37"/>
+  <text x="204" y="94" font-family="Anton" font-size="57.6" letter-spacing="2" fill="#f0df37">TOKENIZE</text><text x="204" y="156" font-family="Anton" font-size="57.6" letter-spacing="2" fill="#f0df37">TOKYO</text>
+  <text x="206" y="188" font-family="Zen Kaku Gothic New" font-weight="500" font-size="14" letter-spacing="7" fill="#b9ad3a">東京トークン化計画</text></svg>
+<figcaption><span class="no">01-B1</span><span class="cap">Anton · Cyberpunk yellow</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="01-B2"><rect width="560" height="220" fill="#0d1310"/><use href="#m-grid" x="40" y="36" width="140" height="140" style="color:#d7f985;--sg:#d7f985"/>
+  <text x="204" y="94" font-family="Anton" font-size="57.6" letter-spacing="2" fill="#d7f985">TOKENIZE</text><text x="204" y="156" font-family="Anton" font-size="57.6" letter-spacing="2" fill="#d7f985">TOKYO</text>
+  <text x="206" y="188" font-family="Zen Kaku Gothic New" font-weight="500" font-size="14" letter-spacing="7" fill="#8fa65c">東京トークン化計画</text></svg>
+<figcaption><span class="no">01-B2</span><span class="cap">Anton · Lime on green-black</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="01-B3"><rect width="560" height="220" fill="#0b0c0e"/><use href="#m-grid" x="40" y="36" width="140" height="140" style="color:#f1f2f3;--sg:#f0df37"/>
+  <text x="204" y="94" font-family="Anton" font-size="57.6" letter-spacing="2" fill="#f1f2f3">TOKENIZE</text><text x="204" y="156" font-family="Anton" font-size="57.6" letter-spacing="2" fill="#f1f2f3">TOKYO</text>
+  <text x="206" y="188" font-family="Zen Kaku Gothic New" font-weight="500" font-size="14" letter-spacing="7" fill="#8b9098">東京トークン化計画</text></svg>
+<figcaption><span class="no">01-B3</span><span class="cap">Anton · Mono + yellow solar grid</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="01-C1"><rect width="560" height="220" fill="#0b0c0e"/><use href="#m-grid" x="40" y="36" width="140" height="140" style="color:#f0df37;--sg:#f0df37"/>
+  <text transform="translate(204 94) scale(.78 1)" font-family="Archivo Black" font-size="51.2" letter-spacing="1" fill="#f0df37">TOKENIZE</text><text transform="translate(204 156) scale(.78 1)" font-family="Archivo Black" font-size="51.2" letter-spacing="1" fill="#f0df37">TOKYO</text>
+  <text x="206" y="188" font-family="Zen Kaku Gothic New" font-weight="500" font-size="14" letter-spacing="7" fill="#b9ad3a">東京トークン化計画</text></svg>
+<figcaption><span class="no">01-C1</span><span class="cap">Archivo Black, condensed 78% · Cyberpunk yellow</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="01-C2"><rect width="560" height="220" fill="#0d1310"/><use href="#m-grid" x="40" y="36" width="140" height="140" style="color:#d7f985;--sg:#d7f985"/>
+  <text transform="translate(204 94) scale(.78 1)" font-family="Archivo Black" font-size="51.2" letter-spacing="1" fill="#d7f985">TOKENIZE</text><text transform="translate(204 156) scale(.78 1)" font-family="Archivo Black" font-size="51.2" letter-spacing="1" fill="#d7f985">TOKYO</text>
+  <text x="206" y="188" font-family="Zen Kaku Gothic New" font-weight="500" font-size="14" letter-spacing="7" fill="#8fa65c">東京トークン化計画</text></svg>
+<figcaption><span class="no">01-C2</span><span class="cap">Archivo Black, condensed 78% · Lime on green-black</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="01-C3"><rect width="560" height="220" fill="#0b0c0e"/><use href="#m-grid" x="40" y="36" width="140" height="140" style="color:#f1f2f3;--sg:#f0df37"/>
+  <text transform="translate(204 94) scale(.78 1)" font-family="Archivo Black" font-size="51.2" letter-spacing="1" fill="#f1f2f3">TOKENIZE</text><text transform="translate(204 156) scale(.78 1)" font-family="Archivo Black" font-size="51.2" letter-spacing="1" fill="#f1f2f3">TOKYO</text>
+  <text x="206" y="188" font-family="Zen Kaku Gothic New" font-weight="500" font-size="14" letter-spacing="7" fill="#8b9098">東京トークン化計画</text></svg>
+<figcaption><span class="no">01-C3</span><span class="cap">Archivo Black, condensed 78% · Mono + yellow solar grid</span></figcaption></figure></div>
+  <h3>Extras · mark variations (hero 160 + 32 / 20 px scale check)</h3>
+  <div class="grid">
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="01-x1"><rect width="560" height="220" fill="#0b0c0e"/>
+  <use href="#m-grid" x="28" y="30" width="160" height="160" style="color:#f0df37;--sg:#f0df37"/>
+  <text x="210" y="96" font-family="Bebas Neue" font-size="64" letter-spacing="3" fill="#f0df37">TOKENIZE</text>
+  <text x="210" y="152" font-family="Bebas Neue" font-size="64" letter-spacing="3" fill="#f0df37">TOKYO</text>
+  <text x="211" y="180" font-family="Zen Kaku Gothic New" font-weight="500" font-size="12" letter-spacing="6" fill="#b9ad3a">東京トークン化計画</text>
+  <line x1="448" y1="120" x2="448" y2="196" stroke="#2a2d31"/>
+  <use href="#m-grid" x="468" y="150" width="32" height="32" style="color:#f0df37;--sg:#f0df37"/><use href="#m-grid" x="514" y="156" width="20" height="20" style="color:#f0df37;--sg:#f0df37"/>
+  <text x="484" y="206" font-family="IBM Plex Mono" font-size="9" fill="#8b9098" text-anchor="middle">32</text>
+  <text x="524" y="206" font-family="IBM Plex Mono" font-size="9" fill="#8b9098" text-anchor="middle">20</text></svg>
+<figcaption><span class="no">01-x1</span><span class="cap">Current pin-roof, 3×2 solar grid</span><span class="why">Most literal ("solar rooftop"); the six cells merge into a blob at 20 px.</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="01-x2"><rect width="560" height="220" fill="#0b0c0e"/>
+  <use href="#m-step" x="28" y="30" width="160" height="160" style="color:#f0df37;--sg:#f0df37"/>
+  <text x="210" y="96" font-family="Bebas Neue" font-size="64" letter-spacing="3" fill="#f0df37">TOKENIZE</text>
+  <text x="210" y="152" font-family="Bebas Neue" font-size="64" letter-spacing="3" fill="#f0df37">TOKYO</text>
+  <text x="211" y="180" font-family="Zen Kaku Gothic New" font-weight="500" font-size="12" letter-spacing="6" fill="#b9ad3a">東京トークン化計画</text>
+  <line x1="448" y1="120" x2="448" y2="196" stroke="#2a2d31"/>
+  <use href="#m-step" x="468" y="150" width="32" height="32" style="color:#f0df37;--sg:#f0df37"/><use href="#m-step" x="514" y="156" width="20" height="20" style="color:#f0df37;--sg:#f0df37"/>
+  <text x="484" y="206" font-family="IBM Plex Mono" font-size="9" fill="#8b9098" text-anchor="middle">32</text>
+  <text x="524" y="206" font-family="IBM Plex Mono" font-size="9" fill="#8b9098" text-anchor="middle">20</text></svg>
+<figcaption><span class="no">01-x2</span><span class="cap">Stepped building: roof / floor / land</span><span class="why">Three solid bands read as "layers of rights"; holds up best at 20 px.</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="01-x3"><rect width="560" height="220" fill="#0b0c0e"/>
+  <use href="#m-cut" x="28" y="30" width="160" height="160" style="color:#f0df37;--sg:#f0df37"/>
+  <text x="210" y="96" font-family="Bebas Neue" font-size="64" letter-spacing="3" fill="#f0df37">TOKENIZE</text>
+  <text x="210" y="152" font-family="Bebas Neue" font-size="64" letter-spacing="3" fill="#f0df37">TOKYO</text>
+  <text x="211" y="180" font-family="Zen Kaku Gothic New" font-weight="500" font-size="12" letter-spacing="6" fill="#b9ad3a">東京トークン化計画</text>
+  <line x1="448" y1="120" x2="448" y2="196" stroke="#2a2d31"/>
+  <use href="#m-cut" x="468" y="150" width="32" height="32" style="color:#f0df37;--sg:#f0df37"/><use href="#m-cut" x="514" y="156" width="20" height="20" style="color:#f0df37;--sg:#f0df37"/>
+  <text x="484" y="206" font-family="IBM Plex Mono" font-size="9" fill="#8b9098" text-anchor="middle">32</text>
+  <text x="524" y="206" font-family="IBM Plex Mono" font-size="9" fill="#8b9098" text-anchor="middle">20</text></svg>
+<figcaption><span class="no">01-x3</span><span class="cap">Pin-roof with a T cut out</span><span class="why">Solid silhouette + initial; strong at favicon size, but the T repeats the rejected T-badge idea.</span></figcaption></figure></div>
+</section>
+<section>
+  <h2><span>09</span>Iso city grid + one lit block</h2>
+  <p class="legend">Rows = typeface + JP placement (A Anton, JP below · B Bebas, JP tag above right · C DM Sans 800 wide, JP in chip). Columns = colour (1 yellow · 2 lime · 3 cyan with white type).</p>
+  <div class="grid">
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="09-A1"><rect width="560" height="220" fill="#0b0c0e"/><rect width="560" height="220" fill="url(#iso-k)"/>
+  <path d="M480.00 34.64 L500.00 46.19 V69.28 L480.00 57.73Z" fill="#b3a520"/>
+  <path d="M520.00 34.64 L500.00 46.19 V69.28 L520.00 57.73Z" fill="#8a7f18"/>
+  <path d="M480.00 34.64 L500.00 23.09 L520.00 34.64 L500.00 46.19Z" fill="#f0df37"/><text x="40" y="150" font-family="Anton" font-size="64" letter-spacing="1.5" fill="#f1f2f3">TOKENIZE TOKYO</text>
+    <text x="42" y="186" font-family="Noto Sans JP" font-weight="700" font-size="15" letter-spacing="7" fill="#8b9098">東京トークン化計画</text></svg>
+<figcaption><span class="no">09-A1</span><span class="cap">Anton · JP below · Yellow block · black grid</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="09-A2"><rect width="560" height="220" fill="#0d1310"/><rect width="560" height="220" fill="url(#iso-g)"/>
+  <path d="M480.00 34.64 L500.00 46.19 V69.28 L480.00 57.73Z" fill="#a1bb63"/>
+  <path d="M520.00 34.64 L500.00 46.19 V69.28 L520.00 57.73Z" fill="#7a8e4b"/>
+  <path d="M480.00 34.64 L500.00 23.09 L520.00 34.64 L500.00 46.19Z" fill="#d7f985"/><text x="40" y="150" font-family="Anton" font-size="64" letter-spacing="1.5" fill="#eef3e6">TOKENIZE TOKYO</text>
+    <text x="42" y="186" font-family="Noto Sans JP" font-weight="700" font-size="15" letter-spacing="7" fill="#7f9580">東京トークン化計画</text></svg>
+<figcaption><span class="no">09-A2</span><span class="cap">Anton · JP below · Lime block · green-black grid</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="09-A3"><rect width="560" height="220" fill="#0b0c0e"/><rect width="560" height="220" fill="url(#iso-k)"/>
+  <path d="M480.00 34.64 L500.00 46.19 V69.28 L480.00 57.73Z" fill="#26a9bf"/>
+  <path d="M520.00 34.64 L500.00 46.19 V69.28 L520.00 57.73Z" fill="#1d8091"/>
+  <path d="M480.00 34.64 L500.00 23.09 L520.00 34.64 L500.00 46.19Z" fill="#33e1ff"/><text x="40" y="150" font-family="Anton" font-size="64" letter-spacing="1.5" fill="#ffffff">TOKENIZE TOKYO</text>
+    <text x="42" y="186" font-family="Noto Sans JP" font-weight="700" font-size="15" letter-spacing="7" fill="#8b9098">東京トークン化計画</text></svg>
+<figcaption><span class="no">09-A3</span><span class="cap">Anton · JP below · Cyan block · black grid, white type</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="09-B1"><rect width="560" height="220" fill="#0b0c0e"/><rect width="560" height="220" fill="url(#iso-k)"/>
+  <path d="M480.00 34.64 L500.00 46.19 V69.28 L480.00 57.73Z" fill="#b3a520"/>
+  <path d="M520.00 34.64 L500.00 46.19 V69.28 L520.00 57.73Z" fill="#8a7f18"/>
+  <path d="M480.00 34.64 L500.00 23.09 L520.00 34.64 L500.00 46.19Z" fill="#f0df37"/><text x="468" y="100" font-family="Noto Sans JP" font-weight="700" font-size="13" letter-spacing="4" text-anchor="end" fill="#8b9098">東京トークン化計画</text>
+    <text x="40" y="170" font-family="Bebas Neue" font-size="78" letter-spacing="3" fill="#f1f2f3">TOKENIZE TOKYO</text></svg>
+<figcaption><span class="no">09-B1</span><span class="cap">Bebas Neue · JP tag above, right · Yellow block · black grid</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="09-B2"><rect width="560" height="220" fill="#0d1310"/><rect width="560" height="220" fill="url(#iso-g)"/>
+  <path d="M480.00 34.64 L500.00 46.19 V69.28 L480.00 57.73Z" fill="#a1bb63"/>
+  <path d="M520.00 34.64 L500.00 46.19 V69.28 L520.00 57.73Z" fill="#7a8e4b"/>
+  <path d="M480.00 34.64 L500.00 23.09 L520.00 34.64 L500.00 46.19Z" fill="#d7f985"/><text x="468" y="100" font-family="Noto Sans JP" font-weight="700" font-size="13" letter-spacing="4" text-anchor="end" fill="#7f9580">東京トークン化計画</text>
+    <text x="40" y="170" font-family="Bebas Neue" font-size="78" letter-spacing="3" fill="#eef3e6">TOKENIZE TOKYO</text></svg>
+<figcaption><span class="no">09-B2</span><span class="cap">Bebas Neue · JP tag above, right · Lime block · green-black grid</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="09-B3"><rect width="560" height="220" fill="#0b0c0e"/><rect width="560" height="220" fill="url(#iso-k)"/>
+  <path d="M480.00 34.64 L500.00 46.19 V69.28 L480.00 57.73Z" fill="#26a9bf"/>
+  <path d="M520.00 34.64 L500.00 46.19 V69.28 L520.00 57.73Z" fill="#1d8091"/>
+  <path d="M480.00 34.64 L500.00 23.09 L520.00 34.64 L500.00 46.19Z" fill="#33e1ff"/><text x="468" y="100" font-family="Noto Sans JP" font-weight="700" font-size="13" letter-spacing="4" text-anchor="end" fill="#8b9098">東京トークン化計画</text>
+    <text x="40" y="170" font-family="Bebas Neue" font-size="78" letter-spacing="3" fill="#ffffff">TOKENIZE TOKYO</text></svg>
+<figcaption><span class="no">09-B3</span><span class="cap">Bebas Neue · JP tag above, right · Cyan block · black grid, white type</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="09-C1"><rect width="560" height="220" fill="#0b0c0e"/><rect width="560" height="220" fill="url(#iso-k)"/>
+  <path d="M480.00 34.64 L500.00 46.19 V69.28 L480.00 57.73Z" fill="#b3a520"/>
+  <path d="M520.00 34.64 L500.00 46.19 V69.28 L520.00 57.73Z" fill="#8a7f18"/>
+  <path d="M480.00 34.64 L500.00 23.09 L520.00 34.64 L500.00 46.19Z" fill="#f0df37"/><text x="40" y="132" font-family="DM Sans" font-weight="800" font-size="31" letter-spacing="9" fill="#f1f2f3">TOKENIZE TOKYO</text>
+    <rect x="40.5" y="152.5" width="170" height="26" rx="13" fill="#0b0c0e" stroke="#8b9098"/>
+    <text x="125.5" y="170" font-family="Noto Sans JP" font-weight="700" font-size="12" letter-spacing="4" text-anchor="middle" fill="#8b9098">東京トークン化計画</text></svg>
+<figcaption><span class="no">09-C1</span><span class="cap">DM Sans 800 wide · JP in chip · Yellow block · black grid</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="09-C2"><rect width="560" height="220" fill="#0d1310"/><rect width="560" height="220" fill="url(#iso-g)"/>
+  <path d="M480.00 34.64 L500.00 46.19 V69.28 L480.00 57.73Z" fill="#a1bb63"/>
+  <path d="M520.00 34.64 L500.00 46.19 V69.28 L520.00 57.73Z" fill="#7a8e4b"/>
+  <path d="M480.00 34.64 L500.00 23.09 L520.00 34.64 L500.00 46.19Z" fill="#d7f985"/><text x="40" y="132" font-family="DM Sans" font-weight="800" font-size="31" letter-spacing="9" fill="#eef3e6">TOKENIZE TOKYO</text>
+    <rect x="40.5" y="152.5" width="170" height="26" rx="13" fill="#0d1310" stroke="#7f9580"/>
+    <text x="125.5" y="170" font-family="Noto Sans JP" font-weight="700" font-size="12" letter-spacing="4" text-anchor="middle" fill="#7f9580">東京トークン化計画</text></svg>
+<figcaption><span class="no">09-C2</span><span class="cap">DM Sans 800 wide · JP in chip · Lime block · green-black grid</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="09-C3"><rect width="560" height="220" fill="#0b0c0e"/><rect width="560" height="220" fill="url(#iso-k)"/>
+  <path d="M480.00 34.64 L500.00 46.19 V69.28 L480.00 57.73Z" fill="#26a9bf"/>
+  <path d="M520.00 34.64 L500.00 46.19 V69.28 L520.00 57.73Z" fill="#1d8091"/>
+  <path d="M480.00 34.64 L500.00 23.09 L520.00 34.64 L500.00 46.19Z" fill="#33e1ff"/><text x="40" y="132" font-family="DM Sans" font-weight="800" font-size="31" letter-spacing="9" fill="#ffffff">TOKENIZE TOKYO</text>
+    <rect x="40.5" y="152.5" width="170" height="26" rx="13" fill="#0b0c0e" stroke="#8b9098"/>
+    <text x="125.5" y="170" font-family="Noto Sans JP" font-weight="700" font-size="12" letter-spacing="4" text-anchor="middle" fill="#8b9098">東京トークン化計画</text></svg>
+<figcaption><span class="no">09-C3</span><span class="cap">DM Sans 800 wide · JP in chip · Cyan block · black grid, white type</span></figcaption></figure></div>
+  <h3>Extras · one block ("activation") vs cluster ("market")</h3>
+  <div class="grid">
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="09-x1"><rect width="560" height="220" fill="#0b0c0e"/><rect width="560" height="220" fill="url(#iso-k)" opacity="1"/><path d="M480.00 46.19 L500.00 57.73 V80.83 L480.00 69.28Z" fill="#b3a520"/>
+  <path d="M520.00 46.19 L500.00 57.73 V80.83 L520.00 69.28Z" fill="#8a7f18"/>
+  <path d="M480.00 46.19 L500.00 34.64 L520.00 46.19 L500.00 57.73Z" fill="#f0df37"/>
+  <text x="40" y="150" font-family="Anton" font-size="64" letter-spacing="1.5" fill="#f1f2f3">TOKENIZE TOKYO</text>
+  <text x="42" y="186" font-family="Noto Sans JP" font-weight="700" font-size="15" letter-spacing="7" fill="#8b9098">東京トークン化計画</text></svg>
+<figcaption><span class="no">09-x1</span><span class="cap">One lit block = "activation"</span><span class="why">One asset switched on: the clearest single story, and it survives shrinking.</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="09-x2"><rect width="560" height="220" fill="#0b0c0e"/><rect width="560" height="220" fill="url(#iso-k)" opacity="1"/><path d="M480.00 11.55 L500.00 23.09 V69.28 L480.00 57.73Z" fill="#b3a520"/>
+  <path d="M520.00 11.55 L500.00 23.09 V69.28 L520.00 57.73Z" fill="#8a7f18"/>
+  <path d="M480.00 11.55 L500.00 -0.00 L520.00 11.55 L500.00 23.09Z" fill="#f0df37"/><path d="M460.00 46.19 L480.00 57.73 V80.83 L460.00 69.28Z" fill="#b3a520"/>
+  <path d="M500.00 46.19 L480.00 57.73 V80.83 L500.00 69.28Z" fill="#8a7f18"/>
+  <path d="M460.00 46.19 L480.00 34.64 L500.00 46.19 L480.00 57.73Z" fill="#f0df37"/><path d="M500.00 34.64 L520.00 46.19 V80.83 L500.00 69.28Z" fill="#b3a520"/>
+  <path d="M540.00 34.64 L520.00 46.19 V80.83 L540.00 69.28Z" fill="#8a7f18"/>
+  <path d="M500.00 34.64 L520.00 23.09 L540.00 34.64 L520.00 46.19Z" fill="#f0df37"/>
+  <text x="40" y="150" font-family="Anton" font-size="64" letter-spacing="1.5" fill="#f1f2f3">TOKENIZE TOKYO</text>
+  <text x="42" y="186" font-family="Noto Sans JP" font-weight="700" font-size="15" letter-spacing="7" fill="#8b9098">東京トークン化計画</text></svg>
+<figcaption><span class="no">09-x2</span><span class="cap">Cluster of three = "market"</span><span class="why">Reads as a live market with depth; busier, and loses shape below ~120 px.</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="09-x3"><rect width="560" height="220" fill="#0b0c0e"/><rect width="560" height="220" fill="url(#iso-k)" opacity="0.45"/><line x1="500" y1="0" x2="500" y2="46.19" stroke="#f0df37" stroke-width="1.5"/><circle cx="500" cy="4" r="3" fill="#f0df37"/><path d="M480.00 46.19 L500.00 57.73 V80.83 L480.00 69.28Z" fill="#b3a520"/>
+  <path d="M520.00 46.19 L500.00 57.73 V80.83 L520.00 69.28Z" fill="#8a7f18"/>
+  <path d="M480.00 46.19 L500.00 34.64 L520.00 46.19 L500.00 57.73Z" fill="#f0df37"/>
+  <text x="40" y="150" font-family="Anton" font-size="64" letter-spacing="1.5" fill="#f1f2f3">TOKENIZE TOKYO</text>
+  <text x="42" y="186" font-family="Noto Sans JP" font-weight="700" font-size="15" letter-spacing="7" fill="#8b9098">東京トークン化計画</text></svg>
+<figcaption><span class="no">09-x3</span><span class="cap">Dim grid + pin line to one block</span><span class="why">Adds the "located on the map" cue from the app; the drop line is the strongest focal point of the three.</span></figcaption></figure></div>
+</section>
+<section>
+  <h2><span>10</span>Data plate / ticker</h2>
+  <p class="legend">Rows = typeface + second line (A DM Sans 700, JP + protocol · B Manrope 800, JP only · C IBM Plex Sans 700, protocol line + JP corner tag). Columns = colour (1 black/yellow · 2 green-black/lime · 3 inverted yellow).</p>
+  <div class="grid">
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="10-A1"><rect width="560" height="220" fill="#191b1f"/>
+  <rect x="28" y="46" width="504" height="128" rx="14" fill="#0b0c0e" stroke="#3a3e45" stroke-width="1.5"/>
+  <g fill="#3a3e45"><circle cx="512" cy="64" r="3"/><circle cx="512" cy="156" r="3"/></g>
+  <text x="512" y="114" font-family="IBM Plex Mono" font-size="10" fill="#f0df37" text-anchor="middle" letter-spacing="1">01</text><rect x="46" y="66" width="8" height="88" rx="2" fill="#f0df37"/>
+    <text x="76" y="113" font-family="DM Sans" font-weight="700" font-size="38" letter-spacing=".5" fill="#f1f2f3">TOKENIZE TOKYO</text>
+    <text x="77" y="143" font-family="DM Sans, Noto Sans JP" font-weight="500" font-size="11.5" letter-spacing="2" fill="#8b9098">東京トークン化計画 · URBAN RIGHTS PROTOCOL 01</text></svg>
+<figcaption><span class="no">10-A1</span><span class="cap">DM Sans 700 · Black plate · yellow bar</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="10-A2"><rect width="560" height="220" fill="#16201a"/>
+  <rect x="28" y="46" width="504" height="128" rx="14" fill="#0d1310" stroke="#2a3a2f" stroke-width="1.5"/>
+  <g fill="#2a3a2f"><circle cx="512" cy="64" r="3"/><circle cx="512" cy="156" r="3"/></g>
+  <text x="512" y="114" font-family="IBM Plex Mono" font-size="10" fill="#d7f985" text-anchor="middle" letter-spacing="1">01</text><rect x="46" y="66" width="8" height="88" rx="2" fill="#d7f985"/>
+    <text x="76" y="113" font-family="DM Sans" font-weight="700" font-size="38" letter-spacing=".5" fill="#eef3e6">TOKENIZE TOKYO</text>
+    <text x="77" y="143" font-family="DM Sans, Noto Sans JP" font-weight="500" font-size="11.5" letter-spacing="2" fill="#7f9580">東京トークン化計画 · URBAN RIGHTS PROTOCOL 01</text></svg>
+<figcaption><span class="no">10-A2</span><span class="cap">DM Sans 700 · Green-black plate · lime bar</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="10-A3"><rect width="560" height="220" fill="#0b0c0e"/>
+  <rect x="28" y="46" width="504" height="128" rx="14" fill="#f0df37" stroke="#f0df37" stroke-width="1.5"/>
+  <g fill="#b3a520"><circle cx="512" cy="64" r="3"/><circle cx="512" cy="156" r="3"/></g>
+  <text x="512" y="114" font-family="IBM Plex Mono" font-size="10" fill="#0b0c0e" text-anchor="middle" letter-spacing="1">01</text><rect x="46" y="66" width="8" height="88" rx="2" fill="#0b0c0e"/>
+    <text x="76" y="113" font-family="DM Sans" font-weight="700" font-size="38" letter-spacing=".5" fill="#0b0c0e">TOKENIZE TOKYO</text>
+    <text x="77" y="143" font-family="DM Sans, Noto Sans JP" font-weight="500" font-size="11.5" letter-spacing="2" fill="#4a4515">東京トークン化計画 · URBAN RIGHTS PROTOCOL 01</text></svg>
+<figcaption><span class="no">10-A3</span><span class="cap">DM Sans 700 · Yellow plate · black bar (inverted)</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="10-B1"><rect width="560" height="220" fill="#191b1f"/>
+  <rect x="28" y="46" width="504" height="128" rx="14" fill="#0b0c0e" stroke="#3a3e45" stroke-width="1.5"/>
+  <g fill="#3a3e45"><circle cx="512" cy="64" r="3"/><circle cx="512" cy="156" r="3"/></g>
+  <text x="512" y="114" font-family="IBM Plex Mono" font-size="10" fill="#f0df37" text-anchor="middle" letter-spacing="1">01</text><rect x="46" y="66" width="8" height="88" rx="2" fill="#f0df37"/>
+    <text x="76" y="109" font-family="Manrope" font-weight="800" font-size="37" letter-spacing="0" fill="#f1f2f3">TOKENIZE TOKYO</text>
+    <text x="77" y="143" font-family="Noto Sans JP" font-weight="700" font-size="19" letter-spacing="6" fill="#8b9098">東京トークン化計画</text></svg>
+<figcaption><span class="no">10-B1</span><span class="cap">Manrope 800 · JP only, larger · Black plate · yellow bar</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="10-B2"><rect width="560" height="220" fill="#16201a"/>
+  <rect x="28" y="46" width="504" height="128" rx="14" fill="#0d1310" stroke="#2a3a2f" stroke-width="1.5"/>
+  <g fill="#2a3a2f"><circle cx="512" cy="64" r="3"/><circle cx="512" cy="156" r="3"/></g>
+  <text x="512" y="114" font-family="IBM Plex Mono" font-size="10" fill="#d7f985" text-anchor="middle" letter-spacing="1">01</text><rect x="46" y="66" width="8" height="88" rx="2" fill="#d7f985"/>
+    <text x="76" y="109" font-family="Manrope" font-weight="800" font-size="37" letter-spacing="0" fill="#eef3e6">TOKENIZE TOKYO</text>
+    <text x="77" y="143" font-family="Noto Sans JP" font-weight="700" font-size="19" letter-spacing="6" fill="#7f9580">東京トークン化計画</text></svg>
+<figcaption><span class="no">10-B2</span><span class="cap">Manrope 800 · JP only, larger · Green-black plate · lime bar</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="10-B3"><rect width="560" height="220" fill="#0b0c0e"/>
+  <rect x="28" y="46" width="504" height="128" rx="14" fill="#f0df37" stroke="#f0df37" stroke-width="1.5"/>
+  <g fill="#b3a520"><circle cx="512" cy="64" r="3"/><circle cx="512" cy="156" r="3"/></g>
+  <text x="512" y="114" font-family="IBM Plex Mono" font-size="10" fill="#0b0c0e" text-anchor="middle" letter-spacing="1">01</text><rect x="46" y="66" width="8" height="88" rx="2" fill="#0b0c0e"/>
+    <text x="76" y="109" font-family="Manrope" font-weight="800" font-size="37" letter-spacing="0" fill="#0b0c0e">TOKENIZE TOKYO</text>
+    <text x="77" y="143" font-family="Noto Sans JP" font-weight="700" font-size="19" letter-spacing="6" fill="#4a4515">東京トークン化計画</text></svg>
+<figcaption><span class="no">10-B3</span><span class="cap">Manrope 800 · JP only, larger · Yellow plate · black bar (inverted)</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="10-C1"><rect width="560" height="220" fill="#191b1f"/>
+  <rect x="28" y="46" width="504" height="128" rx="14" fill="#0b0c0e" stroke="#3a3e45" stroke-width="1.5"/>
+  <g fill="#3a3e45"><circle cx="512" cy="64" r="3"/><circle cx="512" cy="156" r="3"/></g>
+  <text x="512" y="114" font-family="IBM Plex Mono" font-size="10" fill="#f0df37" text-anchor="middle" letter-spacing="1">01</text><text x="46" y="66" font-family="Noto Sans JP" font-weight="700" font-size="9" letter-spacing="3" fill="#8b9098">東京トークン化計画</text>
+    <rect x="46" y="76" width="8" height="80" rx="2" fill="#f0df37"/>
+    <text x="76" y="118" font-family="IBM Plex Sans" font-weight="700" font-size="37" letter-spacing="0" fill="#f1f2f3">TOKENIZE TOKYO</text>
+    <text x="77" y="146" font-family="IBM Plex Sans" font-weight="500" font-size="11.5" letter-spacing="2.5" fill="#8b9098">URBAN RIGHTS PROTOCOL · TOKYO · 01</text></svg>
+<figcaption><span class="no">10-C1</span><span class="cap">IBM Plex Sans 700 · JP corner tag · Black plate · yellow bar</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="10-C2"><rect width="560" height="220" fill="#16201a"/>
+  <rect x="28" y="46" width="504" height="128" rx="14" fill="#0d1310" stroke="#2a3a2f" stroke-width="1.5"/>
+  <g fill="#2a3a2f"><circle cx="512" cy="64" r="3"/><circle cx="512" cy="156" r="3"/></g>
+  <text x="512" y="114" font-family="IBM Plex Mono" font-size="10" fill="#d7f985" text-anchor="middle" letter-spacing="1">01</text><text x="46" y="66" font-family="Noto Sans JP" font-weight="700" font-size="9" letter-spacing="3" fill="#7f9580">東京トークン化計画</text>
+    <rect x="46" y="76" width="8" height="80" rx="2" fill="#d7f985"/>
+    <text x="76" y="118" font-family="IBM Plex Sans" font-weight="700" font-size="37" letter-spacing="0" fill="#eef3e6">TOKENIZE TOKYO</text>
+    <text x="77" y="146" font-family="IBM Plex Sans" font-weight="500" font-size="11.5" letter-spacing="2.5" fill="#7f9580">URBAN RIGHTS PROTOCOL · TOKYO · 01</text></svg>
+<figcaption><span class="no">10-C2</span><span class="cap">IBM Plex Sans 700 · JP corner tag · Green-black plate · lime bar</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="10-C3"><rect width="560" height="220" fill="#0b0c0e"/>
+  <rect x="28" y="46" width="504" height="128" rx="14" fill="#f0df37" stroke="#f0df37" stroke-width="1.5"/>
+  <g fill="#b3a520"><circle cx="512" cy="64" r="3"/><circle cx="512" cy="156" r="3"/></g>
+  <text x="512" y="114" font-family="IBM Plex Mono" font-size="10" fill="#0b0c0e" text-anchor="middle" letter-spacing="1">01</text><text x="46" y="66" font-family="Noto Sans JP" font-weight="700" font-size="9" letter-spacing="3" fill="#4a4515">東京トークン化計画</text>
+    <rect x="46" y="76" width="8" height="80" rx="2" fill="#0b0c0e"/>
+    <text x="76" y="118" font-family="IBM Plex Sans" font-weight="700" font-size="37" letter-spacing="0" fill="#0b0c0e">TOKENIZE TOKYO</text>
+    <text x="77" y="146" font-family="IBM Plex Sans" font-weight="500" font-size="11.5" letter-spacing="2.5" fill="#4a4515">URBAN RIGHTS PROTOCOL · TOKYO · 01</text></svg>
+<figcaption><span class="no">10-C3</span><span class="cap">IBM Plex Sans 700 · JP corner tag · Yellow plate · black bar (inverted)</span></figcaption></figure></div>
+  <h3>Extras · chip, mark plate, ticker</h3>
+  <div class="grid">
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="10-x1"><rect width="560" height="220" fill="#191b1f"/>
+    <rect x="0" y="80" width="560" height="60" fill="#0b0c0e"/><line x1="0" y1="140.5" x2="560" y2="140.5" stroke="#2a2d31"/>
+    <rect x="20" y="82" width="240" height="56" rx="10" fill="#0b0c0e" stroke="#3a3e45" stroke-width="1.5"/>
+    <rect x="34" y="96" width="5" height="28" rx="1.5" fill="#f0df37"/>
+    <text x="52" y="117" font-family="DM Sans" font-weight="700" font-size="20" fill="#f1f2f3">TOKENIZE TOKYO</text>
+    <g font-family="IBM Plex Mono" font-size="11" fill="#8b9098" letter-spacing="1"><text x="330" y="114">MAP</text><text x="380" y="114">ASSETS</text><text x="454" y="114">WALLET</text></g>
+    <text x="20" y="176" font-family="IBM Plex Mono" font-size="10" fill="#5d626a">app header mock · 240×56 chip</text></svg>
+<figcaption><span class="no">10-x1</span><span class="cap">Compact header chip 240×56</span><span class="why">Drop-in for the app sidebar/header; the bar alone carries the brand at this size.</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="10-x2"><rect width="560" height="220" fill="#191b1f"/>
+  <rect x="28" y="46" width="504" height="128" rx="14" fill="#0b0c0e" stroke="#3a3e45" stroke-width="1.5"/>
+  <g fill="#3a3e45"><circle cx="512" cy="64" r="3"/><circle cx="512" cy="156" r="3"/></g>
+  <text x="512" y="114" font-family="IBM Plex Mono" font-size="10" fill="#f0df37" text-anchor="middle" letter-spacing="1">01</text><use href="#m-grid" x="42" y="74" width="72" height="72" style="color:#f0df37;--sg:#f0df37"/>
+    <text x="130" y="113" font-family="DM Sans" font-weight="700" font-size="36" letter-spacing=".5" fill="#f1f2f3">TOKENIZE TOKYO</text>
+    <text x="131" y="141" font-family="DM Sans, Noto Sans JP" font-weight="500" font-size="11" letter-spacing="2" fill="#8b9098">東京トークン化計画 · URBAN RIGHTS</text></svg>
+<figcaption><span class="no">10-x2</span><span class="cap">Plate with pin-roof mark instead of bar</span><span class="why">Joins sections 01 and 10: the mark becomes the plate's ID stamp.</span></figcaption></figure>
+<figure class="card"><svg viewBox="0 0 560 220" role="img" aria-label="10-x3"><rect width="560" height="220" fill="#191b1f"/>
+  <rect x="28" y="46" width="504" height="128" rx="14" fill="#0b0c0e" stroke="#3a3e45" stroke-width="1.5"/>
+  <g fill="#3a3e45"><circle cx="512" cy="64" r="3"/><circle cx="512" cy="156" r="3"/></g>
+  <text x="512" y="114" font-family="IBM Plex Mono" font-size="10" fill="#f0df37" text-anchor="middle" letter-spacing="1">01</text><rect x="46" y="66" width="8" height="88" rx="2" fill="#f0df37"/>
+    <text x="76" y="110" font-family="DM Sans" font-weight="700" font-size="38" letter-spacing=".5" fill="#f1f2f3">TOKENIZE TOKYO</text>
+    <g clip-path="url(#tick-clip)" data-noclip="1"><g class="ticker" font-family="IBM Plex Mono" font-size="11.5" fill="#c9ccd1" letter-spacing=".5">
+      <text x="77" y="143"><tspan fill="#f0df37">▮</tspan> 150 DORMANT → 50 TOKENIZED → 18 ACTIVATED</text><text x="437" y="143"><tspan fill="#f0df37">▮</tspan> 150 DORMANT → 50 TOKENIZED → 18 ACTIVATED</text></g></g></svg>
+<figcaption><span class="no">10-x3</span><span class="cap">Plate with running ticker line</span><span class="why">Live counters turn the logo into a status readout; only for hero/pitch, not the favicon.</span></figcaption></figure></div>
+</section>
+</main>
+<script>
+  const btn = document.getElementById('toggle');
+  btn.addEventListener('click', () => {
+    const on = document.body.classList.toggle('light');
+    btn.setAttribute('aria-pressed', String(on));
+    btn.textContent = on ? 'Dark background' : 'Light background';
+  });
+</script>
+</body>
+</html>
