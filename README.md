@@ -160,7 +160,7 @@ Hosting uses Vercel. Configure production environment variables before `vercel d
 
 ### How to run
 
-**Prerequisites:** Node.js 22, npm and Git. Contract work also requires Foundry (`forge`, `anvil`); Forge MultiBaas linking requires Python 3. CI pins Foundry 1.5.0.
+**Prerequisites:** Node.js 22.9+ and npm 11.10.1 (`npm install --global npm@11.10.1`), plus Git. Use the pinned npm version for consistent peer-dependency installation. Contract work also requires Foundry (`forge`, `anvil`); Forge MultiBaas linking requires Python 3. CI pins Foundry 1.5.0.
 
 ```bash
 git clone --recurse-submodules https://github.com/natsukingly/tokenize-tokyo.git
