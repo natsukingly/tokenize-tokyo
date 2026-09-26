@@ -128,7 +128,11 @@ export default function AssetDetailsDialog({
                             ).toLocaleString("en")}{" "}
                             mJPY <small>/ unit</small>
                           </b>
-                          <span>{offer.remaining} units available</span>
+                          <span>
+                            {offer.remaining}{" "}
+                            {offer.remaining === "1" ? "unit" : "units"}{" "}
+                            available
+                          </span>
                         </div>
                       ))
                     ) : (

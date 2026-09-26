@@ -320,6 +320,8 @@ function ActivityChart({
           {days.map((day, i) => {
             const height = proportion(values[i], max) * 0.75;
             const center = (i + 0.5) * (490 / days.length);
+            const textAnchor =
+              i === 0 ? "start" : i === days.length - 1 ? "end" : "middle";
             return (
               <g key={day.day}>
                 <title>
@@ -354,7 +356,7 @@ function ActivityChart({
                   <text
                     x={center}
                     y={98 - height}
-                    textAnchor="middle"
+                    textAnchor={textAnchor}
                     fill="currentColor"
                     fontSize="12"
                   >
@@ -365,7 +367,7 @@ function ActivityChart({
                   <text
                     x={center}
                     y="125"
-                    textAnchor="middle"
+                    textAnchor={textAnchor}
                     fill="currentColor"
                     fontSize="12"
                   >
