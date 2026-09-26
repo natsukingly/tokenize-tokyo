@@ -120,6 +120,7 @@ let journal: Journal;
 let locked = false;
 const lock = resolve(directory, "seed.lock");
 const actors: Record<string, ReturnType<typeof privateKeyToAccount>> = {};
+const nextNonces = new Map<string, number>();
 const limit = Number(flag("--limit") || 196);
 if (
   !Number.isInteger(limit) ||
@@ -309,13 +310,17 @@ async function send(action: Action) {
         (action.actor === "owner" ? OWNER_RESERVE : 0n),
     `Insufficient Sepolia ETH for ${action.actor}; resume after funding`,
   );
-  const serialized = await account.signTransaction({
-    chainId,
-    type: "legacy",
-    nonce: await rpc.getTransactionCount({
+  const nonce = Math.max(
+    await rpc.getTransactionCount({
       address: account.address,
       blockTag: "pending",
     }),
+    nextNonces.get(action.actor) ?? 0,
+  );
+  const serialized = await account.signTransaction({
+    chainId,
+    type: "legacy",
+    nonce,
     to,
     data,
     value,
@@ -337,6 +342,7 @@ async function send(action: Action) {
   };
   journal.steps[action.id] = step;
   save(); // Exact hash and bounded intent persisted BEFORE the first broadcast.
+  nextNonces.set(action.actor, nonce + 1);
   try {
     await rpc.sendRawTransaction({ serializedTransaction: serialized });
   } catch (e) {

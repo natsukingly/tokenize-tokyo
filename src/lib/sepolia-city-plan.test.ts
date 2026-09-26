@@ -41,6 +41,14 @@ describe("additive Sepolia city catalog", () => {
       if (p.stage === 4) expect(p.subscription).toBeGreaterThan(0);
       if (p.deposit > 0)
         expect([p.stage, p.revenue, p.subscription]).toEqual([5, true, 100]);
+      if (p.stage === 6 && p.kind === "Rooftop") {
+        expect(parseMetadata(p.terms).description).toContain(
+          "No property ownership or income entitlement",
+        );
+        expect(parseMetadata(p.metadata).description).not.toContain(
+          "proportional share of revenue",
+        );
+      }
     }
   });
 });

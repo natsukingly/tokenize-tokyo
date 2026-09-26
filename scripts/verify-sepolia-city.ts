@@ -4,11 +4,7 @@ import { formatEther } from "viem";
 import { config } from "../src/lib/config";
 import { loadMarket } from "../src/lib/multibaas";
 import { parseMetadata } from "../src/lib/model";
-import {
-  cityPlan,
-  cityPlanSummary,
-  CITY_DATASET,
-} from "../src/lib/sepolia-city-plan";
+import { cityPlan, CITY_DATASET } from "../src/lib/sepolia-city-plan";
 
 async function main() {
   if (!process.argv.includes("--env") || config.chainId !== 11155111)
@@ -35,8 +31,7 @@ async function main() {
     receipts.dataset !== CITY_DATASET
   )
     throw new Error("Receipt deployment mismatch");
-  const plan = cityPlan(),
-    summary = cityPlanSummary();
+  const plan = cityPlan();
   const state = await loadMarket();
   const actions = receipts.transactions.filter(
     (tx) => !tx.id.startsWith("setup/"),
@@ -44,13 +39,9 @@ async function main() {
   const outputs = new Map(
     receipts.transactions.map((tx) => [tx.id, tx.outputId]),
   );
-  for (const p of plan) {
-    if (
-      !outputs.has(
-        `${p.key}/${p.stage === 5 ? "claim" : p.stage >= 3 ? "list" : p.stage === 2 ? "verify-asset" : p.stage === 1 ? "submit" : "register"}`,
-      )
-    )
-      throw new Error(`Incomplete scenario: ${p.key}`);
+  const registered = plan.filter((p) => outputs.has(`${p.key}/register`));
+  const done = (id: string) => outputs.has(id);
+  for (const p of registered) {
     const asset = state.assets.find(
       (asset) => asset.id === outputs.get(`${p.key}/register`),
     );
@@ -62,14 +53,14 @@ async function main() {
       throw new Error(`Asset not indexed: ${p.key}`);
     if (
       asset.status !==
-      (p.stage === 0
-        ? "Draft"
-        : p.stage === 1
+      (done(`${p.key}/verify-asset`)
+        ? "Verified"
+        : done(`${p.key}/submit`)
           ? "Pending verification"
-          : "Verified")
+          : "Draft")
     )
       throw new Error(`Indexed asset state mismatch: ${p.key}`);
-    if (p.stage < 3) continue;
+    if (!done(`${p.key}/issue`)) continue;
     const right = state.rights.find(
       (right) => right.id === outputs.get(`${p.key}/issue`),
     );
@@ -79,9 +70,16 @@ async function main() {
     if (
       !right ||
       right.assetId !== asset.id ||
-      right.status !== (p.stage === 5 ? "Active" : "Verified") ||
-      !listing ||
-      Number(listing.remaining) !== p.supply - p.subscription
+      right.status !==
+        (done(`${p.key}/activate`)
+          ? "Active"
+          : done(`${p.key}/verify-right`)
+            ? "Verified"
+            : "Pending verification") ||
+      (done(`${p.key}/list`) &&
+        (!listing ||
+          Number(listing.remaining) !==
+            p.supply - (done(`${p.key}/purchase`) ? p.subscription : 0)))
     )
       throw new Error(`Indexed rights/listing mismatch: ${p.key}`);
   }
@@ -97,10 +95,26 @@ async function main() {
   const volume = formatEther(BigInt(state.metrics.volume)),
     income = formatEther(BigInt(state.metrics.deposited));
   if (
-    state.assets.length !== 200 ||
-    state.rights.length !== 116 ||
-    volume !== String(37700 + summary.expectedNewVolume) ||
-    income !== String(5800 + summary.expectedNewDeposits)
+    state.assets.length !== 4 + registered.length ||
+    state.rights.length !==
+      4 + plan.filter((p) => done(`${p.key}/issue`)).length ||
+    volume !==
+      String(
+        37700 +
+          plan.reduce(
+            (sum, p) =>
+              sum + (done(`${p.key}/purchase`) ? p.price * p.subscription : 0),
+            0,
+          ),
+      ) ||
+    income !==
+      String(
+        5800 +
+          plan.reduce(
+            (sum, p) => sum + (done(`${p.key}/revenue`) ? p.deposit : 0),
+            0,
+          ),
+      )
   )
     throw new Error(
       "Snapshot totals differ; wait for indexing or inspect subsequent user activity",
@@ -109,6 +123,13 @@ async function main() {
     checkedAt: new Date().toISOString(),
     chainId: config.chainId,
     dataset: CITY_DATASET,
+    targetAssets: 200,
+    remainingAssetsToRegister: 200 - state.assets.length,
+    completedAdditionalScenarios: plan.filter((p) =>
+      done(
+        `${p.key}/${p.stage === 5 ? "claim" : p.stage === 4 ? "purchase" : p.stage >= 3 ? "list" : p.stage === 2 ? "verify-asset" : p.stage === 1 ? "submit" : "register"}`,
+      ),
+    ).length,
     assets: state.assets.length,
     rights: state.rights.length,
     activeRights: state.rights.filter((r) => r.status === "Active").length,

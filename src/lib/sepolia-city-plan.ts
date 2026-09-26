@@ -30,9 +30,13 @@ export function cityPlan() {
     const price = revenue
       ? [600, 900, 1200, 1800, 2400][index % 5]
       : Number(SPACE_TYPES[site.kind].price);
+    const usageTerms =
+      site.kind === "Rooftop" && stage === 6
+        ? "Exclusive rooftop use to install and operate a test solar array. No property ownership or income entitlement."
+        : SPACE_TYPES[site.kind].terms;
     const description = revenue
       ? `Fictional ${site.kind.toLowerCase()} business in ${site.district.split(" · ")[0]}. Fund preparation and operation through 100 income units. Holders share only deposited test income; the operator controls physical use. ${stage === 5 ? "Operation is simulated and an initial test income deposit is included." : "Preparation, owner consent and operating checks are simulated."} No guaranteed return or property ownership.`
-      : `Fictional ${site.kind.toLowerCase()} space. ${SPACE_TYPES[site.kind].terms} Site dimensions and ownership checks are simulated. This test does not convey property ownership.`;
+      : `Fictional ${site.kind.toLowerCase()} space. ${usageTerms} Site dimensions and ownership checks are simulated. This test does not convey property ownership.`;
     const name = site.name.replace(/ · Demo$/, " · Sepolia Test");
     const metadata = compactMetadataURI({
       name,
@@ -51,7 +55,7 @@ export function cityPlan() {
         : SPACE_TYPES[site.kind].purpose,
       description: revenue
         ? "Proportional share of deposited test income. No exclusive use or guaranteed yield."
-        : SPACE_TYPES[site.kind].terms,
+        : usageTerms,
       simulated: true,
     });
     return {
