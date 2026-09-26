@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import type { CardOrderView } from "@/lib/card-checkout";
+import { cardOrderView, type CardOrderView } from "@/lib/card-checkout";
+import { cardFetch } from "@/lib/card-fetch";
 import styles from "./CardCheckout.module.css";
 import LoadingOverlay from "./LoadingOverlay";
 
@@ -50,16 +51,18 @@ export default function CardOrderStatus({
       setBusy(true);
       if (reconcile) setForeground(true);
       try {
-        const response = await fetch(`/api/card-checkout/orders/${id}`, {
+        const body = await cardFetch(`/api/card-checkout/orders/${id}`, {
           method: reconcile ? "POST" : "GET",
           cache: "no-store",
           signal,
         });
-        const body = await response.json();
-        if (!response.ok)
-          throw new Error(body.error || "Unable to check your order.");
+        const parsed = cardOrderView.safeParse(body);
+        if (!parsed.success || parsed.data.id !== id)
+          throw new Error(
+            "Unable to check this order response. Please try again.",
+          );
         if (!signal?.aborted) {
-          setOrder(body);
+          setOrder(parsed.data);
           setError("");
         }
       } catch (e) {
@@ -161,7 +164,7 @@ export default function CardOrderStatus({
           </p>
         )}
         <div className={styles.actions}>
-          {order?.checkoutUrl && (
+          {order?.checkoutUrl && order.state === "awaiting_payment" && (
             <a className="primary" href={order.checkoutUrl}>
               Resume test payment
             </a>

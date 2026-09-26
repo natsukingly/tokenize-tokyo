@@ -2,6 +2,7 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { CreditCard, Wallet, ArrowUpRight } from "lucide-react";
 import { cardAmount } from "@/lib/card-checkout";
+import { cardFetch } from "@/lib/card-fetch";
 import type { Listing } from "@/lib/model";
 import styles from "./CardCheckout.module.css";
 
@@ -41,11 +42,10 @@ export default function CardPaymentOption({
   useEffect(() => {
     if (demo || method !== "card") return;
     const controller = new AbortController();
-    fetch("/api/card-checkout", {
+    cardFetch("/api/card-checkout", {
       signal: controller.signal,
       cache: "no-store",
     })
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((r) => setAvailable(r.available === true))
       .catch(() => {
         if (!controller.signal.aborted) setAvailable(false);
@@ -74,7 +74,7 @@ export default function CardPaymentOption({
     setError("");
     requestId.current ||= crypto.randomUUID();
     try {
-      const response = await fetch("/api/card-checkout", {
+      const result = await cardFetch("/api/card-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -86,12 +86,9 @@ export default function CardPaymentOption({
           acceptedTerms: true,
         }),
       });
-      const result = await response.json();
-      if (!response.ok)
-        throw new Error(
-          result.error || "Checkout is unavailable. Please try again.",
-        );
       if (current.current !== identity) return;
+      if (typeof result.url !== "string")
+        throw new Error("Invalid checkout response.");
       const url = new URL(result.url);
       if (url.protocol !== "https:" || url.hostname !== "checkout.stripe.com")
         throw new Error("Invalid checkout response.");

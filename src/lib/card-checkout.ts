@@ -49,6 +49,32 @@ export type CardOrderView = Pick<CardOrder, "id" | "state" | "txHash"> & {
   chainId: number;
   checkoutUrl?: string;
 };
+export const cardOrderView = z
+  .object({
+    id: z.uuid(),
+    state: z.enum([
+      "creating",
+      "awaiting_payment",
+      "fulfilling",
+      "submitted",
+      "fulfilled",
+      "expired",
+      "review",
+    ]),
+    txHash: z
+      .string()
+      .regex(/^0x[\da-f]{64}$/i)
+      .nullable(),
+    recipient: z.string().regex(/^0x[\da-f]{40}$/i),
+    quantity: z.string().regex(/^[1-9]\d{0,5}$/),
+    amountJpy: z.number().int().min(50).max(100_000),
+    chainId: z.number().int().positive(),
+    checkoutUrl: z
+      .url()
+      .refine((url) => new URL(url).origin === "https://checkout.stripe.com")
+      .optional(),
+  })
+  .refine((order) => order.state !== "fulfilled" || order.txHash !== null);
 
 /** Test pricing only: exactly 1 MockJPY = 1 simulated JPY. Never round a charge. */
 export function cardAmount(total: bigint, decimals: number) {
