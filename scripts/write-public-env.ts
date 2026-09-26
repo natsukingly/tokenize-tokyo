@@ -15,5 +15,17 @@ const lines = Object.entries(names).map(
   ([key, label]) => `NEXT_PUBLIC_${label}_ADDRESS=${deployment[key]}`,
 );
 lines.push(`NEXT_PUBLIC_CHAIN_ID=${deployment.chainId}`);
+if (deployment.ens && deployment.authority) {
+  if (deployment.ens.locallyForked)
+    throw new Error(
+      "Do not export local fork addresses as a public deployment",
+    );
+  lines.push(
+    `NEXT_PUBLIC_ENSV2_AUTHORITY_ADDRESS=${deployment.authority}`,
+    `NEXT_PUBLIC_ENSV2_PARENT=${deployment.ens.parent}`,
+    `NEXT_PUBLIC_ENSV2_ASSET_ID=${deployment.ens.assetId}`,
+    `NEXT_PUBLIC_ENSV2_SCOPE=${deployment.ens.scope}`,
+  );
+}
 writeFileSync(target, lines.join("\n") + "\n");
 console.log("Public addresses written to", target);

@@ -1,0 +1,69 @@
+.card {
+  width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.card > * {
+  max-width: 100%;
+}
+.card button {
+  white-space: normal;
+}
+.card > small {
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+.card h3 {
+  font-size: 18px;
+  margin: 12px 0;
+}
+.card p {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.contents {
+  list-style: none;
+  padding: 0;
+  margin: 14px 0;
+}
+.contents li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+}
+.contents li > span {
+  min-width: 0;
+}
+.contents small,
+.contents b {
+  white-space: nowrap;
+  font-size: 11px;
+  color: var(--muted);
+}
+.details {
+  margin-top: 18px;
+  border-top: 1px solid var(--line);
+  padding-top: 15px;
+}
+.details summary {
+  cursor: pointer;
+  font-size: 13px;
+}
+.note {
+  font-size: 12px !important;
+}
+.total {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 18px 0;
+}
+.total b {
+  color: var(--lime);
+}

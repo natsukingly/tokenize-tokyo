@@ -10,6 +10,7 @@ import { config, labels, type ContractKey } from "./config";
 import { events, eventQuery } from "./queries";
 import { project } from "./projection";
 import { walletTransaction, type WalletProvider } from "./transactions";
+import { assertWallet, isTxHash, type TransactionProgress } from "./wallet";
 import type { ChainEvent, MarketState } from "./model";
 export function clients(url = config.url, key = config.key) {
   if (!url || !key)
@@ -138,17 +139,27 @@ export async function loadMarket(account?: string): Promise<MarketState> {
       ["rights", state.rights],
       ["basket", state.baskets],
     ] as const) {
-      for (const item of items) {
-        const key = token + ":" + item.id;
-        const [balance, claimable] = await Promise.all([
-          readContract(token, "balanceOf", [account, item.id]),
-          readContract(token === "rights" ? "revenue" : "basket", "claimable", [
-            item.id,
-            account,
-          ]),
-        ]);
-        state.balances[key] = String(balance);
-        state.claimable[key] = String(claimable);
+      if (!items.length) continue;
+      const balances = (await readContract(token, "balanceOfBatch", [
+        items.map(() => account),
+        items.map((item) => item.id),
+      ])) as string[];
+      items.forEach((item, i) => {
+        state.balances[token + ":" + item.id] = String(balances[i]);
+      });
+      // Past holders can still claim accrued revenue, even with a zero balance.
+      for (let i = 0; i < items.length; i += 4) {
+        await Promise.all(
+          items.slice(i, i + 4).map(async (item) => {
+            state.claimable[token + ":" + item.id] = String(
+              await readContract(
+                token === "rights" ? "revenue" : "basket",
+                "claimable",
+                [item.id, account],
+              ),
+            );
+          }),
+        );
       }
     }
   }
@@ -160,15 +171,61 @@ export async function sendViaMultiBaas(
   contract: ContractKey,
   method: string,
   args: unknown[] = [],
+  onProgress?: (progress: TransactionProgress) => void,
 ) {
-  const chain = Number(
-    BigInt(String(await provider.request({ method: "eth_chainId" }))),
-  );
-  if (chain !== config.chainId)
-    throw new Error(`Switch your wallet to chain ${config.chainId}.`);
-  const { data } = await clients().contracts.callContractFunction(
+  return sendAtMultiBaas(
+    provider,
+    from,
     config.addresses[contract],
     labels[contract],
+    method,
+    args,
+    onProgress,
+  );
+}
+
+/** ENS targets come from a verified on-chain binding. Exact calldata must match the reviewed intent. */
+export async function sendVerifiedCallViaMultiBaas(
+  provider: WalletProvider,
+  from: string,
+  target: {
+    address: string;
+    label: string;
+    method: string;
+    args: unknown[];
+    data: string;
+  },
+  onProgress?: (progress: TransactionProgress) => void,
+) {
+  if (config.chainId !== 11155111 || !/^0x[0-9a-f]+$/i.test(target.data))
+    throw new Error("ENS delegation requires the Sepolia protocol deployment.");
+  return sendAtMultiBaas(
+    provider,
+    from,
+    target.address,
+    target.label,
+    target.method,
+    target.args,
+    onProgress,
+    target.data,
+  );
+}
+
+async function sendAtMultiBaas(
+  provider: WalletProvider,
+  from: string,
+  address: string,
+  label: string,
+  method: string,
+  args: unknown[],
+  onProgress?: (progress: TransactionProgress) => void,
+  expectedData?: string,
+) {
+  onProgress?.({ phase: "preparing" });
+  await assertWallet(provider, from);
+  const { data } = await clients().contracts.callContractFunction(
+    address,
+    label,
     method,
     { args, from, signAndSubmit: false, formatInts: "as_strings" },
   );
@@ -176,22 +233,47 @@ export async function sendViaMultiBaas(
     throw new Error("MultiBaas did not return an unsigned transaction");
   const result = data.result as unknown as TransactionToSignResponse;
   if (result.submitted) throw new Error("Unexpected server-signed transaction");
-  const tx = walletTransaction(result.tx, from, config.addresses[contract]);
+  const tx = walletTransaction(result.tx, from, address);
+  if (expectedData && tx.data.toLowerCase() !== expectedData.toLowerCase())
+    throw new Error(
+      "MultiBaas calldata does not match the reviewed ENS action.",
+    );
+  // Check again after the remote composition call, including between approval
+  // and purchase. Never sign for a stale account or on a different chain.
+  await assertWallet(provider, from);
+  onProgress?.({ phase: "signature" });
   const hash = String(
     await provider.request({ method: "eth_sendTransaction", params: [tx] }),
   );
-  // Wallet RPC is used only for signing/submission/receipt, never as an independent contract data backend.
-  for (let i = 0; i < 90; i++) {
-    const receipt = (await provider.request({
-      method: "eth_getTransactionReceipt",
-      params: [hash],
-    })) as { status: string } | null;
+  if (!isTxHash(hash))
+    throw new Error("Wallet returned an invalid transaction hash.");
+  onProgress?.({ phase: "submitted", hash });
+  // Read receipts from the configured chain via MultiBaas even if the user
+  // changes their wallet network while this transaction is confirming.
+  for (let i = 0; i < 60; i++) {
+    let receipt;
+    try {
+      receipt = (await clients().chains.getTransactionReceipt(hash)).data.result
+        .data;
+    } catch (error) {
+      const status = (error as { response?: { status?: number } }).response
+        ?.status;
+      if (status !== 404 && status !== 400) break;
+    }
     if (receipt) {
-      if (BigInt(receipt.status) !== 1n)
-        throw new Error("Transaction reverted: " + hash);
+      if (BigInt(receipt.status) !== 1n) {
+        onProgress?.({ phase: "reverted", hash });
+        throw new Error(
+          "Transaction reverted. Open the transaction to inspect the receipt.",
+        );
+      }
+      onProgress?.({ phase: "confirmed", hash });
       return hash;
     }
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1500));
   }
-  throw new Error("Transaction submitted; confirmation pending: " + hash);
+  onProgress?.({ phase: "pending", hash });
+  throw new Error(
+    "Transaction was submitted; confirmation is still pending. Check the explorer before retrying.",
+  );
 }

@@ -46,7 +46,7 @@ function mulberry32(seed: number) {
   };
 }
 export function generateDormantSites(
-  count = 150,
+  count = 750,
   seed = 20260926,
 ): DormantSite[] {
   const rand = mulberry32(seed),

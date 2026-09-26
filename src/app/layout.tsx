@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./globals.css";
+import "./cyberpunk.css";
+import "./city-view.css";
 export const metadata: Metadata = {
   title: "TOKENIZE TOKYO — Put the city to work",
   description:
@@ -8,7 +10,7 @@ export const metadata: Metadata = {
 };
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="cyberpunk">
       <body>{children}</body>
     </html>
   );

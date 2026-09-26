@@ -175,6 +175,51 @@ it("preserves rejection, closure, metadata updates and basket composition", () =
 it("handles empty city and unknown metadata references explicitly", () =>
   expect(project([], address).assets).toEqual([]));
 
+it("normalizes MultiBaas byte arrays and JSON-encoded basket arrays", () => {
+  const bytes = Array.from({ length: 32 }, (_, i) => i);
+  const hex = "0x" + bytes.map((b) => b.toString(16).padStart(2, "0")).join("");
+  const state = project(
+    [
+      e("AssetRegistered", {
+        assetId: 1,
+        issuer: address,
+        assetType: 0,
+        geoReference: JSON.stringify(bytes),
+      }),
+      e("RightCreated", {
+        rightId: 1,
+        assetId: 1,
+        rightType: 1,
+        supply: 100,
+        termsHash: bytes,
+      }),
+      e("RightScopeDefined", {
+        rightId: 1,
+        scope: 0,
+        purpose: JSON.stringify(bytes),
+        exclusive: false,
+      }),
+      e("BasketCreated", {
+        basketId: 1,
+        rightIds: '["1","2"]',
+        unitsPerShare: '["1","3"]',
+      }),
+    ],
+    address,
+  );
+  expect(state.assets[0].geoReference).toBe(hex);
+  expect(state.rights[0].termsHash).toBe(hex);
+  expect(state.rights[0].purpose).toBe(hex);
+  expect(state.baskets[0].rightIds).toEqual(["1", "2"]);
+  expect(state.baskets[0].units).toEqual(["1", "3"]);
+  expect(() =>
+    project(
+      [e("AssetRegistered", { assetId: 1, geoReference: "[999]" })],
+      address,
+    ),
+  ).toThrow("bytes32");
+});
+
 it("uses the latest lifecycle transition when rejected assets are revised and resubmitted", () => {
   const history = [
     e("AssetRegistered", { assetId: 1, issuer: address, assetType: 0 }),

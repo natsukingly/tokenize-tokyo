@@ -1,0 +1,59 @@
+.picks {
+  display: grid;
+  gap: 12px;
+}
+.picks > p {
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--muted);
+  margin: 0;
+}
+.picks > button {
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+  text-align: left;
+  display: grid;
+  gap: 10px;
+}
+.picks > button:hover strong {
+  color: var(--lime);
+}
+.title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.title svg {
+  flex-shrink: 0;
+}
+.title strong {
+  flex: 1;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 10px;
+}
+.meta b {
+  color: var(--lime);
+  font-weight: 500;
+}
+.track {
+  height: 3px;
+  background: var(--line);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.track span {
+  display: block;
+  height: 100%;
+  background: var(--lime);
+}
+.picks small {
+  font-size: 10px;
+  color: var(--muted);
+}

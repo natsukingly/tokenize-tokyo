@@ -1,0 +1,47 @@
+.status {
+  min-height: 280px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  text-align: center;
+  padding: 28px;
+}
+.status > svg {
+  color: var(--lime);
+}
+.status strong {
+  font-size: 16px;
+  font-weight: 500;
+}
+.status p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+  max-width: 420px;
+  margin: 10px 0 0;
+}
+.compact {
+  position: absolute;
+  left: 20px;
+  bottom: 115px;
+  z-index: 6;
+  min-height: 0;
+  max-width: calc(100% - 40px);
+  flex-direction: row;
+  gap: 12px;
+  padding: 14px 18px;
+  background: #191c20ee;
+}
+.compact strong {
+  font-size: 12px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .status > svg {
+    animation: none;
+  }
+}

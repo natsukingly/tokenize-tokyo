@@ -1,0 +1,100 @@
+.panel {
+  padding: 20px 0;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  line-height: 1.65;
+  min-width: 0;
+}
+.heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.heading span,
+.panel p,
+.panel dt {
+  color: var(--muted);
+}
+.panel h3 {
+  font-size: 15px;
+  margin: 22px 0 10px;
+}
+.panel dl {
+  margin: 16px 0;
+}
+.panel dl > div {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+.panel dd {
+  margin: 3px 0 0;
+  overflow-wrap: anywhere;
+}
+.panel a {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  color: var(--text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.panel label:not(.review) {
+  display: grid;
+  gap: 5px;
+  margin: 12px 0;
+}
+.panel input:not([type="checkbox"]) {
+  width: 100%;
+  min-width: 0;
+  background: var(--bg);
+  color: var(--text);
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+}
+.panel button {
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  color: var(--text);
+  background: transparent;
+  font-size: 12px;
+}
+.panel button:hover:not(:disabled) {
+  border-color: var(--lime);
+}
+.panel button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.review {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 18px 0;
+}
+.review input {
+  margin-top: 5px;
+  flex: none;
+}
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.remaining {
+  font-variant-numeric: tabular-nums;
+}
+.receipt {
+  margin: 8px 12px 0 0;
+}
+.spin {
+  animation: rotate 1s linear infinite;
+  margin-right: 8px;
+}
+@keyframes rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}

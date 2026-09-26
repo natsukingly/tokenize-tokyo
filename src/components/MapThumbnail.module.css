@@ -1,0 +1,70 @@
+.thumbnail {
+  position: relative;
+  display: block;
+  width: 98px;
+  height: 76px;
+  flex: none;
+  overflow: hidden;
+  border: 1px solid #ffffff16;
+  border-radius: 6px;
+  background: #15171a;
+}
+.compact {
+  width: 64px;
+  height: 64px;
+}
+.renderer,
+.image,
+.fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.renderer {
+  pointer-events: none;
+}
+.image {
+  object-fit: cover;
+}
+.fallback {
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  background: repeating-linear-gradient(
+    35deg,
+    transparent 0 19px,
+    #ffffff06 20px 21px
+  );
+}
+.pin {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  transform: translate(-50%, -50%);
+  background: var(--lime);
+  border: 2px solid #15171a;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 6px #eaff582c,
+    0 0 16px #eaff5840;
+}
+.badge {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  display: grid;
+  place-items: center;
+  padding: 4px;
+  border-radius: 3px;
+  color: var(--lime);
+  background: #15171aec;
+}
+@media (max-width: 600px) {
+  .thumbnail {
+    width: 62px;
+    height: 62px;
+  }
+}

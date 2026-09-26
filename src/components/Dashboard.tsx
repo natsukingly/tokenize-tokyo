@@ -1,4 +1,9 @@
 "use client";
+import BrandPlate, {
+  BrandMark,
+  BRAND_VARIANTS,
+  type BrandVariant,
+} from "./BrandPlate";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -21,6 +26,13 @@ import {
   Menu,
   ExternalLink,
   Sparkles,
+  BookOpen,
+  Store,
+  LayoutDashboard,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Info,
+  Network,
 } from "lucide-react";
 import { formatEther, parseEther, keccak256, stringToHex } from "viem";
 import { config, type ContractKey } from "@/lib/config";
@@ -30,6 +42,7 @@ import {
   demoState,
   demoCall,
   resetDemo,
+  addDemoActivity,
 } from "@/lib/demo";
 import {
   EMPTY,
@@ -41,6 +54,7 @@ import {
   type Right,
 } from "@/lib/model";
 import { assetStage } from "@/lib/lifecycle";
+import { useTheme } from "@/lib/use-theme";
 import {
   DORMANT_DATASET_LABEL,
   DORMANT_SITES,
@@ -48,8 +62,47 @@ import {
   type DormantSite,
   type LensKind,
 } from "@/lib/dormant";
-import { loadMarket, sendViaMultiBaas } from "@/lib/multibaas";
-import type { WalletProvider } from "@/lib/transactions";
+import { loadMarket, readContract, sendViaMultiBaas } from "@/lib/multibaas";
+import { useBrowserWallet } from "@/lib/use-browser-wallet";
+import {
+  isTxHash,
+  transactionPhase,
+  transactionUrl,
+  walletError,
+  type RecentTransaction,
+  type TransactionProgress,
+} from "@/lib/wallet";
+import WalletPanel from "./WalletPanel";
+import AccountGate from "./AccountGate";
+import DataStatus from "./DataStatus";
+import { BasketPoolCard, BasketOfferCard } from "./BasketCards";
+import AssetIcon from "./AssetIcon";
+import AssetDirectory, {
+  DEFAULT_DIRECTORY_FILTERS,
+  type DirectoryFilters,
+} from "./AssetDirectory";
+import FinanceMarkets, { type MarketView } from "./FinanceMarkets";
+import { FundingProgress } from "./Launchpad";
+import { fundingCampaigns, openFundingProjects } from "@/lib/funding";
+import TokenizeFlow from "./TokenizeFlow";
+import { suggestedProject, parseAssumptions } from "@/lib/project-plan";
+import { compactMetadataURI } from "@/lib/model";
+import { ProjectEconomics } from "./ProjectPlan";
+import TokenizeDialog from "./TokenizeDialog";
+import Tutorial from "./Tutorial";
+import MarketOverview from "./MarketOverview";
+import MapControls from "./MapControls";
+import ActivityFeed from "./ActivityFeed";
+import NamespaceDashboard from "./NamespaceDashboard";
+import MapFunding from "./MapFunding";
+import SpaceEnsPreview from "./SpaceEnsPreview";
+import {
+  ASSET_KINDS,
+  SPACE_TYPES,
+  defaultsForKind,
+  assetTypeCode,
+  type AssetKind,
+} from "@/lib/catalog";
 const TokyoMap = dynamic(() => import("./TokyoMap"), {
   ssr: false,
   loading: () => <div className="map-stage map-loading">Preparing Tokyo…</div>,
@@ -62,19 +115,93 @@ const today = () => new Date().toISOString().slice(0, 10);
 const year = () =>
   new Date(Date.now() + 365 * 86400000).toISOString().slice(0, 10);
 const same = (a: string, b: string) => a.toLowerCase() === b.toLowerCase();
-const DEMO = config.mode === "demo";
-export default function Dashboard() {
+export default function Dashboard({
+  demo = config.mode === "demo",
+}: {
+  demo?: boolean;
+}) {
+  const DEMO = demo;
+  const wallet = useBrowserWallet(!DEMO);
+  const account = wallet.account;
+  const [walletOpen, setWalletOpen] = useState(false);
+  const [walletTourContainer, setWalletTourContainer] =
+    useState<HTMLDivElement | null>(null);
+  const [walletGasBalance, setWalletGasBalance] = useState<string | null>(null);
+  const [transaction, setTransaction] = useState<TransactionProgress | null>(
+    null,
+  );
+  const [recentTransactions, setRecentTransactions] = useState<
+    RecentTransaction[]
+  >([]);
+  const [verifierRoles, setVerifierRoles] = useState({
+    registry: false,
+    rights: false,
+  });
+  const actionLock = useRef(false);
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(
+        localStorage.getItem("tokenize-tokyo:transactions") || "[]",
+      );
+      if (Array.isArray(saved))
+        setRecentTransactions(
+          saved
+            .filter(
+              (tx) =>
+                isTxHash(tx.hash) &&
+                typeof tx.label === "string" &&
+                typeof tx.account === "string" &&
+                tx.phase in transactionPhase,
+            )
+            .slice(0, 30),
+        );
+    } catch {
+      /* A transaction can still be inspected without local history. */
+    }
+  }, []);
+  useEffect(() => {
+    setVerifierRoles({ registry: false, rights: false });
+    if (DEMO || !account) return;
+    let cancelled = false;
+    const role = keccak256(stringToHex("VERIFIER_ROLE"));
+    Promise.all([
+      readContract("registry", "hasRole", [role, account]),
+      readContract("rights", "hasRole", [role, account]),
+    ])
+      .then(([registry, rights]) => {
+        if (!cancelled)
+          setVerifierRoles({
+            registry: registry === true,
+            rights: rights === true,
+          });
+      })
+      .catch(() => {
+        /* Fail closed: on-chain contracts remain the authority. */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [account, DEMO]);
+  const { theme } = useTheme();
+  // Logo lab switcher: open /?logo=stack|plate|grid|jp|bar|mono|terminal
+  const [logoVariant, setLogoVariant] = useState<BrandVariant>("monow");
+  useEffect(() => {
+    const v = new URLSearchParams(window.location.search).get(
+      "logo",
+    ) as BrandVariant | null;
+    if (v && BRAND_VARIANTS.includes(v)) setLogoVariant(v);
+  }, []);
+
   const [state, setState] = useState<MarketState>(EMPTY),
     [tab, setTab] = useState("Explore"),
     [kind, setKind] = useState("All assets"),
     [status, setStatus] = useState("All stages"),
     [selected, setSelected] = useState("1"),
     [actor, setActor] = useState<keyof typeof ACTORS>("Investor B"),
-    [account, setAccount] = useState(""),
     [busy, setBusy] = useState(""),
     [notice, setNotice] = useState(""),
     [error, setError] = useState(""),
-    [showTokenize, setShowTokenize] = useState(false),
+    [showSpacePicker, setShowSpacePicker] = useState(false),
     [xray, setXray] = useState(false),
     [lens, setLens] = useState(false),
     [ownedOnly, setOwnedOnly] = useState(false),
@@ -84,8 +211,80 @@ export default function Dashboard() {
     [highlighted, setHighlighted] = useState<string[]>([]),
     [quantity, setQuantity] = useState("1"),
     [listPrice, setListPrice] = useState("2400"),
-    [deposit, setDeposit] = useState("10000"),
     [termsAccepted, setTermsAccepted] = useState(false);
+  const [fundingOnly, setFundingOnly] = useState(false);
+  const [ensSelection, setEnsSelection] = useState("");
+  const [basketName, setBasketName] = useState("Tokyo Urban Income Basket");
+  const [loadedAccount, setLoadedAccount] = useState<string | null>(null);
+  const [marketLoaded, setMarketLoaded] = useState(false);
+  const [loadError, setLoadError] = useState("");
+  useEffect(() => {
+    if (
+      ["namespaces", "ens"].includes(
+        new URLSearchParams(window.location.search).get("view") || "",
+      )
+    )
+      setTab("Namespaces");
+  }, []);
+  const [tokenizeOpen, setTokenizeOpen] = useState(false);
+  const [flowStarted, setFlowStarted] = useState(false);
+  const [flowTarget, setFlowTarget] = useState("new");
+  const [tutorialContainer, setTutorialContainer] =
+    useState<HTMLDivElement | null>(null);
+  const openTokenize = (fresh = false) => {
+    if (fresh || !flowStarted) {
+      setFlowTarget(
+        fresh ? "new" : actor === "Demo verifier" ? selected : "new",
+      );
+      setCreatedGeo("");
+      setFlowVersion((version) => version + 1);
+      setFlowStarted(true);
+    }
+    setShowSpacePicker(false);
+    setTokenizeOpen(true);
+  };
+  const closeTokenize = () => {
+    setShowSpacePicker(false);
+    setTokenizeOpen(false);
+  };
+  const [financeSource, setFinanceSource] = useState("");
+  const [marketRequest, setMarketRequest] = useState(0);
+  const [marketView, setMarketView] = useState<MarketView>("assets");
+  const [directoryFilters, setDirectoryFilters] = useState<DirectoryFilters>(
+    DEFAULT_DIRECTORY_FILTERS,
+  );
+  const [directorySelection, setDirectorySelection] = useState<string | null>(
+    null,
+  );
+  const [cityFocus, setCityFocus] = useState(true);
+  const [cityDetailsOpen, setCityDetailsOpen] = useState(false);
+  const [sidebarExpanded, setSidebarExpanded] = useState(true);
+  const [tutorialRequest, setTutorialRequest] = useState(0),
+    [guideActive, setGuideActive] = useState(false),
+    [flowVersion, setFlowVersion] = useState(0),
+    [createdGeo, setCreatedGeo] = useState("");
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("tour") === "1")
+      setTutorialRequest((n) => n + 1);
+  }, []);
+  const cityView = theme === "cyberpunk" && cityFocus && tab === "Explore";
+  const openExplore = () => {
+    setCityFocus(true);
+    setTab("Explore");
+  };
+  const previousFilters = useRef(
+    `${kind}|${status}|${ownedOnly}|${fundingOnly}`,
+  );
+  useEffect(() => {
+    const next = `${kind}|${status}|${ownedOnly}|${fundingOnly}`;
+    if (previousFilters.current === next) return;
+    previousFilters.current = next;
+    setSelected("");
+    setCityDetailsOpen(false);
+    setHighlighted([]);
+    setTermsAccepted(false);
+    setQuantity("1");
+  }, [kind, status, ownedOnly, fundingOnly]);
   const [form, setForm] = useState({
     name: "",
     district: "TOKYO",
@@ -103,12 +302,34 @@ export default function Dashboard() {
     policy: "Open",
     scope: "Rooftop",
     purpose: "SOLAR",
-    exclusive: "Yes",
+    exclusive: "No",
     lng: "139.775",
     lat: "35.689",
+    overview: suggestedProject("Rooftop", "").overview,
+    analysis: JSON.stringify(suggestedProject("Rooftop", "").assumptions),
   });
+  useEffect(() => {
+    if (!DEMO)
+      setState((previous) => ({
+        ...previous,
+        cash: "0",
+        balances: {},
+        claimable: {},
+      }));
+  }, [account, DEMO]);
   const active = DEMO ? ACTORS[actor] : account,
     addresses = DEMO ? DEMO_ADDRESSES : config.addresses;
+  useEffect(() => {
+    setLoadedAccount(null);
+    setTermsAccepted(false);
+    setCompose([]);
+    setQuantity("1");
+    setTransaction(null);
+    setNotice("");
+    setError("");
+    setOwnedOnly(false);
+  }, [active]);
+  const accountReady = !!active && loadedAccount === active.toLowerCase();
   const activeRef = useRef(active);
   activeRef.current = active;
   const loading = useRef(false);
@@ -121,16 +342,21 @@ export default function Dashboard() {
     const requestedAccount = activeRef.current;
     loading.current = true;
     setRefreshing(true);
+    setLoadError("");
     try {
       const s = DEMO
         ? demoState(activeRef.current)
         : await loadMarket(activeRef.current || undefined);
-      if (requestedAccount === activeRef.current) setState(s);
-      else refreshPending.current = true;
+      if (requestedAccount === activeRef.current) {
+        setState(s);
+        setMarketLoaded(true);
+        setLoadedAccount(requestedAccount.toLowerCase());
+      } else refreshPending.current = true;
       setLastSync(new Date().toLocaleTimeString());
-      setError("");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Unable to load MultiBaas");
+      setLoadError(
+        "Check your connection and try again. Previously loaded data is kept until an update succeeds.",
+      );
     } finally {
       loading.current = false;
       setRefreshing(false);
@@ -169,59 +395,80 @@ export default function Dashboard() {
       clearInterval(fallback);
     };
   }, [refresh]);
+  const connect = () => setWalletOpen(true);
   useEffect(() => {
-    const p = (window as unknown as { ethereum?: WalletProvider }).ethereum;
-    if (!p) return;
-    const changed = () => {
-      setAccount("");
-      setNotice("Wallet changed. Reconnect to refresh your portfolio.");
-    };
-    p.on?.("accountsChanged", changed);
-    p.on?.("chainChanged", changed);
-    return () => {
-      p.removeListener?.("accountsChanged", changed);
-      p.removeListener?.("chainChanged", changed);
-    };
-  }, []);
-  const connect = async () => {
-    try {
-      const p = (window as unknown as { ethereum?: WalletProvider }).ethereum;
-      if (!p) throw new Error("Install a browser wallet to use the testnet.");
-      const accounts = (await p.request({
-        method: "eth_requestAccounts",
-      })) as string[];
-      setAccount(accounts[0] || "");
-    } catch (e) {
-      setError((e as Error).message);
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("view") === "dashboard") {
+      setTab("Explore");
+      setCityFocus(false);
     }
-  };
+    if (DEMO && params.get("sample") === "1") {
+      addDemoActivity();
+      void refresh();
+    }
+  }, [DEMO, refresh]);
   const send = async (
     contract: ContractKey,
     method: string,
     args: unknown[] = [],
   ) => {
-    if (!active) throw new Error("Connect your wallet first.");
+    if (!active) {
+      setWalletOpen(true);
+      throw new Error("Connect your wallet first.");
+    }
     if (DEMO) return demoCall(active, contract, method, args);
-    const p = (window as unknown as { ethereum?: WalletProvider }).ethereum;
+    const p = wallet.provider;
     if (!p) throw new Error("Browser wallet unavailable");
-    return sendViaMultiBaas(p, active, contract, method, args);
+    return sendViaMultiBaas(p, active, contract, method, args, (progress) => {
+      if (activeRef.current === active) setTransaction(progress);
+      if (progress.hash) {
+        const entry: RecentTransaction = {
+          ...progress,
+          hash: progress.hash,
+          label: `${method} · ${contract}`,
+          account: active,
+          chainId: config.chainId,
+          createdAt: Date.now(),
+        };
+        setRecentTransactions((previous) => {
+          const next = [
+            entry,
+            ...previous.filter((tx) => tx.hash !== entry.hash),
+          ].slice(0, 30);
+          try {
+            localStorage.setItem(
+              "tokenize-tokyo:transactions",
+              JSON.stringify(next),
+            );
+          } catch {}
+          return next;
+        });
+      }
+    });
   };
   const run = async (label: string, work: () => Promise<unknown>) => {
-    if (busy) return;
+    if (actionLock.current) return false;
+    actionLock.current = true;
+    setTransaction(null);
     setBusy(label);
     setError("");
     setNotice("");
+    const requestedAccount = activeRef.current;
     try {
       await work();
-      setNotice(
-        DEMO
-          ? label + " · simulated successfully"
-          : label + " · confirmed. Waiting for the MultiBaas index.",
-      );
+      if (activeRef.current === requestedAccount)
+        setNotice(
+          DEMO
+            ? label + " · simulated successfully"
+            : label + " · confirmed. Waiting for the MultiBaas index.",
+        );
       await refresh();
+      return true;
     } catch (e) {
-      setError((e as Error).message || "Action failed");
+      if (activeRef.current === requestedAccount) setError(walletError(e));
+      return false;
     } finally {
+      actionLock.current = false;
       setBusy("");
     }
   };
@@ -251,7 +498,10 @@ export default function Dashboard() {
     );
   const stage = (a: Asset) =>
     assetStage(a.id, state, listingFor(a).length > 0, addresses.rights);
-  const filtered = assets.filter(
+  const campaigns = fundingCampaigns(state);
+  const openProjects = openFundingProjects(campaigns);
+  const fundingIds = new Set(openProjects.map((c) => c.asset.id));
+  const baseFiltered = assets.filter(
     (a) =>
       status === "All stages" ||
       stage(a) === status ||
@@ -264,25 +514,37 @@ export default function Dashboard() {
             ),
         )),
   );
-  useEffect(() => {
-    if (
-      tab === "Explore" &&
-      filtered.length &&
-      !filtered.some((a) => a.id === selected)
-    ) {
-      setSelected(filtered[0].id);
-      setTermsAccepted(false);
-      setQuantity("1");
-    }
-  }, [tab, filtered, selected]);
+  const filtered = fundingOnly
+    ? baseFiltered.filter((a) => fundingIds.has(a.id))
+    : baseFiltered;
+  const visibleProjects = openProjects.filter((c) =>
+    baseFiltered.some((a) => a.id === c.asset.id),
+  );
+  const viewAssetOnMap = (id: string) => {
+    setFundingOnly(false);
+    setKind("All assets");
+    setStatus("All stages");
+    setOwnedOnly(false);
+    setLens(false);
+    setHighlighted([]);
+    setDirectorySelection(id);
+    openExplore();
+  };
   const asset = state.assets.find((a) => a.id === selected),
     rights = state.rights.filter((r) => r.assetId === selected),
     listings = asset ? listingFor(asset) : [];
   const select = useCallback((id: string) => {
     setSelected(id);
+    setCityDetailsOpen(true);
     setTermsAccepted(false);
     setQuantity("1");
   }, []);
+  // Open details after the map filters reset, so their close effect cannot hide it.
+  useEffect(() => {
+    if (tab !== "Explore" || directorySelection === null) return;
+    select(directorySelection);
+    setDirectorySelection(null);
+  }, [tab, directorySelection, select]);
   const activeAssets = state.assets.filter((a) => stage(a) === "Active");
   const activatedCount = state.assets.filter((a) =>
     state.rights.some((r) => r.assetId === a.id && r.status === "Active"),
@@ -290,27 +552,29 @@ export default function Dashboard() {
   const openDormant = (site: DormantSite) => {
     setForm((f) => ({
       ...f,
+      ...defaultsForKind(site.kind),
       name: site.name,
       district: site.district,
       kind: site.kind,
-      right: site.kind === "Vacant Home" ? "Usage Right" : "Revenue Share",
-      supply: site.kind === "Vacant Home" ? "1" : "100",
-      scope:
-        site.kind === "Rooftop"
-          ? "Rooftop"
-          : site.kind === "Vacant Home"
-            ? "Interior"
-            : "Land",
       area: String(site.area),
       capacity: String(site.capacity),
       lng: String(site.coordinates[0]),
       lat: String(site.coordinates[1]),
+      overview: suggestedProject(site.kind, site.name).overview,
+      analysis: JSON.stringify(
+        suggestedProject(site.kind, site.name).assumptions,
+      ),
     }));
-    setShowTokenize(true);
-    setTab("Tokenize");
+    setShowSpacePicker(false);
+    setCreatedGeo("");
+    setFlowVersion((v) => v + 1);
+    setFlowTarget("new");
+    setFlowStarted(true);
+    setTokenizeOpen(true);
   };
   const compatible = state.rights.filter(
     (r) =>
+      accountReady &&
       r.kind === "Revenue Share" &&
       r.policy === "Open" &&
       available(r) &&
@@ -342,24 +606,39 @@ export default function Dashboard() {
         throw new Error("Choose a location near Tokyo.");
       const meta = {
         name: form.name,
+        kind: form.kind,
         district: form.district,
         coordinates: [lng, lat],
         area: Number(form.area),
         capacity: Number(form.capacity),
-        description: form.terms,
+        description: form.overview.trim() || form.terms,
+        projectAssumptions: (() => {
+          try {
+            return parseAssumptions(JSON.parse(form.analysis));
+          } catch {
+            return null;
+          }
+        })(),
+        planningBasis:
+          "Illustrative AI-authored draft, edited by issuer; not a site appraisal or market forecast.",
         evidence: form.evidence,
         simulated: true,
       };
       const geo = keccak256(
         stringToHex(JSON.stringify({ coordinates: meta.coordinates })),
       );
+      const uri = compactMetadataURI(meta);
+      if (new TextEncoder().encode(uri).length > 4096)
+        throw new Error(
+          "Project details exceed this deployment’s 4 KB inline limit. Shorten the description or evidence reference before registering.",
+        );
       await send("registry", "registerAsset", [
         geo,
-        metadataURI(meta),
-        ["Rooftop", "Vacant Home", "Idle Land", "Other"].indexOf(form.kind),
+        uri,
+        assetTypeCode(form.kind),
       ]);
-      setShowTokenize(false);
-      setTab("Tokenize");
+      setCreatedGeo(geo);
+      setShowSpacePicker(false);
     });
   const createRight = (a: Asset) =>
     run("Issue right for verification", async () => {
@@ -377,10 +656,7 @@ export default function Dashboard() {
         purpose: form.terms,
         evidence: form.evidence,
         simulated: true,
-        permittedUse:
-          form.right === "Usage Right"
-            ? "As specified in purpose"
-            : "Solar revenue distribution",
+        permittedUse: form.purpose,
         repairConditions: "Issuer approval required for structural works.",
       });
       await send("rights", "createScopedRight", [
@@ -422,24 +698,224 @@ export default function Dashboard() {
       String(e.args.assetId) === selected ||
       rights.some((r) => String(e.args.rightId) === r.id),
   );
-  const field = (name: keyof typeof form, label: string, type = "text") => (
-    <label>
-      {label}
-      <input
-        type={type}
-        value={form[name]}
-        onChange={(e) => setForm({ ...form, [name]: e.target.value })}
-      />
+  const walletControl = DEMO ? (
+    <label
+      className="actor"
+      title="Switch demo roles; no real wallet is connected"
+    >
+      <Wallet size={14} aria-hidden="true" />
+      <span className="actor-label">Demo role</span>
+      <select
+        aria-label="Demo role"
+        value={actor}
+        onChange={(e) => setActor(e.target.value as keyof typeof ACTORS)}
+      >
+        {Object.keys(ACTORS).map((a) => (
+          <option key={a}>{a}</option>
+        ))}
+      </select>
+      <ChevronDown size={12} aria-hidden="true" />
     </label>
+  ) : (
+    <button className="wallet-button" onClick={connect} aria-haspopup="dialog">
+      <Wallet size={14} />
+      {account ? short(account) : "Connect wallet"}
+    </button>
+  );
+  const feedback = (
+    <>
+      {error && (
+        <div className="feedback error" role="alert">
+          {error}
+          <button onClick={() => setError("")} aria-label="Dismiss error">
+            <X size={16} />
+          </button>
+        </div>
+      )}
+      {(busy || notice || transaction?.hash) && (
+        <div className="feedback" role="status">
+          {busy ? (
+            <>
+              <span className="spinner" />
+              {DEMO
+                ? `${busy}…`
+                : `${busy} · ${transaction ? transactionPhase[transaction.phase] : "Preparing"}`}
+            </>
+          ) : (
+            <>
+              <Check size={16} />
+              {notice ||
+                (transaction ? transactionPhase[transaction.phase] : "")}
+            </>
+          )}
+          {!DEMO && transaction?.hash && (
+            <a
+              className="transaction-link"
+              href={transactionUrl(transaction.hash)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              View transaction <ArrowUpRight size={14} />
+            </a>
+          )}
+          <button
+            onClick={() => {
+              setNotice("");
+              if (!busy) setTransaction(null);
+            }}
+            aria-label="Dismiss notice"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
+    </>
+  );
+  const activeNavigation = tab === "Explore" && !cityFocus ? "Dashboard" : tab;
+  const navigationLabel =
+    activeNavigation === "Portfolio"
+      ? "My assets"
+      : activeNavigation === "Namespaces"
+        ? "ENS Index"
+        : activeNavigation;
+  const mapFilters = (
+    <div className="section-row explore-filters">
+      <div
+        className="segmented asset-type-options"
+        role="group"
+        aria-label="Asset type filter"
+      >
+        {["All assets", ...ASSET_KINDS].map((k) => (
+          <button
+            className={kind === k ? "active" : ""}
+            aria-pressed={kind === k}
+            key={k}
+            onClick={() => setKind(k)}
+          >
+            {k === "All assets" ? (
+              <Layers3 size={14} />
+            ) : (
+              <AssetIcon kind={k as AssetKind} size={14} />
+            )}{" "}
+            {k}
+          </button>
+        ))}
+      </div>
+      <select
+        className="stage-filter"
+        aria-label="Lifecycle filter"
+        value={status}
+        onChange={(e) => setStatus(e.target.value)}
+      >
+        {[
+          "All stages",
+          "Dormant",
+          "Available",
+          "Funding",
+          "Funded",
+          "Active",
+          "Secondary Market",
+        ].map((s) => (
+          <option key={s}>{s}</option>
+        ))}
+      </select>
+      <div className="filter-actions">
+        <button
+          className="text-button reset-map-filters"
+          disabled={
+            kind === "All assets" &&
+            status === "All stages" &&
+            !ownedOnly &&
+            !fundingOnly
+          }
+          onClick={() => {
+            setKind("All assets");
+            setStatus("All stages");
+            setOwnedOnly(false);
+            setFundingOnly(false);
+          }}
+        >
+          <X size={13} />
+          Reset filters
+        </button>
+        <button
+          className="icon-button"
+          aria-label="Refresh market"
+          onClick={() => void refresh()}
+        >
+          <RefreshCw size={15} className={refreshing ? "spin" : ""} />
+        </button>
+      </div>
+    </div>
+  );
+  const mapTools = (
+    <div className="map-lenses">
+      <button
+        className={xray ? "on" : ""}
+        aria-pressed={xray}
+        onClick={() => {
+          setXray(!xray);
+          setLens(false);
+        }}
+      >
+        <Layers3 size={13} /> City X-ray
+      </button>
+      <button
+        className={"lens-toggle" + (lens ? " on" : "")}
+        aria-pressed={lens}
+        onClick={() => {
+          setLens(!lens);
+          setXray(false);
+        }}
+      >
+        <Sparkles size={13} /> Opportunity Lens
+      </button>
+      <button
+        className={ownedOnly ? "on" : ""}
+        aria-pressed={ownedOnly}
+        onClick={() => {
+          if (!active) connect();
+          else setOwnedOnly(!ownedOnly);
+        }}
+      >
+        <Wallet size={13} /> My spaces
+      </button>
+      {lens && (
+        <div className="lens-count" aria-live="polite">
+          <strong>{dormantCount(kind)} dormant opportunities</strong>
+          <span>
+            {kind === "All assets" ? "All kinds" : kind} ·{" "}
+            {DORMANT_DATASET_LABEL}
+          </span>
+        </div>
+      )}
+    </div>
   );
   return (
-    <div className="app-shell">
-      <aside className="sidebar">
-        <a className="brand" href="/">
+    <div
+      className={
+        "app-shell" +
+        (cityView ? " city-view" : "") +
+        (sidebarExpanded ? " city-sidebar-expanded" : "") +
+        (cityDetailsOpen ? " city-details-open" : "")
+      }
+    >
+      <aside className="sidebar" id="app-sidebar">
+        <a className="brand" href="/" aria-label="TOKENIZE TOKYO">
+          <BrandPlate
+            className="brand-cyberpunk"
+            width={190}
+            variant={logoVariant}
+          />
+          <BrandMark
+            className="brand-compact"
+            size={32}
+            variant={logoVariant}
+          />
           <span className="brand-mark">
             T<span>↗</span>
           </span>
-          <span>
+          <span className="brand-original-text">
             TOKENIZE
             <br />
             <b>TOKYO</b>
@@ -450,25 +926,77 @@ export default function Dashboard() {
         </div>
         <nav>
           {[
-            { name: "Explore", icon: MapPin },
-            { name: "Portfolio", icon: Wallet },
-            { name: "Compose", icon: Layers3 },
-            { name: "Tokenize", icon: Plus },
-            { name: "Activity", icon: Activity },
-          ].map(({ name, icon: Icon }) => (
-            <button
-              key={name}
-              className={tab === name ? "active" : ""}
-              onClick={() => setTab(name)}
+            {
+              label: "Platform",
+              items: [
+                { name: "Explore", icon: MapPin },
+                { name: "Dashboard", icon: LayoutDashboard },
+                { name: "Markets", icon: Store },
+                { name: "Namespaces", icon: Network },
+                { name: "Activity", icon: Activity },
+              ],
+            },
+            {
+              label: "My workspace",
+              items: [
+                { name: "Portfolio", icon: Wallet },
+                { name: "Compose", icon: Layers3 },
+              ],
+            },
+          ].map(({ label, items }) => (
+            <div
+              className="nav-group"
+              role="group"
+              aria-label={label}
+              key={label}
             >
-              <Icon size={18} />
-              {name}
-              {name === "Compose" && <span className="nav-new">NEW</span>}
-            </button>
+              <span className="nav-group-label">{label}</span>
+              {items.map(({ name, icon: Icon }) => (
+                <button
+                  key={name}
+                  className={activeNavigation === name ? "active" : ""}
+                  aria-current={activeNavigation === name ? "page" : undefined}
+                  title={
+                    name === "Portfolio"
+                      ? "My assets"
+                      : name === "Namespaces"
+                        ? "ENS Index"
+                        : name
+                  }
+                  onClick={() => {
+                    if (name === "Dashboard" || name === "Explore") {
+                      setCityFocus(name === "Explore");
+                      setTab("Explore");
+                    } else {
+                      if (name === "Markets") {
+                        setFinanceSource("");
+                        setMarketView("assets");
+                      }
+                      setTab(name);
+                    }
+                  }}
+                >
+                  <Icon size={18} />
+                  {name === "Portfolio"
+                    ? "My assets"
+                    : name === "Namespaces"
+                      ? "ENS Index"
+                      : name}
+                  {name === "Compose" && <span className="nav-new">NEW</span>}
+                </button>
+              ))}
+            </div>
           ))}
+          <button
+            className="guide-entry"
+            title="Quick tour"
+            onClick={() => setTutorialRequest((n) => n + 1)}
+          >
+            <BookOpen size={18} />
+            Quick tour
+          </button>
         </nav>
         <div className="sidebar-bottom">
-          <div className="city-symbol">東京</div>
           <p>
             More possibility.
             <br />
@@ -493,223 +1021,308 @@ export default function Dashboard() {
       </aside>
       <main>
         <header className="topbar">
+          {cityView && (
+            <button
+              className="sidebar-toggle icon-button"
+              aria-label="Toggle sidebar"
+              aria-expanded={sidebarExpanded}
+              aria-controls="app-sidebar"
+              title={sidebarExpanded ? "Collapse sidebar" : "Expand sidebar"}
+              onClick={() => setSidebarExpanded(!sidebarExpanded)}
+            >
+              {sidebarExpanded ? (
+                <PanelLeftClose size={18} />
+              ) : (
+                <PanelLeftOpen size={18} />
+              )}
+            </button>
+          )}
+          <a
+            className="city-brand"
+            href={DEMO ? "/demo?theme=cyberpunk" : "/?theme=cyberpunk"}
+            aria-label="TOKENIZE TOKYO"
+          >
+            <BrandPlate width={190} variant={logoVariant} />
+          </a>
           <div className="breadcrumb">
-            TOKYO <span>/</span> {tab.toUpperCase()}{" "}
-            <span className="network-dot" />
+            TOKYO <span>/</span> {navigationLabel.toUpperCase()}
           </div>
           <div className="top-actions">
             <span className={"mode " + (DEMO ? "demo" : "")}>
               <span />
               {DEMO ? "SIMULATED DEMO" : "MULTIBAAS TESTNET"}
             </span>
-            {DEMO ? (
-              <label className="actor">
-                <Wallet size={14} />
-                <select
-                  aria-label="Demo actor"
-                  value={actor}
-                  onChange={(e) =>
-                    setActor(e.target.value as keyof typeof ACTORS)
-                  }
-                >
-                  {Object.keys(ACTORS).map((a) => (
-                    <option key={a}>{a}</option>
-                  ))}
-                </select>
-                <ChevronDown size={12} />
-              </label>
-            ) : (
-              <button className="wallet-button" onClick={connect}>
-                <Wallet size={14} />
-                {account ? short(account) : "Connect wallet"}
-              </button>
+            {marketLoaded && refreshing && (
+              <span className="data-refresh" role="status">
+                <RefreshCw size={14} className="spin" /> Updating
+              </span>
             )}
+            {!tokenizeOpen && walletControl}
+            <button
+              className="primary header-tokenize"
+              aria-label="Tokenize a space"
+              aria-haspopup="dialog"
+              title="Tokenize a space"
+              disabled={!marketLoaded}
+              onClick={() => openTokenize()}
+            >
+              <Plus size={16} /> <span>Tokenize</span>
+            </button>
           </div>
         </header>
-        <div className="main-content">
-          <section className="heading">
-            <div>
-              <div className="eyebrow">
-                <span /> A CITY OF UNTAPPED POSSIBILITY
-              </div>
-              <h1>
-                {tab === "Explore" ? (
-                  <>
-                    Put the city <em>to work.</em>
-                  </>
-                ) : tab === "Portfolio" ? (
-                  <>
-                    Your stake in <em>tomorrow.</em>
-                  </>
-                ) : tab === "Compose" ? (
-                  <>
-                    A whole greater <em>than its parts.</em>
-                  </>
-                ) : tab === "Tokenize" ? (
-                  <>
-                    What can your asset <em>provide?</em>
-                  </>
-                ) : (
-                  <>
-                    Every action. <em>Accounted for.</em>
-                  </>
-                )}
-              </h1>
-              <p>
-                {tab === "Explore"
-                  ? "Discover urban spaces. Fund new possibilities. Own the rights that bring them to life."
-                  : tab === "Compose"
-                    ? "Combine compatible solar revenue rights into one fully backed Tokyo Solar Basket."
-                    : tab === "Portfolio"
-                      ? "Urban rights, basket shares and revenue backed by actual deposits."
-                      : tab === "Tokenize"
-                        ? "Register a place, define its rights, and unlock its next chapter."
-                        : "Follow the lifecycle from registration to productive capital."}
-              </p>
-            </div>
-            <button
-              className="primary"
-              onClick={() => {
-                setShowTokenize(true);
-                setTab("Tokenize");
-              }}
-            >
-              <Plus size={16} /> Tokenize an asset
-            </button>
-          </section>
-          <div className="demo-note">
-            <ShieldCheck size={14} />
-            <span>
-              Test assets only. Verification is simulated. Map data does not
-              prove ownership. Mock JPY has no monetary value.
-            </span>
-            <button
-              onClick={() =>
-                run("Fund test wallet", () =>
-                  send("settlement", "mint", [
-                    active,
-                    parseEther("1000000").toString(),
-                  ]),
-                )
+        <div
+          className={
+            "main-content" + (tab === "Tokenize" ? " focused-page" : "")
+          }
+        >
+          <Tutorial
+            container={
+              walletOpen
+                ? walletTourContainer
+                : tokenizeOpen
+                  ? tutorialContainer
+                  : null
+            }
+            request={tutorialRequest}
+            state={state}
+            hasSelectedSpace={!!asset && (!cityView || cityDetailsOpen)}
+            hasOpenOffer={listings.length > 0}
+            account={DEMO ? active : account}
+            chainId={wallet.chainId}
+            gasBalance={walletGasBalance}
+            transactions={recentTransactions}
+            demo={DEMO}
+            onActive={setGuideActive}
+            onActor={(name) => setActor(name as keyof typeof ACTORS)}
+            onNavigate={(next) => {
+              if (next === "Wallet") {
+                setWalletOpen(true);
+                return;
               }
-            >
-              Test faucet <ArrowUpRight size={12} />
-            </button>
-          </div>
-          {error && (
-            <div className="feedback error" role="alert">
-              {error}
-              <button onClick={() => setError("")} aria-label="Dismiss error">
-                <X size={16} />
+              setWalletOpen(false);
+              if (next === "Funding") {
+                closeTokenize();
+                setFinanceSource("");
+                setMarketView("funding");
+                setMarketRequest((n) => n + 1);
+                setTab("Markets");
+                return;
+              }
+              if (next === "Owner workspace") {
+                if (!flowStarted) openTokenize(true);
+                else setTokenizeOpen(true);
+                return;
+              }
+              if (next === "Inspect right") {
+                openExplore();
+                setCityDetailsOpen(true);
+                document
+                  .querySelectorAll('[aria-label="Map controls"] details[open]')
+                  .forEach((item) => item.removeAttribute("open"));
+                return;
+              }
+              if (next === "Tokenize") openTokenize(true);
+              else {
+                closeTokenize();
+                if (next === "Explore") openExplore();
+                else setTab(next);
+              }
+              setKind("All assets");
+              setStatus("All stages");
+              setOwnedOnly(false);
+            }}
+          />
+
+          <h1 className="sr-only">{navigationLabel}</h1>
+          {activeNavigation === "Dashboard" && (
+            <div className="demo-note">
+              <ShieldCheck size={14} />
+              <span>
+                Test assets only. Verification is simulated. Map data does not
+                prove ownership. Mock JPY has no monetary value.
+              </span>
+              <button
+                onClick={() =>
+                  run("Fund test wallet", () =>
+                    send("settlement", "mint", [
+                      active,
+                      parseEther("1000000").toString(),
+                    ]),
+                  )
+                }
+              >
+                Test faucet <ArrowUpRight size={12} />
               </button>
             </div>
           )}
-          {(busy || notice) && (
-            <div className="feedback" role="status">
-              {busy ? (
-                <>
-                  <span className="spinner" />
-                  {busy}… Confirm each transaction in your wallet.
-                </>
-              ) : (
-                <>
-                  <Check size={16} />
-                  {notice}
-                </>
-              )}
-              <button onClick={() => setNotice("")} aria-label="Dismiss notice">
-                <X size={16} />
+          {!tokenizeOpen && feedback}
+          {!marketLoaded &&
+            activeNavigation !== "Explore" &&
+            activeNavigation !== "Portfolio" && (
+              <DataStatus error={loadError} onRetry={() => void refresh()} />
+            )}
+          {marketLoaded && loadError && (
+            <div className="sample-activity" role="status">
+              <p>Update unavailable. Showing the last loaded data.</p>
+              <button className="secondary" onClick={() => void refresh()}>
+                Retry update
               </button>
             </div>
           )}
-          <section className="metrics">
-            <Metric
-              label="ASSETS REGISTERED"
-              value={String(state.assets.length)}
-              note="Places with new potential"
-              icon={<Building2 size={17} />}
-            />
-            <Metric
-              label="ACTIVE LISTINGS"
-              value={String(
-                state.listings.filter(
-                  (l) => !l.cancelled && BigInt(l.remaining) > 0n,
-                ).length,
-              )}
-              note="Primary & secondary rights"
-              icon={<Layers3 size={17} />}
-            />
-            <Metric
-              label="TRADED VOLUME"
-              value={money(state.metrics.volume)}
-              suffix="mJPY"
-              note="Settled marketplace payments"
-              icon={<ArrowUpRight size={17} />}
-            />
-            <Metric
-              label="REVENUE DEPOSITED"
-              value={money(state.metrics.deposited)}
-              suffix="mJPY"
-              note="Actual deposits in live mode"
-              icon={<Sun size={17} />}
-            />
-          </section>
-          {tab === "Explore" && (
-            <>
-              <div className="section-row">
-                <div className="segmented">
-                  {["All assets", "Rooftop", "Vacant Home", "Idle Land"].map(
-                    (k) => (
-                      <button
-                        className={kind === k ? "active" : ""}
-                        key={k}
-                        onClick={() => setKind(k)}
-                      >
-                        {k === "Rooftop" ? (
-                          <Sun size={14} />
-                        ) : k === "Vacant Home" ? (
-                          <House size={14} />
-                        ) : k === "All assets" ? (
-                          <Layers3 size={14} />
-                        ) : (
-                          <MapPin size={14} />
-                        )}{" "}
-                        {k}
-                      </button>
-                    ),
-                  )}
-                </div>
-                <select
-                  className="stage-filter"
-                  aria-label="Lifecycle filter"
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value)}
-                >
-                  {[
-                    "All stages",
-                    "Dormant",
-                    "Available",
-                    "Funding",
-                    "Funded",
-                    "Active",
-                    "Secondary Market",
-                  ].map((s) => (
-                    <option key={s}>{s}</option>
-                  ))}
-                </select>
-                <button
-                  className="icon-button"
-                  aria-label="Refresh market"
-                  onClick={() => void refresh()}
-                >
-                  <RefreshCw size={15} className={refreshing ? "spin" : ""} />
-                </button>
+          {activeNavigation === "Dashboard" && DEMO && (
+            <div className="sample-activity">
+              <div>
+                <b>Example market activity</b>
+                <p>
+                  Load 28 days of fictional purchases, resales, income deposits,
+                  and a mixed-asset basket. Your existing demo work is kept.
+                </p>
               </div>
+              {state.baskets.some(
+                (b) => b.name === "Tokyo Mixed Income Basket · Example",
+              ) ? (
+                <button
+                  className="secondary"
+                  onClick={() => {
+                    setActor("Investor C");
+                    setTab("Portfolio");
+                  }}
+                >
+                  View sample holdings
+                </button>
+              ) : (
+                <button
+                  className="secondary"
+                  disabled={!!busy}
+                  onClick={() =>
+                    run("Load example activity", async () => {
+                      addDemoActivity();
+                    })
+                  }
+                >
+                  Load example activity
+                </button>
+              )}
+            </div>
+          )}
+          {marketLoaded && activeNavigation === "Dashboard" && !guideActive && (
+            <section className="metrics">
+              <Metric
+                label="ASSETS REGISTERED"
+                value={String(state.assets.length)}
+                note="Places with new potential"
+                icon={<Building2 size={17} />}
+              />
+              <Metric
+                label="ACTIVE LISTINGS"
+                value={String(
+                  state.listings.filter(
+                    (l) => !l.cancelled && BigInt(l.remaining) > 0n,
+                  ).length,
+                )}
+                note="Primary & secondary rights"
+                icon={<Layers3 size={17} />}
+              />
+              <Metric
+                label="TRADED VOLUME"
+                value={money(state.metrics.volume)}
+                suffix="mJPY"
+                note="Settled marketplace payments"
+                icon={<ArrowUpRight size={17} />}
+              />
+              <Metric
+                label="REVENUE DEPOSITED"
+                value={money(state.metrics.deposited)}
+                suffix="mJPY"
+                note="Actual deposits in live mode"
+                icon={<Sun size={17} />}
+              />
+            </section>
+          )}
+          {marketLoaded && tab === "Explore" && !cityFocus && !guideActive && (
+            <MarketOverview
+              state={state}
+              rightsAddress={addresses.rights}
+              demo={DEMO}
+              onFilter={(value) => {
+                setKind(value);
+                setStatus("All stages");
+                setOwnedOnly(false);
+                setCityFocus(true);
+              }}
+              onReview={() => openTokenize()}
+              onFunded={() => {
+                setKind("All assets");
+                setStatus("Funded");
+                setOwnedOnly(false);
+                setCityFocus(true);
+              }}
+            />
+          )}
+          {tab === "Explore" && cityFocus && (
+            <>
+              {cityView ? (
+                <MapControls
+                  funding={{
+                    count: visibleProjects.length,
+                    active: fundingOnly,
+                    loading: !marketLoaded,
+                    onToggle: () => {
+                      setFundingOnly((v) => !v);
+                      setLens(false);
+                    },
+                    content: (
+                      <MapFunding
+                        projects={visibleProjects}
+                        onView={viewAssetOnMap}
+                      />
+                    ),
+                  }}
+                  filters={mapFilters}
+                  tools={mapTools}
+                  filterLabel={[
+                    !marketLoaded
+                      ? "Loading spaces…"
+                      : kind !== "All assets" ||
+                          status !== "All stages" ||
+                          ownedOnly ||
+                          fundingOnly
+                        ? `${filtered.length} matching spaces`
+                        : "",
+                    kind !== "All assets" ? kind : "",
+                    status !== "All stages" ? status : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
+                  toolLabel={[
+                    xray ? "X-ray" : "",
+                    lens ? "Opportunity Lens" : "",
+                    ownedOnly ? "My spaces" : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
+                />
+              ) : (
+                mapFilters
+              )}
               <div className="explore-layout">
                 <div className="map-wrap">
                   <TokyoMap
+                    theme={theme}
                     assets={filtered}
-                    selected={selected}
+                    selected={
+                      cityView && !cityDetailsOpen ? undefined : selected
+                    }
+                    filterActive={
+                      kind !== "All assets" ||
+                      status !== "All stages" ||
+                      ownedOnly ||
+                      fundingOnly
+                    }
+                    fundingProjects={openProjects.map((c) => ({
+                      assetId: c.asset.id,
+                      percent: c.percent,
+                    }))}
                     onSelect={select}
                     highlighted={highlighted}
                     xray={xray}
@@ -724,116 +1337,113 @@ export default function Dashboard() {
                       setForm((f) => ({ ...f, scope }));
                     }}
                   />
-                  <div className="map-top">
-                    <span>
-                      <span className="network-dot" /> LIVE CITY / DEMO ASSETS
-                    </span>
-                    <button
-                      onClick={() =>
-                        setHighlighted(state.assets.map((a) => a.id))
-                      }
+                  {!marketLoaded && (
+                    <DataStatus
+                      compact
+                      error={loadError}
+                      onRetry={() => void refresh()}
+                    />
+                  )}
+                  {marketLoaded && (
+                    <div
+                      className="lens-funnel"
+                      aria-label="Dormant to activated"
                     >
-                      <Layers3 size={13} /> City overview
-                    </button>
-                  </div>
-                  <div
-                    className="lens-funnel"
-                    aria-label="Dormant to activated"
-                  >
-                    <span>
-                      <b>{DORMANT_SITES.length}</b> DORMANT
-                    </span>
-                    <ArrowRight size={11} />
-                    <span>
-                      <b>{state.assets.length}</b> TOKENIZED
-                    </span>
-                    <ArrowRight size={11} />
-                    <span>
-                      <b>{activatedCount}</b> ACTIVATED
-                    </span>
-                  </div>
-                  <div className="map-lenses">
-                    <button
-                      className={xray ? "on" : ""}
-                      onClick={() => {
-                        setXray(!xray);
-                        setLens(false);
-                      }}
-                    >
-                      <Layers3 size={13} /> City X-ray
-                    </button>
-                    <button
-                      className={"lens-toggle" + (lens ? " on" : "")}
-                      aria-pressed={lens}
-                      onClick={() => {
-                        setLens(!lens);
-                        setXray(false);
-                      }}
-                    >
-                      <Sparkles size={13} /> Opportunity Lens
-                    </button>
-                    <button
-                      className={ownedOnly ? "on" : ""}
-                      onClick={() => setOwnedOnly(!ownedOnly)}
-                    >
-                      <Wallet size={13} /> My spaces
-                    </button>
-                    <button
-                      onClick={() => {
-                        setKind("Rooftop");
-                        setStatus("Active");
-                        setXray(true);
-                        setLens(false);
-                      }}
-                    >
-                      Active solar lens
-                    </button>
-                    {lens && (
-                      <div className="lens-count" aria-live="polite">
-                        <strong>
-                          {dormantCount(kind)} dormant opportunities
-                        </strong>
-                        <span>
-                          {kind === "All assets" ? "All kinds" : kind} ·{" "}
-                          {DORMANT_DATASET_LABEL}
-                        </span>
-                      </div>
-                    )}
-                  </div>
+                      <span>
+                        <b>{DORMANT_SITES.length}</b> DORMANT
+                      </span>
+                      <ArrowRight size={11} />
+                      <span>
+                        <b>{state.assets.length}</b> TOKENIZED
+                      </span>
+                      <ArrowRight size={11} />
+                      <span>
+                        <b>{activatedCount}</b> ACTIVATED
+                      </span>
+                    </div>
+                  )}
+                  {!cityView && mapTools}
                   <div className="map-stats">
                     <span>
-                      <i className="green" /> Solar opportunity
+                      <i className="green" /> Revenue opportunity
                     </span>
                     <span>
-                      <i className="amber" /> Community space
+                      <i className="amber" /> Usage opportunity
                     </span>
                   </div>
+                  <details className="city-map-info">
+                    <summary aria-label="About this map" title="About this map">
+                      <Info size={16} />
+                    </summary>
+                    <div>
+                      <strong>About this map</strong>
+                      <p>
+                        Test assets only. Verification, highlighted spaces and
+                        dimensions are simulated. Map data does not prove
+                        property ownership.
+                      </p>
+                      <p>
+                        3D basemap: OpenStreetMap / OpenFreeMap. Mock JPY has no
+                        monetary value.
+                      </p>
+                    </div>
+                  </details>
                 </div>
-                <aside className="asset-detail">
+                <aside className="asset-detail" id="asset-detail-panel">
+                  <div className="city-detail-heading">
+                    <span>THE SPACE & THE RIGHT</span>
+                    <button
+                      aria-label="Close asset details"
+                      onClick={() => setCityDetailsOpen(false)}
+                    >
+                      <X size={18} />
+                    </button>
+                  </div>
                   {asset ? (
                     <>
                       <div className="detail-art">
-                        <div
-                          className={
-                            "mini-building " +
-                            (asset.kind === "Vacant Home" ? "house" : "")
-                          }
-                        >
-                          <span />
-                          <span />
-                          <span />
-                          <span />
-                          <span />
-                          <span />
-                        </div>
-                        <span className="sim-badge">SIMULATED ASSET</span>
-                        <div className="art-coords">
-                          {asset.coordinates[1].toFixed(4)} N<br />
-                          {asset.coordinates[0].toFixed(4)} E
-                        </div>
-                        <span className="art-number">
-                          {asset.id.padStart(3, "0")}
-                        </span>
+                        {theme === "cyberpunk" ? (
+                          <div className="asset-space-summary">
+                            <div className="asset-space-icon">
+                              <AssetIcon kind={asset.kind} size={24} />
+                            </div>
+                            <div>
+                              <strong>{asset.kind}</strong>
+                              <span>
+                                {asset.area.toLocaleString()} m² · Demo space
+                              </span>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            {asset.kind === "Rooftop" ? (
+                              <div className="mini-building">
+                                <span />
+                                <span />
+                                <span />
+                                <span />
+                                <span />
+                                <span />
+                              </div>
+                            ) : (
+                              <div
+                                className="space-illustration"
+                                style={{ color: SPACE_TYPES[asset.kind].color }}
+                              >
+                                <AssetIcon kind={asset.kind} size={46} />
+                                <strong>{asset.kind}</strong>
+                              </div>
+                            )}
+                            <span className="sim-badge">SIMULATED ASSET</span>
+                            <div className="art-coords">
+                              {asset.coordinates[1].toFixed(4)} N<br />
+                              {asset.coordinates[0].toFixed(4)} E
+                            </div>
+                            <span className="art-number">
+                              {asset.id.padStart(3, "0")}
+                            </span>
+                          </>
+                        )}
                       </div>
                       <div className="detail-content">
                         <div className="detail-location">
@@ -850,7 +1460,41 @@ export default function Dashboard() {
                           </span>
                           <span className="badge">{stage(asset)}</span>
                         </div>
-                        <p className="description">{asset.description}</p>
+                        <section
+                          className="asset-overview"
+                          aria-label="About this space"
+                        >
+                          <h3>ABOUT THIS SPACE</h3>
+                          <p
+                            className="description"
+                            style={{ whiteSpace: "pre-line" }}
+                          >
+                            {asset.description}
+                          </p>
+                          {(() => {
+                            const a = parseAssumptions(
+                              parseMetadata(asset.metadataURI)
+                                .projectAssumptions,
+                            );
+                            return a ? (
+                              <details className="wizard-details">
+                                <summary>
+                                  Project economics · illustrative scenarios
+                                </summary>
+                                <ProjectEconomics assumptions={a} />
+                              </details>
+                            ) : null;
+                          })()}
+                        </section>
+                        <SpaceEnsPreview
+                          demo={DEMO}
+                          asset={asset}
+                          rights={rights}
+                          onInspect={(name) => {
+                            setEnsSelection(name);
+                            setTab("Namespaces");
+                          }}
+                        />
                         <div className="right-explainer">
                           <span>WHAT YOU&apos;RE BUYING</span>
                           <h3>
@@ -863,8 +1507,8 @@ export default function Dashboard() {
                           </h3>
                           <p>
                             {rights[0]?.kind === "Revenue Share"
-                              ? "A proportional share of revenue actually deposited by this solar project."
-                              : "A time-limited right to use this space for the purpose defined in its terms."}
+                              ? "A proportional share of revenue actually deposited by this project."
+                              : SPACE_TYPES[asset.kind].terms}
                           </p>
                         </div>
                         <div className="detail-facts">
@@ -885,6 +1529,8 @@ export default function Dashboard() {
                                 <>
                                   {asset.capacity} <small>kWp</small>
                                 </>
+                              ) : rights[0]?.kind === "Revenue Share" ? (
+                                "Income"
                               ) : (
                                 "Usage"
                               )}
@@ -928,6 +1574,14 @@ export default function Dashboard() {
                             <p className="hash">Terms hash: {r.termsHash}</p>
                           </details>
                         ))}
+                        {campaigns
+                          .filter(
+                            (c) =>
+                              c.asset.id === asset.id && !c.listing.cancelled,
+                          )
+                          .map((c) => (
+                            <FundingProgress key={c.listing.id} campaign={c} />
+                          ))}
                         {listings.length ? (
                           <>
                             <label className="terms-check">
@@ -973,11 +1627,12 @@ export default function Dashboard() {
                                   className="primary"
                                   disabled={
                                     !!busy ||
-                                    !termsAccepted ||
+                                    (!!active && !termsAccepted) ||
                                     same(l.seller, active)
                                   }
-                                  onClick={() =>
-                                    run("Purchase rights", async () => {
+                                  onClick={() => {
+                                    if (!active) return connect();
+                                    return run("Purchase rights", async () => {
                                       if (
                                         !/^\d+$/.test(quantity) ||
                                         BigInt(quantity) <= 0n ||
@@ -997,12 +1652,14 @@ export default function Dashboard() {
                                         l.id,
                                         quantity,
                                       ]);
-                                    })
-                                  }
+                                    });
+                                  }}
                                 >
-                                  {same(l.seller, active)
-                                    ? "Your listing"
-                                    : "Acquire right"}
+                                  {!active
+                                    ? "Connect wallet to buy"
+                                    : same(l.seller, active)
+                                      ? "Your listing"
+                                      : "Acquire right"}
                                   <ArrowUpRight size={15} />
                                 </button>
                               </div>
@@ -1022,65 +1679,48 @@ export default function Dashboard() {
                             .reverse()
                             .map((e, i) => (
                               <p key={i}>
-                                {e.name} · block {e.block}
+                                {!DEMO && isTxHash(e.txHash) ? (
+                                  <a
+                                    href={transactionUrl(e.txHash)}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                  >
+                                    {e.name} · block {e.block} ↗
+                                  </a>
+                                ) : (
+                                  <>
+                                    {e.name} · block {e.block}
+                                  </>
+                                )}
                               </p>
                             ))}
                         </details>
                       </div>
                     </>
                   ) : (
-                    <div className="empty">Register an asset to begin.</div>
+                    <div className="empty">
+                      {marketLoaded
+                        ? "Select a space on the map to see its rights."
+                        : "Loading spaces…"}
+                    </div>
                   )}
                 </aside>
               </div>
-              <section className="opportunity-section">
-                <div className="section-title">
-                  <h2>
-                    Spaces with a next chapter
-                    <span>{filtered.length.toString().padStart(2, "0")}</span>
-                  </h2>
-                  <span>
-                    EXPLORE THE POSSIBILITIES <ArrowRight size={14} />
-                  </span>
-                </div>
-                <div className="asset-grid">
-                  {filtered.map((a) => (
-                    <button
-                      className={
-                        "asset-card " + (a.id === selected ? "chosen" : "")
-                      }
-                      key={a.id}
-                      onClick={() => select(a.id)}
-                    >
-                      <div className="card-icon">
-                        {a.kind === "Rooftop" ? <Sun /> : <House />}
-                      </div>
-                      <div>
-                        <span>{a.district}</span>
-                        <h3>{a.name}</h3>
-                        <p>
-                          {a.kind} · {a.area} m² · Simulated
-                        </p>
-                      </div>
-                      <ArrowUpRight size={18} />
-                      <div className="card-bottom">
-                        <span className="status-dot">{stage(a)}</span>
-                        <b>
-                          {listingFor(a)[0]
-                            ? money(listingFor(a)[0].unitPrice) + " mJPY"
-                            : "Awaiting listing"}
-                        </b>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </section>
             </>
           )}
-          {tab === "Portfolio" && (
+          {tab === "Portfolio" && !accountReady && (
+            <AccountGate
+              connected={!!active}
+              loading={refreshing}
+              error={loadError}
+              onConnect={connect}
+              onRetry={() => void refresh()}
+            />
+          )}
+          {tab === "Portfolio" && accountReady && (
             <section className="workspace">
               <div className="section-title">
-                <h2>Your urban portfolio</h2>
+                <h2>My assets</h2>
                 <span>
                   TEST BALANCE <b>{money(state.cash)} mJPY</b>
                 </span>
@@ -1111,39 +1751,63 @@ export default function Dashboard() {
                   .map((x) => (
                     <article className="holding" key={x.token + x.id}>
                       <div className="card-icon">
-                        {x.token === "basket" ? <Layers3 /> : <Sun />}
+                        {x.token === "basket" ? (
+                          <Layers3 />
+                        ) : (
+                          <AssetIcon
+                            kind={
+                              state.assets.find(
+                                (a) =>
+                                  a.id ===
+                                  state.rights.find((r) => r.id === x.id)
+                                    ?.assetId,
+                              )?.kind || "Other"
+                            }
+                          />
+                        )}
                       </div>
                       <div>
                         <span>{x.kind}</span>
                         <h3>{x.name}</h3>
                         <p>
                           {state.balances[x.token + ":" + x.id] || "0"} units
-                          held ·{" "}
-                          {money(state.claimable[x.token + ":" + x.id] || "0")}{" "}
-                          mJPY claimable
+                          held{" "}
+                          {x.kind !== "Usage Right" && (
+                            <>
+                              ·{" "}
+                              {money(
+                                state.claimable[x.token + ":" + x.id] || "0",
+                              )}{" "}
+                              mJPY claimable
+                            </>
+                          )}
                         </p>
                       </div>
                       <div className="holding-actions">
-                        <button
-                          disabled={
-                            !!busy ||
-                            BigInt(
-                              state.claimable[x.token + ":" + x.id] || "0",
-                            ) === 0n
-                          }
-                          className="secondary"
-                          onClick={() =>
-                            run("Claim deposited revenue", () =>
-                              send(
-                                x.token === "rights" ? "revenue" : "basket",
-                                x.token === "rights" ? "claim" : "claimRevenue",
-                                [x.id],
-                              ),
-                            )
-                          }
-                        >
-                          Claim revenue
-                        </button>
+                        {x.kind !== "Usage Right" && (
+                          <button
+                            disabled={
+                              !!busy ||
+                              BigInt(
+                                state.claimable[x.token + ":" + x.id] || "0",
+                              ) === 0n
+                            }
+                            className="secondary"
+                            onClick={() =>
+                              run("Claim deposited revenue", () =>
+                                send(
+                                  x.token === "rights" ? "revenue" : "basket",
+                                  x.token === "rights"
+                                    ? "claim"
+                                    : "claimRevenue",
+                                  [x.id],
+                                ),
+                              )
+                            }
+                          >
+                            Claim revenue
+                          </button>
+                        )}
                         <button
                           className="secondary"
                           disabled={!!busy}
@@ -1151,6 +1815,18 @@ export default function Dashboard() {
                         >
                           List for resale
                         </button>
+                        {x.token === "rights" && (
+                          <button
+                            className="secondary"
+                            onClick={() => {
+                              setFinanceSource(x.id);
+                              setMarketView("fraction");
+                              setTab("Markets");
+                            }}
+                          >
+                            Fractionalize / lend · mock
+                          </button>
+                        )}
                         {x.token === "basket" && (
                           <button
                             className="secondary"
@@ -1171,9 +1847,12 @@ export default function Dashboard() {
               {!Object.values(state.balances).some((v) => BigInt(v) > 0n) && (
                 <div className="empty">
                   <Wallet size={32} />
-                  <h3>Your next chapter starts with one right.</h3>
-                  <p>Explore the city and acquire a verified demo right.</p>
-                  <button className="primary" onClick={() => setTab("Explore")}>
+                  <h3>You don’t own any assets yet.</h3>
+                  <p>
+                    Find a space, review its rights, and make your first
+                    purchase.
+                  </p>
+                  <button className="primary" onClick={openExplore}>
                     Explore opportunities <ArrowRight size={15} />
                   </button>
                 </div>
@@ -1227,101 +1906,116 @@ export default function Dashboard() {
                 ))}
             </section>
           )}
-          {tab === "Compose" && (
+          {marketLoaded && tab === "Compose" && (
             <section className="compose-layout">
               <div className="workspace">
-                <div className="eyebrow">FINANCIAL COMPOSABILITY</div>
-                <h2>Tokyo Solar Basket</h2>
+                <h2>Create an income basket</h2>
                 <p className="description">
-                  Many rooftops. One new possibility. Each basket share is
-                  backed by one unit of every selected solar right, held in the
-                  BasketVault.
+                  Combine revenue rights from rooftops, parking, advertising,
+                  and other assets. Each share is backed by one unit of every
+                  selected right held in the vault.
                 </p>
-                <div className="compose-diagram">
-                  <span>
-                    <Sun />
-                    Solar A
-                  </span>
-                  <i>+</i>
-                  <span>
-                    <Sun />
-                    Solar B
-                  </span>
-                  <i>→</i>
-                  <span className="basket-node">
-                    <Layers3 />
-                    TOKYO SOLAR
-                    <br />
-                    BASKET
-                  </span>
-                </div>
-                <h3>01 / Choose your underlyings</h3>
-                {compatible.length ? (
-                  compatible.map((r) => (
-                    <label className="underlying" key={r.id}>
-                      <input
-                        type="checkbox"
-                        checked={compose.includes(r.id)}
-                        onChange={(e) =>
-                          setCompose(
-                            e.target.checked
-                              ? [...compose, r.id]
-                              : compose.filter((id) => id !== r.id),
-                          )
-                        }
-                      />
-                      <Sun size={19} />
-                      <span>
-                        <b>
-                          {state.assets.find((a) => a.id === r.assetId)?.name}
-                        </b>
-                        <small>
-                          {state.balances["rights:" + r.id]} units · Open
-                          transfer · Mock JPY
-                        </small>
-                      </span>
-                    </label>
-                  ))
-                ) : (
-                  <div className="empty compact">
-                    Acquire at least two compatible solar rights to create a
-                    basket. Rights already assigned to a basket can be deposited
-                    into that existing basket.
-                  </div>
-                )}
-                <h3>02 / Deposit and mint</h3>
-                <label>
-                  Basket shares to mint
-                  <input
-                    type="number"
-                    min="1"
-                    value={quantity}
-                    onChange={(e) => setQuantity(e.target.value)}
+                {!accountReady ? (
+                  <AccountGate
+                    connected={!!active}
+                    loading={refreshing}
+                    error={loadError}
+                    title="Start with the income rights you own"
+                    description="Connect to choose your holdings. You can browse existing baskets without connecting."
+                    onConnect={connect}
+                    onRetry={() => void refresh()}
                   />
-                </label>
-                <button
-                  className="primary wide"
-                  disabled={!!busy || compose.length < 2}
-                  onClick={() =>
-                    run("Create basket", async () => {
-                      await send("basket", "createBasket", [
-                        compose,
-                        compose.map(() => "1"),
-                        metadataURI({
-                          name: "Tokyo Solar Basket",
-                          simulated: true,
-                        }),
-                      ]);
-                      setCompose([]);
-                    })
-                  }
-                >
-                  Create basket definition <ArrowRight size={16} />
-                </button>
-                <p className="caption">
-                  Then use “Deposit & mint” below. Shares are issued only when
-                  every underlying is transferred into the vault.
-                </p>
+                ) : (
+                  <>
+                    <h3>01 / Choose 2–8 income rights</h3>
+                    {compatible.length ? (
+                      compatible.map((r) => (
+                        <label className="underlying" key={r.id}>
+                          <input
+                            type="checkbox"
+                            checked={compose.includes(r.id)}
+                            onChange={(e) =>
+                              setCompose(
+                                e.target.checked
+                                  ? [...compose, r.id]
+                                  : compose.filter((id) => id !== r.id),
+                              )
+                            }
+                          />
+                          <AssetIcon
+                            kind={
+                              state.assets.find((a) => a.id === r.assetId)
+                                ?.kind || "Other"
+                            }
+                            size={19}
+                          />
+                          <span>
+                            <b>
+                              {
+                                state.assets.find((a) => a.id === r.assetId)
+                                  ?.name
+                              }
+                            </b>
+                            <small>
+                              {state.balances["rights:" + r.id]} units · Open
+                              transfer · Mock JPY
+                            </small>
+                          </span>
+                        </label>
+                      ))
+                    ) : (
+                      <div className="empty compact">
+                        Acquire at least two compatible revenue rights to create
+                        a basket. Usage rights are not eligible. Rights already
+                        in a pool can be deposited into that existing basket.
+                      </div>
+                    )}
+                    <h3>02 / Name and review your basket</h3>
+                    <label>
+                      Basket name
+                      <input
+                        value={basketName}
+                        maxLength={80}
+                        onChange={(e) => setBasketName(e.target.value)}
+                      />
+                    </label>
+                    {compose.length > 0 && (
+                      <p className="caption">
+                        One basket share will contain one unit of each selected
+                        income right ({compose.length} rights in total).
+                      </p>
+                    )}
+                    <button
+                      className="primary wide"
+                      disabled={
+                        !!busy ||
+                        compose.length < 2 ||
+                        compose.length > 8 ||
+                        !basketName.trim()
+                      }
+                      onClick={() =>
+                        run("Create basket", async () => {
+                          await send("basket", "createBasket", [
+                            compose,
+                            compose.map(() => "1"),
+                            metadataURI({
+                              name: basketName.trim(),
+                              simulated: true,
+                            }),
+                          ]);
+                          setCompose([]);
+                        })
+                      }
+                    >
+                      Save basket plan <ArrowRight size={16} />
+                    </button>
+                    <p className="caption">
+                      This records the combination; your rights stay in your
+                      wallet. Next, open the basket and choose “Add your rights”
+                      to deposit them and receive shares.
+                    </p>
+                  </>
+                )}
                 <div className="callout">
                   <ShieldCheck size={18} />
                   <p>
@@ -1332,69 +2026,47 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="workspace">
-                <h3>Basket pools</h3>
+                <h3>Browse income baskets</h3>
                 {state.baskets.map((b) => (
-                  <article className="basket-pool" key={b.id}>
-                    <Layers3 size={30} />
-                    <h2>
-                      {b.name} #{b.id}
-                    </h2>
-                    <p>
-                      {b.rightIds.length} rooftops ·{" "}
-                      {b.units
-                        .map((u, i) => u + " × Right " + b.rightIds[i])
-                        .join(" + ")}
-                    </p>
-                    <button
-                      className="primary"
-                      disabled={!!busy}
-                      onClick={() =>
-                        run("Deposit underlying & mint basket", async () => {
-                          await approve("rights", "basket");
-                          await send("basket", "depositUnderlying", [
-                            b.id,
-                            quantity,
-                          ]);
-                          setHighlighted(
-                            state.rights
-                              .filter((r) => b.rightIds.includes(r.id))
-                              .map((r) => r.assetId),
-                          );
-                        })
-                      }
-                    >
-                      Deposit & mint <ArrowUpRight size={16} />
-                    </button>
-                    <button
-                      className="secondary"
-                      onClick={() => {
+                  <BasketPoolCard
+                    key={`${active}:${b.id}`}
+                    basket={b}
+                    state={state}
+                    connected={!!active}
+                    ready={accountReady}
+                    busy={!!busy}
+                    demo={DEMO}
+                    onConnect={connect}
+                    onDeposit={(shares) =>
+                      run("Create backed basket shares", async () => {
+                        await approve("rights", "basket");
+                        await send("basket", "depositUnderlying", [
+                          b.id,
+                          shares,
+                        ]);
                         setHighlighted(
                           state.rights
                             .filter((r) => b.rightIds.includes(r.id))
                             .map((r) => r.assetId),
                         );
-                        setTab("Explore");
-                      }}
-                    >
-                      View underlying rooftops
-                    </button>
-                    <button
-                      className="secondary"
-                      onClick={() => listRight("basket", b.id)}
-                      disabled={
-                        !!busy ||
-                        BigInt(state.balances["basket:" + b.id] || "0") === 0n
-                      }
-                    >
-                      List basket shares
-                    </button>
-                  </article>
+                      })
+                    }
+                    onView={() => {
+                      setHighlighted(
+                        state.rights
+                          .filter((r) => b.rightIds.includes(r.id))
+                          .map((r) => r.assetId),
+                      );
+                      openExplore();
+                    }}
+                    onManage={() => setTab("Portfolio")}
+                  />
                 ))}
                 {!state.baskets.length && (
                   <div className="empty">
                     <Layers3 size={42} />
                     <h3>The city is your building block.</h3>
-                    <p>Create the first fully backed solar basket.</p>
+                    <p>Create a basket backed by compatible revenue rights.</p>
                   </div>
                 )}
                 {state.listings
@@ -1405,365 +2077,99 @@ export default function Dashboard() {
                       BigInt(l.remaining) > 0n,
                   )
                   .map((l) => (
-                    <div className="basket-pool" key={l.id}>
-                      <h3>
-                        Basket #{l.rightId} · {money(l.unitPrice)} mJPY
-                      </h3>
-                      <p>
-                        {l.remaining} shares available. Review underlying rights
-                        in the pool above.
-                      </p>
-                      <label className="terms-check">
-                        <input
-                          type="checkbox"
-                          checked={termsAccepted}
-                          onChange={(e) => setTermsAccepted(e.target.checked)}
-                        />{" "}
-                        I reviewed the basket and underlying terms.
-                      </label>
-                      <button
-                        className="primary"
-                        disabled={
-                          !!busy || !termsAccepted || same(l.seller, active)
-                        }
-                        onClick={() =>
-                          run("Purchase basket shares", async () => {
-                            await approve(
-                              "settlement",
-                              "market",
-                              (
-                                BigInt(quantity) * BigInt(l.unitPrice)
-                              ).toString(),
+                    <BasketOfferCard
+                      key={`${active}:${l.id}`}
+                      listing={l}
+                      basket={state.baskets.find((b) => b.id === l.rightId)}
+                      state={state}
+                      account={active}
+                      busy={!!busy}
+                      demo={DEMO}
+                      onConnect={connect}
+                      onPurchase={(shares) =>
+                        run("Purchase basket shares", async () => {
+                          if (
+                            !/^\d+$/.test(shares) ||
+                            BigInt(shares) <= 0n ||
+                            BigInt(shares) > BigInt(l.remaining)
+                          )
+                            throw new Error(
+                              "Enter a whole quantity within the available supply.",
                             );
-                            await send("market", "purchase", [l.id, quantity]);
-                          })
-                        }
-                      >
-                        Acquire basket shares
-                      </button>
-                    </div>
+                          await approve(
+                            "settlement",
+                            "market",
+                            (BigInt(shares) * BigInt(l.unitPrice)).toString(),
+                          );
+                          await send("market", "purchase", [l.id, shares]);
+                        })
+                      }
+                    />
                   ))}
               </div>
             </section>
           )}
-          {tab === "Tokenize" && (
-            <section className="tokenize-layout">
-              <div className="workspace">
-                <div className="section-title">
-                  <h2>From possibility to productive asset</h2>
-                </div>
-                <div className="callout">
-                  <Layers3 size={18} />
-                  <p>
-                    Urban Rights Protocol: space × time × purpose. Overlapping
-                    exclusive roof, interior, wall or land usage is rejected
-                    on-chain. Revenue rights can coexist with solar usage.
-                  </p>
-                </div>
-                <div className="flow-steps">
-                  {[
-                    "Register",
-                    "Verify asset",
-                    "Issue right",
-                    "Verify right",
-                    "List",
-                    "Activate",
-                  ].map((s, i) => (
-                    <span key={s}>
-                      <b>{String(i + 1).padStart(2, "0")}</b>
-                      {s}
-                    </span>
-                  ))}
-                </div>
-                <p className="description">
-                  Anyone can register. A demo verifier must approve both the
-                  asset and its specific rights before a listing can go live.
-                </p>
-                <div className="form-grid">
-                  {field("name", "Asset name")}
-                  {field("district", "District")}
-                  <label>
-                    Asset type
-                    <select
-                      aria-label="Asset type"
-                      value={form.kind}
-                      onChange={(e) =>
-                        setForm({
-                          ...form,
-                          kind: e.target.value,
-                          right:
-                            e.target.value === "Vacant Home"
-                              ? "Usage Right"
-                              : "Revenue Share",
-                          supply:
-                            e.target.value === "Vacant Home" ? "1" : "100",
-                        })
-                      }
-                    >
-                      {["Rooftop", "Vacant Home", "Idle Land", "Other"].map(
-                        (x) => (
-                          <option key={x}>{x}</option>
-                        ),
-                      )}
-                    </select>
-                  </label>
-                  <label>
-                    Right type
-                    <select
-                      aria-label="Right type"
-                      value={form.right}
-                      onChange={(e) =>
-                        setForm({
-                          ...form,
-                          right: e.target.value,
-                          supply:
-                            e.target.value === "Revenue Share" ? "100" : "1",
-                        })
-                      }
-                    >
-                      {["Revenue Share", "Usage Right", "Lease", "Other"].map(
-                        (x) => (
-                          <option key={x}>{x}</option>
-                        ),
-                      )}
-                    </select>
-                  </label>
-                  <label>
-                    Spatial scope
-                    <select
-                      aria-label="Spatial scope"
-                      value={form.scope}
-                      onChange={(e) =>
-                        setForm({ ...form, scope: e.target.value })
-                      }
-                    >
-                      {[
-                        "Rooftop",
-                        "Interior",
-                        "Wall",
-                        "Land",
-                        "Whole asset",
-                      ].map((x) => (
-                        <option key={x}>{x}</option>
-                      ))}
-                    </select>
-                  </label>
-                  {field("purpose", "Purpose (canonical label)")}
-                  <label>
-                    Exclusive usage
-                    <select
-                      aria-label="Exclusive usage"
-                      value={form.exclusive}
-                      onChange={(e) =>
-                        setForm({ ...form, exclusive: e.target.value })
-                      }
-                    >
-                      <option>Yes</option>
-                      <option>No</option>
-                    </select>
-                  </label>
-                  {field("lng", "Longitude", "number")}
-                  {field("lat", "Latitude", "number")}
-                  {field("area", "Area (m², simulated)", "number")}
-                  {field("capacity", "Capacity (kWp, estimated)", "number")}
-                  {field("supply", "Right supply", "number")}
-                  {field("price", "Primary price (mJPY)", "number")}
-                  {field("start", "Start date", "date")}
-                  {field("end", "End date", "date")}
-                  <label>
-                    Transfer policy
-                    <select
-                      aria-label="Transfer policy"
-                      value={form.policy}
-                      onChange={(e) =>
-                        setForm({ ...form, policy: e.target.value })
-                      }
-                    >
-                      {["Open", "Allowlist", "Nontransferable"].map((x) => (
-                        <option key={x}>{x}</option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="full">
-                    Terms: use, duration, revenue, repairs
-                    <textarea
-                      value={form.terms}
-                      onChange={(e) =>
-                        setForm({ ...form, terms: e.target.value })
-                      }
-                    />
-                  </label>
-                  <label className="full">
-                    Evidence / metadata reference
-                    <textarea
-                      value={form.evidence}
-                      onChange={(e) =>
-                        setForm({ ...form, evidence: e.target.value })
-                      }
-                    />
-                  </label>
-                </div>
-                <button
-                  className="primary wide"
-                  disabled={!!busy}
-                  onClick={createAsset}
-                >
-                  Register demo asset <ArrowRight size={16} />
-                </button>
-                <p className="caption">
-                  The form above defines new rights when you click “Issue right”
-                  on a verified asset below. The terms hash is fixed at
-                  issuance.
-                </p>
-              </div>
-              <div className="workspace">
-                <h3>Owner & verifier workspace</h3>
-                <p className="caption">
-                  In demo mode, switch between Owner A and Demo verifier using
-                  the wallet selector.
-                </p>
-                {state.assets
-                  .filter((a) =>
-                    DEMO
-                      ? actor === "Demo verifier" || same(a.issuer, active)
-                      : true,
-                  )
-                  .map((a) => (
-                    <div className="workflow-card" key={a.id}>
-                      <div className="section-row">
-                        <h3>{a.name}</h3>
-                        <span className="badge">{a.status}</span>
-                      </div>
-                      {a.status === "Draft" && same(a.issuer, active) && (
-                        <button
-                          disabled={!!busy}
-                          className="secondary"
-                          onClick={() =>
-                            run("Submit for verification", () =>
-                              send("registry", "requestVerification", [a.id]),
-                            )
-                          }
-                        >
-                          Submit for verification
-                        </button>
-                      )}
-                      {a.status === "Pending verification" && (
-                        <button
-                          disabled={!!busy}
-                          className="primary"
-                          onClick={() =>
-                            run("Verify asset", () =>
-                              send("registry", "verifyAsset", [a.id, true]),
-                            )
-                          }
-                        >
-                          Demo verify asset
-                        </button>
-                      )}
-                      {a.status === "Verified" && same(a.issuer, active) && (
-                        <button
-                          disabled={!!busy}
-                          className="secondary"
-                          onClick={() => createRight(a)}
-                        >
-                          Issue right from form terms
-                        </button>
-                      )}
-                      {state.rights
-                        .filter((r) => r.assetId === a.id)
-                        .map((r) => (
-                          <div className="right-row" key={r.id}>
-                            <b>
-                              {r.kind} #{r.id}
-                            </b>
-                            <span>
-                              {r.status} · {r.supply} units
-                            </span>
-                            {r.status === "Pending verification" && (
-                              <button
-                                className="primary"
-                                disabled={!!busy}
-                                onClick={() =>
-                                  run("Verify right", () =>
-                                    send("rights", "verifyRight", [r.id, true]),
-                                  )
-                                }
-                              >
-                                Demo verify right
-                              </button>
-                            )}
-                            {available(r) && same(r.issuer, active) && (
-                              <button
-                                className="secondary"
-                                disabled={!!busy}
-                                onClick={() =>
-                                  run("Primary listing", async () => {
-                                    await approve("rights", "market");
-                                    await send("market", "createListing", [
-                                      addresses.rights,
-                                      r.id,
-                                      r.supply,
-                                      parseEther(form.price).toString(),
-                                    ]);
-                                  })
-                                }
-                              >
-                                List at {form.price} mJPY
-                              </button>
-                            )}
-                            {r.status === "Verified" && (
-                              <button
-                                className="secondary"
-                                disabled={!!busy}
-                                onClick={() =>
-                                  run("Activate project", () =>
-                                    send("rights", "activateRight", [r.id]),
-                                  )
-                                }
-                              >
-                                Activate project
-                              </button>
-                            )}
-                            {r.status === "Active" &&
-                              r.kind === "Revenue Share" && (
-                                <button
-                                  className="primary"
-                                  disabled={!!busy}
-                                  onClick={() =>
-                                    run("Deposit project revenue", async () => {
-                                      const amount =
-                                        parseEther(deposit).toString();
-                                      await approve(
-                                        "settlement",
-                                        "revenue",
-                                        amount,
-                                      );
-                                      await send("revenue", "depositRevenue", [
-                                        r.id,
-                                        amount,
-                                      ]);
-                                    })
-                                  }
-                                >
-                                  Deposit revenue
-                                </button>
-                              )}
-                          </div>
-                        ))}
-                    </div>
-                  ))}
-                <label>
-                  Revenue deposit amount (mJPY)
-                  <input
-                    type="number"
-                    value={deposit}
-                    onChange={(e) => setDeposit(e.target.value)}
-                  />
-                </label>
-              </div>
-            </section>
+          {marketLoaded && tab === "Markets" && (
+            <FinanceMarkets
+              key={marketRequest}
+              market={state}
+              directory={
+                <AssetDirectory
+                  assets={state.assets}
+                  rights={state.rights}
+                  filters={directoryFilters}
+                  onFiltersChange={setDirectoryFilters}
+                  listingsFor={listingFor}
+                  stage={stage}
+                  demo={DEMO}
+                  onView={(id) => {
+                    setKind("All assets");
+                    setStatus("All stages");
+                    setOwnedOnly(false);
+                    setLens(false);
+                    setHighlighted([]);
+                    setFundingOnly(false);
+                    setDirectorySelection(id);
+                    openExplore();
+                  }}
+                />
+              }
+              view={marketView}
+              onViewChange={setMarketView}
+              sourceId={financeSource}
+              demo={DEMO}
+              onCreate={() => openTokenize(true)}
+              onView={(id) => {
+                setKind("All assets");
+                setStatus("All stages");
+                setOwnedOnly(false);
+                setFundingOnly(false);
+                setDirectorySelection(id);
+                openExplore();
+              }}
+            />
           )}
-          {tab === "Activity" && (
+          {marketLoaded && tab === "Namespaces" && (
+            <NamespaceDashboard
+              account={account}
+              provider={wallet.provider}
+              onConnect={connect}
+              initialSelection={ensSelection}
+              state={state}
+              demo={DEMO}
+              onView={(id) => {
+                setKind("All assets");
+                setStatus("All stages");
+                setOwnedOnly(false);
+                setLens(false);
+                setHighlighted([]);
+                setFundingOnly(false);
+                setDirectorySelection(id);
+                openExplore();
+              }}
+            />
+          )}
+          {marketLoaded && tab === "Activity" && (
             <section className="workspace">
               <div className="section-title">
                 <h2>Urban activity ledger</h2>
@@ -1771,36 +2177,7 @@ export default function Dashboard() {
                   {DEMO ? "SIMULATED EVENTS" : "MULTIBAAS EVENT QUERIES"}
                 </span>
               </div>
-              <div className="activity-table">
-                <div className="table-head">
-                  <span>EVENT</span>
-                  <span>REFERENCE</span>
-                  <span>BLOCK</span>
-                  <span>TRANSACTION</span>
-                </div>
-                {state.events
-                  .slice()
-                  .reverse()
-                  .map((e, i) => (
-                    <div className="table-row" key={e.txHash + e.name + i}>
-                      <span>
-                        <i className="green" />
-                        {e.name}
-                      </span>
-                      <span>
-                        {e.args.assetId
-                          ? "Asset " + e.args.assetId
-                          : e.args.rightId
-                            ? "Right " + e.args.rightId
-                            : e.args.basketId
-                              ? "Basket " + e.args.basketId
-                              : "Protocol"}
-                      </span>
-                      <span>{e.block}</span>
-                      <span>{DEMO ? "Simulated" : short(e.txHash)}</span>
-                    </div>
-                  ))}
-              </div>
+              <ActivityFeed events={state.events} demo={DEMO} />
               {!DEMO && (
                 <a
                   className="text-button"
@@ -1813,36 +2190,42 @@ export default function Dashboard() {
               )}
             </section>
           )}
-          <section className="impact">
-            <div>
-              <div className="eyebrow">
-                <Leaf size={13} /> ACTIVATION, BEYOND TOKENIZATION
+          {marketLoaded && activeNavigation === "Dashboard" && (
+            <section className="impact">
+              <div>
+                <div className="eyebrow">
+                  <Leaf size={13} /> ACTIVATION, BEYOND TOKENIZATION
+                </div>
+                <h2>
+                  Capital is a beginning.
+                  <br />
+                  <em>A working city is the goal.</em>
+                </h2>
               </div>
-              <h2>
-                Capital is a beginning.
-                <br />
-                <em>A working city is the goal.</em>
-              </h2>
-            </div>
-            <div className="impact-number">
-              <strong>{activeAssets.length.toString().padStart(2, "0")}</strong>
-              <span>ASSETS ACTIVATED</span>
-            </div>
-            <div className="impact-number">
-              <strong>
-                {activeAssets.reduce((n, a) => n + a.area, 0).toLocaleString()}
-                <small>m²</small>
-              </strong>
-              <span>ACTIVE SPACE · SIMULATED</span>
-            </div>
-            <div className="impact-number">
-              <strong>
-                {activeAssets.reduce((n, a) => n + a.capacity, 0)}
-                <small>kWp</small>
-              </strong>
-              <span>ESTIMATED SOLAR CAPACITY</span>
-            </div>
-          </section>
+              <div className="impact-number">
+                <strong>
+                  {activeAssets.length.toString().padStart(2, "0")}
+                </strong>
+                <span>ASSETS ACTIVATED</span>
+              </div>
+              <div className="impact-number">
+                <strong>
+                  {activeAssets
+                    .reduce((n, a) => n + a.area, 0)
+                    .toLocaleString()}
+                  <small>m²</small>
+                </strong>
+                <span>ACTIVE SPACE · SIMULATED</span>
+              </div>
+              <div className="impact-number">
+                <strong>
+                  {activeAssets.reduce((n, a) => n + a.capacity, 0)}
+                  <small>kWp</small>
+                </strong>
+                <span>ESTIMATED SOLAR CAPACITY</span>
+              </div>
+            </section>
+          )}
           <footer>
             <span>
               TOKENIZE TOKYO <b>© 2026</b>
@@ -1867,14 +2250,143 @@ export default function Dashboard() {
           </footer>
         </div>
       </main>
-      {showTokenize && (
-        <div className="modal-backdrop" onClick={() => setShowTokenize(false)}>
+      {!DEMO && (
+        <WalletPanel
+          open={walletOpen}
+          onClose={() => setWalletOpen(false)}
+          wallet={wallet}
+          cash={state.cash}
+          cashReady={accountReady}
+          onViewAssets={() => {
+            setWalletOpen(false);
+            setTab("Portfolio");
+          }}
+          actionError={error}
+          tourHost={setWalletTourContainer}
+          tourActive={guideActive}
+          onGasBalance={setWalletGasBalance}
+          busy={!!busy}
+          transactions={recentTransactions.filter(
+            (tx) => tx.chainId === config.chainId && same(tx.account, account),
+          )}
+          onMint={() =>
+            run("Mint MockJPY", () =>
+              send("settlement", "mint", [
+                active,
+                parseEther("1000000").toString(),
+              ]),
+            )
+          }
+        />
+      )}
+      <TokenizeDialog
+        open={tokenizeOpen}
+        onClose={closeTokenize}
+        wallet={tokenizeOpen ? walletControl : null}
+        tourHost={setTutorialContainer}
+      >
+        {tokenizeOpen && feedback}
+        <div hidden={showSpacePicker}>
+          {flowStarted && (
+            <TokenizeFlow
+              key={flowVersion}
+              form={form}
+              setForm={setForm}
+              state={state}
+              active={active}
+              actor={actor}
+              demo={DEMO}
+              verifierRoles={verifierRoles}
+              busy={!!busy}
+              initialTarget={flowTarget}
+              createdAsset={
+                createdGeo
+                  ? state.assets
+                      .filter((a) => a.geoReference === createdGeo)
+                      .at(-1)
+                  : undefined
+              }
+              onPick={() => setShowSpacePicker(true)}
+              onActor={(name) => setActor(name as keyof typeof ACTORS)}
+              issuerActor={(address) =>
+                Object.entries(ACTORS).find(([, a]) => same(a, address))?.[0] ||
+                "Owner A"
+              }
+              onRegister={createAsset}
+              onIssue={createRight}
+              onAction={(label, contract, method, args) =>
+                run(label, () => send(contract, method, args))
+              }
+              onCampaign={() => {
+                closeTokenize();
+                setFinanceSource("");
+                setMarketView("funding");
+                setMarketRequest((n) => n + 1);
+                setTab("Markets");
+              }}
+              onPublish={(r, amount) =>
+                run("Primary listing", async () => {
+                  const held = BigInt(state.balances["rights:" + r.id] || "0");
+                  if (
+                    !/^\d+$/.test(amount) ||
+                    BigInt(amount) <= 0n ||
+                    BigInt(amount) > held
+                  )
+                    throw new Error(
+                      "Enter a whole offer quantity within your holdings.",
+                    );
+                  const reserved = state.listings
+                    .filter(
+                      (l) =>
+                        l.token === "rights" &&
+                        l.rightId === r.id &&
+                        !l.cancelled &&
+                        same(l.seller, active),
+                    )
+                    .reduce((n, l) => n + BigInt(l.remaining), 0n);
+                  if (BigInt(amount) + reserved > held)
+                    throw new Error(
+                      "Some units are already offered. Cancel the existing listing first.",
+                    );
+                  const price = parseEther(form.price);
+                  if (price <= 0n) throw new Error("Enter a positive price.");
+                  await approve("rights", "market");
+                  await send("market", "createListing", [
+                    addresses.rights,
+                    r.id,
+                    amount,
+                    price.toString(),
+                  ]);
+                })
+              }
+              onActivate={(r) =>
+                run("Activate project", () =>
+                  send("rights", "activateRight", [r.id]),
+                )
+              }
+              onDeposit={(r, value) =>
+                run("Deposit project revenue", async () => {
+                  const amount = parseEther(value).toString();
+                  await approve("settlement", "revenue", amount);
+                  await send("revenue", "depositRevenue", [r.id, amount]);
+                })
+              }
+              onView={(id) => {
+                closeTokenize();
+                setKind("All assets");
+                setStatus("All stages");
+                setOwnedOnly(false);
+                setFundingOnly(false);
+                setDirectorySelection(id);
+                openExplore();
+              }}
+            />
+          )}
+        </div>
+        {showSpacePicker && (
           <section
             className="location-modal"
-            role="dialog"
-            aria-modal="true"
             aria-label="Select an asset location"
-            onClick={(e) => e.stopPropagation()}
           >
             <div className="section-title">
               <div>
@@ -1883,7 +2395,7 @@ export default function Dashboard() {
               </div>
               <button
                 className="icon-button"
-                onClick={() => setShowTokenize(false)}
+                onClick={() => setShowSpacePicker(false)}
                 aria-label="Close location picker"
               >
                 <X />
@@ -1894,6 +2406,7 @@ export default function Dashboard() {
               supported in this prototype.
             </p>
             <TokyoMap
+              theme={theme}
               assets={state.assets}
               onSelect={(id) => {
                 const a = state.assets.find((a) => a.id === id);
@@ -1915,14 +2428,14 @@ export default function Dashboard() {
               </span>
               <button
                 className="primary"
-                onClick={() => setShowTokenize(false)}
+                onClick={() => setShowSpacePicker(false)}
               >
                 Define the right <ArrowRight size={16} />
               </button>
             </div>
           </section>
-        </div>
-      )}
+        )}
+      </TokenizeDialog>
     </div>
   );
 }
@@ -1945,8 +2458,14 @@ function Metric({
         <span>{label}</span>
         {icon}
       </div>
-      <strong>
-        {value}
+      <strong title={`${value}${suffix ? ` ${suffix}` : ""}`}>
+        <span className="metric-full">{value}</span>
+        <span className="metric-compact">
+          {Number(value.replaceAll(",", "")).toLocaleString("en", {
+            notation: "compact",
+            maximumFractionDigits: 1,
+          })}
+        </span>
         <small>{suffix}</small>
       </strong>
       <p>{note}</p>

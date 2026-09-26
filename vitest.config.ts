@@ -8,6 +8,8 @@ export default defineConfig({
       provider: "v8",
       include: [
         "src/lib/webhook.ts",
+        "src/lib/finance-lab.ts",
+        "src/lib/catalog.ts",
         "src/lib/queries.ts",
         "src/lib/projection.ts",
         "src/lib/transactions.ts",

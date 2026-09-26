@@ -1,0 +1,179 @@
+{
+  "checkedAt": "2026-09-26T12:03:48.160Z",
+  "site": "https://tokenize-tokyo.vercel.app",
+  "chainId": 2017072401,
+  "wallet": "0xB0487691ac366Ef2F0b932151C5CC5c5D2b98Ba4",
+  "signing": "Controlled test EOA in Node, injected EIP-1193 interface in Playwright; private key never passed to browser. Not manual MetaMask extension QA.",
+  "transactions": [
+    {
+      "hash": "0x6cb6bc5bcfa27e0072463056551d770fe53a113612331107eb8ee580737fecb2",
+      "block": "19340",
+      "from": "0xb0487691ac366ef2f0b932151c5cc5c5d2b98ba4",
+      "to": "0x86b71e71137648dc2c76958d73d75af3f968f67f",
+      "function": "mint",
+      "inputs": [
+        {
+          "name": "to",
+          "value": "0xB0487691ac366Ef2F0b932151C5CC5c5D2b98Ba4",
+          "type": "address"
+        },
+        {
+          "name": "amount",
+          "value": "1000000000000000000000000",
+          "type": "uint256"
+        }
+      ],
+      "events": [
+        "Transfer"
+      ],
+      "status": "confirmed",
+      "explorer": "https://tokenize-tokyo.vercel.app/tx/0x6cb6bc5bcfa27e0072463056551d770fe53a113612331107eb8ee580737fecb2"
+    },
+    {
+      "hash": "0x9c12a4310fda18315e870246b1e7da57c9c35ea24746edaa20ed9890524e2cc0",
+      "block": "19341",
+      "from": "0xb0487691ac366ef2f0b932151c5cc5c5d2b98ba4",
+      "to": "0x86b71e71137648dc2c76958d73d75af3f968f67f",
+      "function": "approve",
+      "inputs": [
+        {
+          "name": "spender",
+          "value": "0x14aC507Bf41118613a257e7482AeFE002bA87C3d",
+          "type": "address"
+        },
+        {
+          "name": "value",
+          "value": "2400000000000000000000",
+          "type": "uint256"
+        }
+      ],
+      "events": [
+        "Approval"
+      ],
+      "status": "confirmed",
+      "explorer": "https://tokenize-tokyo.vercel.app/tx/0x9c12a4310fda18315e870246b1e7da57c9c35ea24746edaa20ed9890524e2cc0"
+    },
+    {
+      "hash": "0xd9221275db9a9d369110577bbeeb25ce751bf0f05f9823458743d555bbc5e9c8",
+      "block": "19342",
+      "from": "0xb0487691ac366ef2f0b932151c5cc5c5d2b98ba4",
+      "to": "0x14ac507bf41118613a257e7482aefe002ba87c3d",
+      "function": "purchase",
+      "inputs": [
+        {
+          "name": "id",
+          "value": "1",
+          "type": "uint256"
+        },
+        {
+          "name": "amount",
+          "value": "1",
+          "type": "uint256"
+        }
+      ],
+      "events": [
+        "Transfer",
+        "TransferSingle",
+        "ListingPurchased"
+      ],
+      "status": "confirmed",
+      "explorer": "https://tokenize-tokyo.vercel.app/tx/0xd9221275db9a9d369110577bbeeb25ce751bf0f05f9823458743d555bbc5e9c8"
+    },
+    {
+      "hash": "0x1bac1e828bd77b1934718b9eca0fa408bce3e7b95a4ad13a4fd72622c06d95f1",
+      "block": "19343",
+      "from": "0xb0487691ac366ef2f0b932151c5cc5c5d2b98ba4",
+      "to": "0x1126eb4a20c16e4ed1f28ed8c03a68b0be15975c",
+      "function": "setApprovalForAll",
+      "inputs": [
+        {
+          "name": "operator",
+          "value": "0x14aC507Bf41118613a257e7482AeFE002bA87C3d",
+          "type": "address"
+        },
+        {
+          "name": "approved",
+          "value": true,
+          "type": "bool"
+        }
+      ],
+      "events": [
+        "ApprovalForAll"
+      ],
+      "status": "confirmed",
+      "explorer": "https://tokenize-tokyo.vercel.app/tx/0x1bac1e828bd77b1934718b9eca0fa408bce3e7b95a4ad13a4fd72622c06d95f1"
+    },
+    {
+      "hash": "0x696eb85e732c6827b1eb1a727d314396e481f26dcc8c9cd6283a546c65e73b90",
+      "block": "19344",
+      "from": "0xb0487691ac366ef2f0b932151c5cc5c5d2b98ba4",
+      "to": "0x14ac507bf41118613a257e7482aefe002ba87c3d",
+      "function": "createListing",
+      "inputs": [
+        {
+          "name": "token",
+          "value": "0x1126EB4A20C16E4ed1f28ED8c03a68B0BE15975C",
+          "type": "address"
+        },
+        {
+          "name": "id",
+          "value": "2",
+          "type": "uint256"
+        },
+        {
+          "name": "amount",
+          "value": "1",
+          "type": "uint256"
+        },
+        {
+          "name": "price",
+          "value": "2400000000000000000000",
+          "type": "uint256"
+        }
+      ],
+      "events": [
+        "ListingCreated"
+      ],
+      "status": "confirmed",
+      "explorer": "https://tokenize-tokyo.vercel.app/tx/0x696eb85e732c6827b1eb1a727d314396e481f26dcc8c9cd6283a546c65e73b90"
+    },
+    {
+      "hash": "0x695b8e774d265e511f080d87ad779a95e29ead2c13270c8d668f95d441baf35e",
+      "block": "19345",
+      "from": "0xb0487691ac366ef2f0b932151c5cc5c5d2b98ba4",
+      "to": "0x14ac507bf41118613a257e7482aefe002ba87c3d",
+      "function": "cancelListing",
+      "inputs": [
+        {
+          "name": "id",
+          "value": "75",
+          "type": "uint256"
+        }
+      ],
+      "events": [
+        "ListingCancelled"
+      ],
+      "status": "confirmed",
+      "explorer": "https://tokenize-tokyo.vercel.app/tx/0x695b8e774d265e511f080d87ad779a95e29ead2c13270c8d668f95d441baf35e"
+    },
+    {
+      "hash": "0x6e5c8e8dff17b72ff89d3e87237ed87d312e6fc9cf846fd10623c85848f3e5d3",
+      "block": "19346",
+      "from": "0xb0487691ac366ef2f0b932151c5cc5c5d2b98ba4",
+      "to": "0x14ac507bf41118613a257e7482aefe002ba87c3d",
+      "function": "cancelListing",
+      "inputs": [
+        {
+          "name": "id",
+          "value": "74",
+          "type": "uint256"
+        }
+      ],
+      "events": [
+        "ListingCancelled"
+      ],
+      "status": "confirmed",
+      "explorer": "https://tokenize-tokyo.vercel.app/tx/0x6e5c8e8dff17b72ff89d3e87237ed87d312e6fc9cf846fd10623c85848f3e5d3"
+    }
+  ]
+}

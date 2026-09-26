@@ -1,7 +1,11 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { LoaderCircle } from "lucide-react";
 import * as maplibregl from "maplibre-gl";
+import { ASSET_KINDS, SPACE_TYPES } from "@/lib/catalog";
+import AssetIcon from "./AssetIcon";
 import type { Asset, Right } from "@/lib/model";
+import type { VisualTheme } from "@/lib/use-theme";
 import { lensMatch, type DormantSite, type LensKind } from "@/lib/dormant";
 import type { FeatureCollection, Feature, Polygon, LineString } from "geojson";
 maplibregl.setWorkerUrl("/maplibre/maplibre-gl-worker.mjs");
@@ -21,6 +25,8 @@ function footprint(a: Asset, scale = 1): [number, number][] {
 export default function TokyoMap({
   assets,
   selected,
+  filterActive = false,
+  fundingProjects = [],
   onSelect,
   highlighted = [],
   pick,
@@ -33,9 +39,12 @@ export default function TokyoMap({
   lens = false,
   lensKind = "All assets",
   onDormantSelect,
+  theme = "original",
 }: {
   assets: Asset[];
   selected?: string;
+  filterActive?: boolean;
+  fundingProjects?: { assetId: string; percent: number }[];
   onSelect: (id: string) => void;
   highlighted?: string[];
   pick?: boolean;
@@ -48,11 +57,16 @@ export default function TokyoMap({
   lens?: boolean;
   lensKind?: LensKind;
   onDormantSelect?: (site: DormantSite) => void;
+  theme?: VisualTheme;
 }) {
   const container = useRef<HTMLDivElement>(null),
+    iconTemplates = useRef<HTMLDivElement>(null),
     map = useRef<maplibregl.Map | null>(null),
     markers = useRef<maplibregl.Marker[]>([]),
     [ready, setReady] = useState(false),
+    [basemapReady, setBasemapReady] = useState(false),
+    [slow, setSlow] = useState(false),
+    [mapAttempt, setMapAttempt] = useState(0),
     [error, setError] = useState(""),
     [tileRevision, setTileRevision] = useState(0);
   const actions = useRef({ pick, onPick, onSelect, onScope, onDormantSelect });
@@ -61,6 +75,11 @@ export default function TokyoMap({
   const focused = useRef("");
   useEffect(() => {
     if (!container.current) return;
+    setReady(false);
+    setBasemapReady(false);
+    setSlow(false);
+    setError("");
+    const slowTimer = setTimeout(() => setSlow(true), 15000);
     try {
       const m = new maplibregl.Map({
         container: container.current,
@@ -72,6 +91,28 @@ export default function TokyoMap({
         attributionControl: { compact: true },
       });
       map.current = m;
+      const cityPainted = () => {
+        if (
+          m.getLayer("tokyo-buildings") &&
+          m.isSourceLoaded("openmaptiles") &&
+          m.queryRenderedFeatures({ layers: ["tokyo-buildings"] }).length > 0
+        ) {
+          setBasemapReady(true);
+          setError("");
+          clearTimeout(slowTimer);
+          m.off("render", cityPainted);
+        }
+      };
+      // Require both loaded viewport tiles and drawn buildings: the first edge
+      // tile alone can otherwise hide the loader over a mostly empty city.
+      m.on("render", cityPainted);
+      const updateMarkerScale = () =>
+        container.current?.classList.toggle(
+          "compact-markers",
+          m.getZoom() < 13.5,
+        );
+      m.on("zoom", updateMarkerScale);
+      updateMarkerScale();
       m.addControl(
         new maplibregl.NavigationControl({ visualizePitch: true }),
         "bottom-right",
@@ -101,6 +142,7 @@ export default function TokyoMap({
           id: "urban-scope",
           type: "fill-extrusion",
           source: "urban-spaces",
+          minzoom: 13,
           paint: {
             "fill-extrusion-color": ["get", "color"],
             "fill-extrusion-height": ["get", "top"],
@@ -189,7 +231,11 @@ export default function TokyoMap({
         m.once("idle", () => setTileRevision((n) => n + 1));
       });
       m.on("error", (e) => {
-        if (String(e.error?.message).includes("style") || !m.isStyleLoaded())
+        if (
+          String(e.error?.message).includes("style") ||
+          ("sourceId" in e && e.sourceId === "openmaptiles") ||
+          !m.isStyleLoaded()
+        )
           setError("Map tiles are unavailable. Asset cards remain usable.");
       });
       m.on("click", (e) => {
@@ -218,30 +264,82 @@ export default function TokyoMap({
             Number(e.lngLat.lat.toFixed(6)),
           ]);
       });
+      const resizeObserver = new ResizeObserver(() => m.resize());
+      resizeObserver.observe(container.current);
       return () => {
+        clearTimeout(slowTimer);
+        resizeObserver.disconnect();
         markers.current.forEach((x) => x.remove());
+        markers.current = [];
         m.remove();
+        if (map.current === m) map.current = null;
       };
     } catch {
+      clearTimeout(slowTimer);
       setError("WebGL is unavailable. Use the asset list to explore Tokyo.");
     }
-  }, []);
+  }, [mapAttempt]);
   useEffect(() => {
     if (!ready || !map.current) return;
     const m = map.current;
+    // Fast Refresh can recreate the map before React's ready flag resets.
+    if (!m.getSource("urban-spaces") || !m.getSource("basket-links")) return;
+    const cyber = theme === "cyberpunk";
+    container.current?.classList.toggle("dense-markers", assets.length > 80);
+    const spaceColor = (a: Asset) =>
+      cyber
+        ? a.id === selected || highlighted.includes(a.id) || filterActive
+          ? "#f0df37"
+          : "#8c9098"
+        : filterActive
+          ? "#d7f985"
+          : SPACE_TYPES[a.kind].color;
     markers.current.forEach((x) => x.remove());
     markers.current = assets.map((a) => {
+      const funding = fundingProjects.find((c) => c.assetId === a.id);
       const el = document.createElement("button");
       el.className =
         "map-pin " +
         (a.kind === "Rooftop" ? "solar" : "home") +
         (a.id === selected ? " selected" : "") +
-        (highlighted.includes(a.id) ? " highlighted" : "");
+        (highlighted.includes(a.id) ? " highlighted" : "") +
+        (filterActive ? " matched" : "") +
+        (funding ? " funding" : "");
       el.setAttribute("aria-label", "Explore " + a.name);
+      el.dataset.assetId = a.id;
+      if (funding)
+        el.title = `Funding open · ${Math.round(funding.percent)}% subscribed`;
       const icon = document.createElement("span");
-      icon.textContent = a.kind === "Rooftop" ? "☀" : "⌂";
+      icon.className = "map-pin-icon";
+      icon.setAttribute("aria-hidden", "true");
+      // Reuse the same SVG icons as the filters without creating a React root per marker.
+      const graphic = iconTemplates.current?.querySelector(
+        `[data-asset-kind="${a.kind}"] svg`,
+      );
+      if (graphic) icon.append(graphic.cloneNode(true));
+      el.style.borderColor = spaceColor(a);
       const label = document.createElement("b");
       label.textContent = a.name;
+      if (funding) {
+        const status = document.createElement("small");
+        status.className = "map-pin-funding";
+        status.textContent = `Funding · ${Math.round(funding.percent)}%`;
+        label.append(status);
+        const track = document.createElement("span");
+        track.className = "map-funding-track";
+        track.setAttribute("role", "progressbar");
+        track.setAttribute("aria-label", "Offer subscribed");
+        track.setAttribute(
+          "aria-valuenow",
+          String(Math.min(100, funding.percent)),
+        );
+        track.setAttribute("aria-valuemin", "0");
+        track.setAttribute("aria-valuemax", "100");
+        const fill = document.createElement("span");
+        fill.style.width = `${Math.min(100, funding.percent)}%`;
+        track.append(fill);
+        label.append(track);
+      }
       el.append(icon, label);
       el.onclick = (e) => {
         e.stopPropagation();
@@ -288,6 +386,13 @@ export default function TokyoMap({
       };
     };
     for (const a of assets) {
+      const defaultScope = [
+        "Rooftop",
+        "Interior",
+        "Wall",
+        "Land",
+        "Whole asset",
+      ].indexOf(SPACE_TYPES[a.kind].scope);
       const roof = a.kind === "Rooftop",
         active = activated.includes(a.id),
         building = surface(a),
@@ -295,9 +400,9 @@ export default function TokyoMap({
       const own = scopes.filter((r) => r.assetId === a.id);
       const layers = xray
         ? Array.from(
-            new Set(own.length ? own.map((r) => r.scope) : [roof ? 0 : 1]),
+            new Set(own.length ? own.map((r) => r.scope) : [defaultScope]),
           )
-        : [roof ? 0 : 1];
+        : [defaultScope];
       layers.forEach((scope) => {
         const names = ["Rooftop", "Interior", "Wall", "Land", "Whole asset"];
         let polygon = building.polygon,
@@ -328,13 +433,20 @@ export default function TokyoMap({
           properties: {
             assetId: a.id,
             scope: names[scope],
-            color: highlighted.includes(a.id)
-              ? "#edff9c"
-              : scope === 1
-                ? "#e3b76d"
-                : active
-                  ? "#7ce6b6"
-                  : "#d7f985",
+            color:
+              highlighted.includes(a.id) || filterActive || a.id === selected
+                ? cyber
+                  ? "#f0df37"
+                  : "#edff9c"
+                : scope === 1
+                  ? cyber
+                    ? "#b8bbc1"
+                    : "#e3b76d"
+                  : active
+                    ? cyber
+                      ? "#cdd0d5"
+                      : "#7ce6b6"
+                    : spaceColor(a),
             base,
             top: high,
           },
@@ -358,7 +470,7 @@ export default function TokyoMap({
               properties: {
                 assetId: a.id,
                 scope: "Rooftop",
-                color: "#248cb5",
+                color: cyber ? "#f0df37" : "#248cb5",
                 base: top + 3,
                 top: top + 4,
               },
@@ -377,8 +489,27 @@ export default function TokyoMap({
     m.setPaintProperty(
       "tokyo-buildings",
       "fill-extrusion-opacity",
-      xray || lens ? 0.13 : 0.8,
+      xray || lens ? 0.13 : filterActive ? 0.28 : 0.8,
     );
+    m.setPaintProperty("building", "fill-color", cyber ? "#292c31" : "#273a31");
+    m.setPaintProperty(
+      "tokyo-buildings",
+      "fill-extrusion-color",
+      cyber ? "#454a52" : "#43564a",
+    );
+    for (const id of ["basket-links-glow", "basket-links-line"])
+      m.setPaintProperty(id, "line-color", cyber ? "#f0df37" : "#d7f985");
+    m.setPaintProperty(
+      "dormant-glow",
+      "circle-color",
+      cyber ? "#f0df37" : "#edff9c",
+    );
+    m.setPaintProperty("dormant-dots", "circle-color", [
+      "case",
+      ["get", "lit"],
+      cyber ? "#f0df37" : "#d7f985",
+      cyber ? "#858992" : "#8fae96",
+    ]);
     const points = assets.filter((a) => highlighted.includes(a.id));
     const links: Feature<LineString>[] = [];
     if (points.length > 1) {
@@ -410,6 +541,7 @@ export default function TokyoMap({
     });
     const focus = selected + "|" + highlighted.join(",");
     if (focused.current !== focus) {
+      m.stop();
       focused.current = focus;
       if (points.length > 1) {
         const bounds = new maplibregl.LngLatBounds();
@@ -434,6 +566,8 @@ export default function TokyoMap({
   }, [
     assets,
     selected,
+    filterActive,
+    fundingProjects,
     highlighted,
     ready,
     xray,
@@ -441,13 +575,15 @@ export default function TokyoMap({
     activated,
     scopes,
     tileRevision,
+    theme,
   ]);
   useEffect(() => {
     if (!ready || !map.current) return;
+    const source = map.current.getSource("dormant-sites") as
+      maplibregl.GeoJSONSource | undefined;
+    if (!source) return;
     dormantById.current = new Map(dormant.map((s) => [s.id, s]));
-    (
-      map.current.getSource("dormant-sites") as maplibregl.GeoJSONSource
-    ).setData({
+    source.setData({
       type: "FeatureCollection",
       features: dormant.map((s) => ({
         type: "Feature",
@@ -462,15 +598,52 @@ export default function TokyoMap({
     });
   }, [dormant, lens, lensKind, ready]);
   return (
-    <div className={"map-stage" + (pick ? " picking" : "")}>
+    <div
+      className={"map-stage" + (pick ? " picking" : "")}
+      data-basemap-state={basemapReady ? "ready" : error ? "error" : "loading"}
+    >
+      <div hidden ref={iconTemplates} aria-hidden="true">
+        {ASSET_KINDS.map((kind) => (
+          <span key={kind} data-asset-kind={kind}>
+            <AssetIcon kind={kind} size={18} />
+          </span>
+        ))}
+      </div>
       <div className="map-canvas" ref={container} />
-      {!ready && (
-        <div className="map-loading">
-          <span className="orb" />
-          Loading Tokyo in three dimensions…
+      {!ready && !error && (
+        <div className="map-loading" role="status">
+          <LoaderCircle size={24} className="spin" aria-hidden="true" />
+          {slow
+            ? "The city map is taking longer to load."
+            : "Loading Tokyo in three dimensions…"}
+          {slow && (
+            <button
+              className="secondary"
+              onClick={() => setMapAttempt((n) => n + 1)}
+            >
+              Retry map
+            </button>
+          )}
         </div>
       )}
-      {error && <div className="map-error">{error}</div>}
+      {(error || (ready && !basemapReady)) && (
+        <div className="map-connection-status" role="status">
+          {!error && (
+            <LoaderCircle size={16} className="spin" aria-hidden="true" />
+          )}
+          <span>
+            {error ||
+              (slow
+                ? "The city map is taking longer to load."
+                : "Loading city buildings…")}
+          </span>
+          {(error || slow) && (
+            <button onClick={() => setMapAttempt((n) => n + 1)}>
+              Retry map
+            </button>
+          )}
+        </div>
+      )}
       <div className="map-label">
         <span>35°41′ N · 139°46′ E</span>
         <strong>

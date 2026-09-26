@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 100" fill="none">
+  <title>TOKENIZE TOKYO — Cyberpunk wordmark</title>
+  <g transform="translate(4 7) scale(1.2)">
+    <path d="M2 12 12 2h50v58L52 70H2V12Z" fill="#191b1f" stroke="#555a62" stroke-width="2"/>
+    <path d="M11 18h37l-8 9H30v29H19V27h-8v-9Z" fill="#f1f2f3"/>
+    <path d="M34 42 48 28H37l7-8h14v15l-8 8V32L37 46l-3-4Z" fill="#f0df37"/>
+    <path d="M12 2h12" stroke="#f0df37" stroke-width="3"/>
+  </g>
+  <g font-family="Arial, sans-serif" font-style="italic" fill="#f1f2f3">
+    <text x="96" y="37" font-size="21" font-weight="600" letter-spacing="5">TOKENIZE</text>
+    <text x="96" y="78" font-size="39" font-weight="900" letter-spacing="6">TOKYO</text>
+  </g>
+</svg>

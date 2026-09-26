@@ -1,5 +1,9 @@
 import { it, expect, vi, afterEach } from "vitest";
-import { ContractsApi, EventQueriesApi } from "@curvegrid/multibaas-sdk";
+import {
+  ContractsApi,
+  EventQueriesApi,
+  ChainsApi,
+} from "@curvegrid/multibaas-sdk";
 import {
   queryRows,
   readContract,
@@ -75,11 +79,17 @@ it("composes unsigned SDK transaction, uses browser signing and waits for succes
         },
       },
     } as never);
-  const request = vi
-    .fn()
-    .mockResolvedValueOnce("0x7a69")
-    .mockResolvedValueOnce("0xhash")
-    .mockResolvedValueOnce({ status: "0x1" });
+  const hash = "0x" + "c".repeat(64);
+  const request = vi.fn(async ({ method }) =>
+    method === "eth_accounts"
+      ? [from]
+      : method === "eth_sendTransaction"
+        ? hash
+        : "0x7a69",
+  );
+  vi.spyOn(ChainsApi.prototype, "getTransactionReceipt").mockResolvedValue({
+    data: { result: { data: { status: "0x1" } } },
+  } as never);
   expect(
     await sendViaMultiBaas(
       { request },
@@ -88,14 +98,14 @@ it("composes unsigned SDK transaction, uses browser signing and waits for succes
       "requestVerification",
       ["1"],
     ),
-  ).toBe("0xhash");
+  ).toBe(hash);
   expect(api).toHaveBeenCalledWith(
     address,
     "urbanassetregistry",
     "requestVerification",
     { from, args: ["1"], signAndSubmit: false, formatInts: "as_strings" },
   );
-  expect(request).toHaveBeenNthCalledWith(2, {
+  expect(request).toHaveBeenCalledWith({
     method: "eth_sendTransaction",
     params: [{ from, to: address, data: "0xabcd", value: "0x0" }],
   });
@@ -120,7 +130,10 @@ it("rejects server-submitted writes and reverted browser transactions", async ()
     } as never);
   await expect(
     sendViaMultiBaas(
-      { request: async () => "0x7a69" },
+      {
+        request: async ({ method }) =>
+          method === "eth_accounts" ? [from] : "0x7a69",
+      },
       from,
       "registry",
       "registerAsset",
@@ -135,12 +148,82 @@ it("rejects server-submitted writes and reverted browser transactions", async ()
       },
     },
   } as never);
-  const request = vi
-    .fn()
-    .mockResolvedValueOnce("0x7a69")
-    .mockResolvedValueOnce("0xhash")
-    .mockResolvedValueOnce({ status: "0x0" });
+  const request = vi.fn(async ({ method }) =>
+    method === "eth_accounts"
+      ? [from]
+      : method === "eth_sendTransaction"
+        ? "0x" + "c".repeat(64)
+        : "0x7a69",
+  );
+  vi.spyOn(ChainsApi.prototype, "getTransactionReceipt").mockResolvedValue({
+    data: { result: { data: { status: "0x0" } } },
+  } as never);
   await expect(
     sendViaMultiBaas({ request }, from, "registry", "registerAsset"),
   ).rejects.toThrow("reverted");
+});
+
+it("aborts before signing when the account changes during MultiBaas composition", async () => {
+  const api = vi
+    .spyOn(ContractsApi.prototype, "callContractFunction")
+    .mockResolvedValue({
+      data: {
+        result: {
+          kind: "TransactionToSignResponse",
+          submitted: false,
+          tx: { from, to: address, data: "0xabcd", value: "0" },
+        },
+      },
+    } as never);
+  let accountReads = 0;
+  const request = vi.fn(async ({ method }) =>
+    method === "eth_accounts"
+      ? [++accountReads === 1 ? from : address]
+      : "0x7a69",
+  );
+  await expect(
+    sendViaMultiBaas({ request }, from, "registry", "registerAsset"),
+  ).rejects.toThrow("account changed");
+  expect(api).toHaveBeenCalledOnce();
+  expect(
+    request.mock.calls.some(([arg]) => arg.method === "eth_sendTransaction"),
+  ).toBe(false);
+});
+it("reports the transaction hash immediately and confirms through the configured-chain SDK", async () => {
+  const hash = "0x" + "d".repeat(64);
+  vi.spyOn(ContractsApi.prototype, "callContractFunction").mockResolvedValue({
+    data: {
+      result: {
+        kind: "TransactionToSignResponse",
+        submitted: false,
+        tx: { from, to: address, data: "0xabcd", value: "0" },
+      },
+    },
+  } as never);
+  vi.spyOn(ChainsApi.prototype, "getTransactionReceipt").mockResolvedValue({
+    data: { result: { data: { status: "0x1" } } },
+  } as never);
+  const progress = vi.fn();
+  await sendViaMultiBaas(
+    {
+      request: async ({ method }) =>
+        method === "eth_accounts"
+          ? [from]
+          : method === "eth_sendTransaction"
+            ? hash
+            : "0x7a69",
+    },
+    from,
+    "registry",
+    "registerAsset",
+    [],
+    progress,
+  );
+  expect(progress.mock.calls.map(([p]) => p.phase)).toEqual([
+    "preparing",
+    "signature",
+    "submitted",
+    "confirmed",
+  ]);
+  expect(progress).toHaveBeenCalledWith({ phase: "submitted", hash });
 });

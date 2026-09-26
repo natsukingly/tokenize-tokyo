@@ -1,4 +1,5 @@
-export type AssetKind = "Rooftop" | "Vacant Home" | "Idle Land" | "Other";
+import type { AssetKind } from "./catalog";
+export type { AssetKind } from "./catalog";
 export type AssetStatus =
   "Draft" | "Pending verification" | "Verified" | "Rejected";
 export type RightStatus =
@@ -88,12 +89,27 @@ export const EMPTY: MarketState = {
 export function metadataURI(value: unknown) {
   return "data:application/json," + encodeURIComponent(JSON.stringify(value));
 }
+export function compactMetadataURI(value: unknown) {
+  const bytes = new TextEncoder().encode(JSON.stringify(value));
+  if (bytes.length > 12000)
+    throw new Error("Project details are too long for inline demo metadata.");
+  return "data:application/json;base64," + btoa(String.fromCharCode(...bytes));
+}
 export function parseMetadata(uri: string): Record<string, unknown> {
   // No arbitrary fetch/SSRF. Demo uses bounded inline metadata; IPFS links remain inspectable.
-  if (!uri.startsWith("data:application/json,") || uri.length > 10000)
+  if (
+    (!uri.startsWith("data:application/json,") &&
+      !uri.startsWith("data:application/json;base64,")) ||
+    uri.length > 16384
+  )
     return {};
   try {
-    const value: unknown = JSON.parse(decodeURIComponent(uri.slice(22)));
+    const text = uri.startsWith("data:application/json;base64,")
+      ? new TextDecoder("utf-8", { fatal: true }).decode(
+          Uint8Array.from(atob(uri.slice(29)), (c) => c.charCodeAt(0)),
+        )
+      : decodeURIComponent(uri.slice(22));
+    const value: unknown = JSON.parse(text);
     return value !== null && typeof value === "object" && !Array.isArray(value)
       ? (value as Record<string, unknown>)
       : {};

@@ -10,9 +10,9 @@ describe("dormant demo dataset", () => {
     expect(generateDormantSites()).toEqual(generateDormantSites());
     expect(generateDormantSites()).toEqual(DORMANT_SITES);
   });
-  it("has about 150 unique sites inside central Tokyo", () => {
-    expect(DORMANT_SITES).toHaveLength(150);
-    expect(new Set(DORMANT_SITES.map((s) => s.id)).size).toBe(150);
+  it("has about 750 unique sites inside central Tokyo", () => {
+    expect(DORMANT_SITES).toHaveLength(750);
+    expect(new Set(DORMANT_SITES.map((s) => s.id)).size).toBe(750);
     for (const {
       coordinates: [lng, lat],
     } of DORMANT_SITES) {
@@ -34,7 +34,7 @@ describe("dormant demo dataset", () => {
       dormantCount("Rooftop") +
         dormantCount("Vacant Home") +
         dormantCount("Idle Land"),
-    ).toBe(150);
-    expect(dormantCount("All assets")).toBe(150);
+    ).toBe(750);
+    expect(dormantCount("All assets")).toBe(750);
   });
 });

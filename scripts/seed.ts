@@ -1,3 +1,4 @@
+import { assetTypeCode, SPACE_TYPES } from "../src/lib/catalog";
 import { readFileSync, writeFileSync } from "node:fs";
 import {
   createPublicClient,
@@ -10,7 +11,7 @@ import {
   type Address,
 } from "viem";
 import { foundry } from "viem/chains";
-import { DEMO_SITES } from "../src/lib/demo";
+import { CORE_DEMO_SITES as DEMO_SITES } from "../src/lib/demo-catalog";
 import { metadataURI } from "../src/lib/model";
 const rpc = "http://127.0.0.1:8545";
 const deployment = JSON.parse(readFileSync("deployments/31337.json", "utf8"));
@@ -104,32 +105,31 @@ async function main() {
     await write(owner, "registry", "registerAsset", [
       keccak256(stringToHex("simulated-site-" + i)),
       metadataURI({ ...site, simulated: true }),
-      i === 2 ? 1 : 0,
+      assetTypeCode(site.kind),
     ]);
     await write(owner, "registry", "requestVerification", [assetId]);
     await write(verifier, "registry", "verifyAsset", [assetId, true]);
     const id = (await read("rights", "nextRightId")) as bigint;
     rightIds.push(id);
     const terms = metadataURI({
-      purpose:
-        i === 2
-          ? "Workshop usage. Repairs require approval."
-          : "Share of actual solar revenue deposits. No guaranteed yield.",
+      purpose: SPACE_TYPES[site.kind].terms,
       simulated: true,
     });
     await write(owner, "rights", "createScopedRight", [
       {
         assetId,
-        kind: i === 2 ? 0 : 1,
-        supply: i === 2 ? 1n : 100n,
+        kind: site.kind === "Rooftop" ? 1 : 0,
+        supply: site.kind === "Rooftop" ? 100n : 1n,
         terms,
         termsHash: keccak256(stringToHex(terms)),
         start: now - 1,
         end: now + 365 * 86400,
         policy: 0,
-        scope: i === 2 ? 1 : 0,
-        purpose: keccak256(stringToHex(i === 2 ? "WORKSHOP" : "SOLAR")),
-        exclusive: i === 2,
+        scope: ["Rooftop", "Interior", "Wall", "Land", "Whole asset"].indexOf(
+          SPACE_TYPES[site.kind].scope,
+        ),
+        purpose: keccak256(stringToHex(SPACE_TYPES[site.kind].purpose)),
+        exclusive: site.kind !== "Rooftop",
       },
     ]);
     await write(verifier, "rights", "verifyRight", [id, true]);
@@ -137,8 +137,8 @@ async function main() {
     await write(owner, "market", "createListing", [
       deployment.rights,
       id,
-      i === 2 ? 1n : 100n,
-      parseEther(i === 2 ? "80000" : i === 0 ? "2400" : "1800"),
+      site.kind === "Rooftop" ? 100n : 1n,
+      parseEther(i === 1 ? "1800" : SPACE_TYPES[site.kind].price),
     ]);
   }
   await write(buyer, "market", "purchase", [listingIds[0], 20n]);

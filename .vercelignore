@@ -1,0 +1,16 @@
+# Upload only application source and build inputs. Never upload local envs,
+# signer data, contract broadcasts, or research / screenshot artifacts.
+/*
+!/src
+!/public
+!/scripts
+/scripts/*
+!/scripts/copy-maplibre-worker.mjs
+!/package.json
+!/package-lock.json
+!/tsconfig.json
+!/next-env.d.ts
+!/next.config.ts
+!/vercel.json
+/src/**/*.test.ts
+/public/maplibre

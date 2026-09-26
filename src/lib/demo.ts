@@ -1,3 +1,4 @@
+import { assetTypeCode, SPACE_TYPES, type AssetKind } from "./catalog";
 import { parseEther, keccak256, stringToHex } from "viem";
 import { metadataURI, type ChainEvent, type MarketState } from "./model";
 import { project } from "./projection";
@@ -16,44 +17,16 @@ export const DEMO_ADDRESSES: Record<ContractKey, string> = {
   basket: "0x0000000000000000000000000000000000000015",
   settlement: "0x0000000000000000000000000000000000000016",
 };
-export const DEMO_SITES = [
-  {
-    name: "Nihonbashi Solar Roof",
-    district: "NIHONBASHI · CHUO",
-    coordinates: [139.7748, 35.6842] as [number, number],
-    area: 420,
-    capacity: 72,
-    description:
-      "An underused rooftop can become a neighborhood source of clean energy.",
-    kind: "Rooftop",
-  },
-  {
-    name: "Kanda Community Solar",
-    district: "KANDA · CHIYODA",
-    coordinates: [139.769, 35.694] as [number, number],
-    area: 310,
-    capacity: 48,
-    description:
-      "Turn unused roof space into a community-funded solar project.",
-    kind: "Rooftop",
-  },
-  {
-    name: "Kuramae Makers House",
-    district: "KURAMAE · TAITO",
-    coordinates: [139.7892, 35.7034] as [number, number],
-    area: 96,
-    capacity: 0,
-    description:
-      "A simulated vacant space, reimagined as a neighborhood workshop. No residential or property ownership is sold.",
-    kind: "Vacant Home",
-  },
-];
+export { DEMO_SITES } from "./demo-catalog";
+import { DEMO_SITES, DEMO_CATALOG_VERSION } from "./demo-catalog";
 const KEY = "tokenize-tokyo-demo-v2";
 type Store = {
   events: ChainEvent[];
   balances: Record<string, string>;
   cash: Record<string, string>;
   claims: Record<string, string>;
+  catalogVersion?: number;
+  showcaseVersion?: number;
 };
 const bkey = (who: string, token: string, id: string) =>
   who.toLowerCase() + ":" + token + ":" + id;
@@ -77,73 +50,330 @@ function seed(): Store {
   const s: Store = { events: [], balances: {}, cash: {}, claims: {} };
   for (const who of Object.values(ACTORS))
     s.cash[who] = parseEther("1000000").toString();
-  DEMO_SITES.forEach((site, i) => {
-    const id = String(i + 1),
-      issuer = ACTORS["Owner A"];
-    emit(s, "registry", "AssetRegistered", {
-      assetId: id,
-      issuer,
-      geoReference: keccak256(stringToHex("simulated-" + id)),
-      metadataURI: metadataURI({ ...site, simulated: true }),
-      assetType: i === 2 ? 1 : 0,
-    });
-    emit(s, "registry", "AssetVerificationRequested", { assetId: id });
-    emit(s, "registry", "AssetVerified", {
-      assetId: id,
-      verifier: ACTORS["Demo verifier"],
-    });
-    emit(s, "rights", "RightCreated", {
-      rightId: id,
-      assetId: id,
-      issuer,
-      rightType: i === 2 ? 0 : 1,
-      supply: i === 2 ? "1" : "100",
-      termsURI: metadataURI({
-        purpose:
-          i === 2
-            ? "Community workshop only; no structural alterations. Repairs require issuer approval."
-            : "Proportional share of settlement tokens actually deposited. No guaranteed return.",
-        evidence: "Simulated verification. Not property ownership.",
-      }),
-      termsHash: keccak256(stringToHex("demo-terms-" + id)),
-      startAt: Math.floor(Date.now() / 1000) - 100,
-      endAt: Math.floor(Date.now() / 1000) + 365 * 86400,
-      transferPolicy: 0,
-    });
-    emit(s, "rights", "RightScopeDefined", {
-      rightId: id,
-      assetId: id,
-      scope: i === 2 ? 1 : 0,
-      purpose: keccak256(stringToHex(i === 2 ? "WORKSHOP" : "SOLAR")),
-      exclusive: i === 2,
-    });
-    emit(s, "rights", "RightVerified", { rightId: id, approved: true });
-    s.balances[bkey(issuer, "rights", id)] = i === 2 ? "1" : "100";
-    emit(s, "market", "ListingCreated", {
-      listingId: id,
-      seller: issuer,
-      token: DEMO_ADDRESSES.rights,
-      rightId: id,
-      amount: i === 2 ? "1" : "100",
-      unitPrice: parseEther(
-        i === 2 ? "80000" : i === 0 ? "2400" : "1800",
-      ).toString(),
-    });
-  });
+  DEMO_SITES.forEach((site, i) => seedSite(s, site, i));
+  s.catalogVersion = DEMO_CATALOG_VERSION;
   return s;
+}
+function seedSite(s: Store, site: (typeof DEMO_SITES)[number], index: number) {
+  const eventStart = s.events.length;
+  const next = (name: string, key: string) =>
+    String(
+      Math.max(
+        0,
+        ...s.events
+          .filter((e) => e.name === name)
+          .map((e) => Number(e.args[key])),
+      ) + 1,
+    );
+  const aid = next("AssetRegistered", "assetId"),
+    id = next("RightCreated", "rightId"),
+    listingId = next("ListingCreated", "listingId"),
+    issuer = ACTORS["Owner A"],
+    solar = site.kind === "Rooftop" || !!site.revenue,
+    t = SPACE_TYPES[site.kind];
+  emit(s, "registry", "AssetRegistered", {
+    assetId: aid,
+    issuer,
+    geoReference: keccak256(stringToHex("simulated-catalog-" + site.name)),
+    metadataURI: metadataURI({ ...site, simulated: true }),
+    assetType: assetTypeCode(site.kind),
+  });
+  emit(s, "registry", "AssetVerificationRequested", { assetId: aid });
+  emit(s, "registry", "AssetVerified", {
+    assetId: aid,
+    verifier: ACTORS["Demo verifier"],
+  });
+  const days =
+    site.kind === "Parking" || site.kind === "Advertising"
+      ? 30
+      : site.kind === "Storage"
+        ? 90
+        : 365;
+  const terms = metadataURI({
+    purpose: site.revenue
+      ? `Proportional share of income deposited by this fictional ${site.kind.toLowerCase()} project. No usage permission or guaranteed return.`
+      : t.terms,
+    evidence: "Simulated verification. Not property ownership.",
+  });
+  emit(s, "rights", "RightCreated", {
+    rightId: id,
+    assetId: aid,
+    issuer,
+    rightType: solar ? 1 : 0,
+    supply: solar ? "100" : "1",
+    termsURI: terms,
+    termsHash: keccak256(stringToHex(terms)),
+    startAt:
+      Math.floor(Date.now() / 1000) -
+      (site.historyDay === undefined ? 100 : 30 * 86400),
+    endAt: Math.floor(Date.now() / 1000) + days * 86400,
+    transferPolicy: 0,
+  });
+  emit(s, "rights", "RightScopeDefined", {
+    rightId: id,
+    assetId: aid,
+    scope: ["Rooftop", "Interior", "Wall", "Land", "Whole asset"].indexOf(
+      t.scope,
+    ),
+    purpose: keccak256(stringToHex(t.purpose)),
+    exclusive: !solar,
+  });
+  emit(s, "rights", "RightVerified", { rightId: id, approved: true });
+  if (site.activated) {
+    // Already-operating demo projects can list rights without a prior fundraise.
+    // Activation alone never creates a sale, deposit or claimable revenue.
+    emit(s, "rights", "RightActivated", { rightId: id, assetId: aid });
+  }
+  s.balances[bkey(issuer, "rights", id)] = solar ? "100" : "1";
+  emit(s, "market", "ListingCreated", {
+    listingId,
+    seller: issuer,
+    token: DEMO_ADDRESSES.rights,
+    rightId: id,
+    amount: solar ? "100" : "1",
+    unitPrice: parseEther(index === 1 ? "1800" : t.price).toString(),
+  });
+  if (site.historyDay !== undefined) {
+    for (let i = eventStart; i < s.events.length; i++)
+      s.events[i].timestamp = new Date(
+        Date.now() - 29 * 86400000,
+      ).toISOString();
+  }
+  if (site.historyDay !== undefined && solar) {
+    // Explicit fictional activity with matching balances and test-token payments.
+    const buyer = "0x00000000000000000000000000000000000000f1";
+    const second = "0x00000000000000000000000000000000000000f2";
+    const sold = BigInt(site.subscribed || 0);
+    const price = parseEther(t.price);
+    for (const [who, units] of [
+      [buyer, sold / 2n],
+      [second, sold - sold / 2n],
+    ] as const) {
+      if (!units) continue;
+      s.cash[who] = (
+        BigInt(s.cash[who] || parseEther("1000000000").toString()) -
+        units * price
+      ).toString();
+      s.cash[issuer] = (BigInt(s.cash[issuer]) + units * price).toString();
+      s.balances[bkey(who, "rights", id)] = units.toString();
+      emit(s, "market", "ListingPurchased", {
+        listingId,
+        buyer: who,
+        seller: issuer,
+        token: DEMO_ADDRESSES.rights,
+        rightId: id,
+        amount: units.toString(),
+        totalPrice: (units * price).toString(),
+      });
+      s.events.at(-1)!.timestamp = new Date(
+        Date.now() - site.historyDay * 86400000,
+      ).toISOString();
+    }
+    s.balances[bkey(issuer, "rights", id)] = (100n - sold).toString();
+    if (site.activated) {
+      for (let week = 0; week <= Math.floor(site.historyDay / 7); week++) {
+        const amount = parseEther(String(500 + (index % 9) * 150));
+        s.cash[issuer] = (BigInt(s.cash[issuer]) - amount).toString();
+        for (const who of [issuer, buyer, second]) {
+          const key = bkey(who, "rights", id);
+          s.claims[key] = (
+            BigInt(s.claims[key] || "0") +
+            (amount * BigInt(s.balances[key] || "0")) / 100n
+          ).toString();
+        }
+        emit(s, "revenue", "RevenueDeposited", {
+          rightId: id,
+          depositor: issuer,
+          amount: amount.toString(),
+        });
+        const daysAgo = site.historyDay - week * 7;
+        s.events.at(-1)!.timestamp = new Date(
+          Date.now() - daysAgo * 86400000,
+        ).toISOString();
+      }
+    }
+  }
 }
 function load(): Store {
   try {
     const raw = localStorage.getItem(KEY);
-    if (raw) return JSON.parse(raw) as Store;
+    if (raw) {
+      const s = JSON.parse(raw) as Store;
+      if ((s.catalogVersion || 0) < DEMO_CATALOG_VERSION) {
+        // Append the new use cases without clearing user-created assets, holdings or history.
+        const existing = project(s.events, DEMO_ADDRESSES.rights).assets;
+        DEMO_SITES.forEach((site, i) => {
+          if (!existing.some((a) => a.name === site.name)) seedSite(s, site, i);
+        });
+        s.catalogVersion = DEMO_CATALOG_VERSION;
+        save(s);
+      }
+      return s;
+    }
   } catch {}
-  return seed();
+  const initial = seed();
+  save(initial);
+  return initial;
 }
 function save(s: Store) {
   localStorage.setItem(KEY, JSON.stringify(s));
 }
 export function resetDemo() {
   localStorage.removeItem(KEY);
+}
+
+// An explicit, repeat-safe historical scenario. Never used by the live MultiBaas adapter.
+export function addDemoActivity(): boolean {
+  const initial = load();
+  if (initial.showcaseVersion === 1) return false;
+  save(initial);
+  const owner = ACTORS["Owner A"],
+    investor = ACTORS["Investor C"],
+    exampleBuyer = "0x000000000000000000000000000000000000000e";
+  const started = initial.events.length;
+  const now = Date.now(),
+    day = 86400000,
+    today = Math.floor(now / day) * day;
+  const stampNew = (from: number, daysAgo: number) => {
+    const s = load();
+    const timestamp = new Date(
+      Math.min(now, today - daysAgo * day + 10 * 3600000),
+    ).toISOString();
+    for (let i = from; i < s.events.length; i++)
+      s.events[i].timestamp = timestamp;
+    save(s);
+  };
+  try {
+    demoCall(owner, "settlement", "mint", [
+      owner,
+      parseEther("300000").toString(),
+    ]);
+    demoCall(exampleBuyer, "settlement", "mint", [
+      exampleBuyer,
+      parseEther("300000").toString(),
+    ]);
+    const ids: string[] = [],
+      listings: string[] = [];
+    for (const [kind, name, coordinates] of [
+      ["Rooftop", "Example · Kanda Solar Income", [139.7694, 35.6942]],
+      ["Parking", "Example · Akihabara Parking Income", [139.7744, 35.6984]],
+      [
+        "Advertising",
+        "Example · Ningyocho Advertising Income",
+        [139.7832, 35.6861],
+      ],
+    ] as const) {
+      demoCall(owner, "registry", "registerAsset", [
+        keccak256(stringToHex(name)),
+        metadataURI({
+          name,
+          kind,
+          coordinates,
+          district: "TOKYO · HISTORICAL DEMO",
+          area: 100,
+          capacity: kind === "Rooftop" ? 20 : 0,
+          description:
+            "Fictional operating project with simulated trades and deposited revenue. Example history, not real performance.",
+          simulated: true,
+        }),
+        assetTypeCode(kind),
+      ]);
+      const assetId = demoState(owner).assets.at(-1)!.id;
+      demoCall(owner, "registry", "requestVerification", [assetId]);
+      demoCall(ACTORS["Demo verifier"], "registry", "verifyAsset", [
+        assetId,
+        true,
+      ]);
+      const terms = metadataURI({
+        purpose: `Proportional share of revenue deposited by this fictional ${kind.toLowerCase()} project. No usage permission or guaranteed return.`,
+        simulated: true,
+      });
+      demoCall(owner, "rights", "createRight", [
+        assetId,
+        1,
+        "100",
+        terms,
+        keccak256(stringToHex(terms)),
+        Math.floor((today - 30 * day) / 1000),
+        Math.floor((now + 365 * day) / 1000),
+        0,
+      ]);
+      const rightId = demoState(owner).rights.at(-1)!.id;
+      demoCall(ACTORS["Demo verifier"], "rights", "verifyRight", [
+        rightId,
+        true,
+      ]);
+      demoCall(ACTORS["Demo verifier"], "rights", "activateRight", [rightId]);
+      demoCall(owner, "market", "createListing", [
+        DEMO_ADDRESSES.rights,
+        rightId,
+        "100",
+        parseEther("1000").toString(),
+      ]);
+      ids.push(rightId);
+      listings.push(demoState(owner).listings.at(-1)!.id);
+    }
+    stampNew(started, 28);
+    for (let daysAgo = 27; daysAgo >= 0; daysAgo--) {
+      const before = load().events.length;
+      for (let i = 0; i < ids.length; i++) {
+        demoCall(investor, "market", "purchase", [listings[i], "1"]);
+        demoCall(owner, "revenue", "depositRevenue", [
+          ids[i],
+          parseEther(
+            String(120 + i * 45 + ((27 - daysAgo) % 5) * 20),
+          ).toString(),
+        ]);
+      }
+      if (daysAgo % 3 === 0) {
+        const rightId = ids[Math.floor(daysAgo / 3) % ids.length];
+        demoCall(investor, "market", "createListing", [
+          DEMO_ADDRESSES.rights,
+          rightId,
+          "1",
+          parseEther("1100").toString(),
+        ]);
+        demoCall(exampleBuyer, "market", "purchase", [
+          demoState(investor).listings.at(-1)!.id,
+          "1",
+        ]);
+        demoCall(investor, "revenue", "claim", [rightId]);
+      }
+      stampNew(before, daysAgo);
+    }
+    demoCall(investor, "basket", "createBasket", [
+      ids,
+      ["1", "1", "1"],
+      metadataURI({
+        name: "Tokyo Mixed Income Basket · Example",
+        simulated: true,
+      }),
+    ]);
+    const basketId = demoState(investor).baskets.at(-1)!.id;
+    demoCall(investor, "basket", "depositUnderlying", [basketId, "10"]);
+    demoCall(investor, "market", "createListing", [
+      DEMO_ADDRESSES.basket,
+      basketId,
+      "5",
+      parseEther("3500").toString(),
+    ]);
+    demoCall(exampleBuyer, "market", "purchase", [
+      demoState(investor).listings.at(-1)!.id,
+      "2",
+    ]);
+    for (const id of ids)
+      demoCall(owner, "revenue", "depositRevenue", [
+        id,
+        parseEther("500").toString(),
+      ]);
+    const complete = load();
+    complete.showcaseVersion = 1;
+    save(complete);
+    return true;
+  } catch (error) {
+    save(initial);
+    throw error;
+  }
 }
 export function demoState(account: string): MarketState {
   const s = load(),
@@ -442,7 +672,7 @@ export function demoCall(
       units = b as string[];
     require(ids.length >= 2 &&
       new Set(ids).size ===
-        ids.length, "Select at least two distinct solar rights");
+        ids.length, "Select at least two distinct revenue rights");
     for (let i = 0; i < ids.length; i++) {
       const r = state.rights.find((x) => x.id === ids[i]);
       require(r?.kind === "Revenue Share" &&

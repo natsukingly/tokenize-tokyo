@@ -51,8 +51,11 @@ async function main() {
     "SDK read nextAssetId:",
     String(await readContract("registry", "nextAssetId")),
   );
-  const from =
-    process.env.PROBE_ADDRESS || "0x0000000000000000000000000000000000000001";
+  const from = process.env.PROBE_ADDRESS || process.env.DEPLOYER_ADDRESS;
+  if (!from || !/^0x[\da-f]{40}$/i.test(from))
+    throw new Error(
+      "Set PROBE_ADDRESS or DEPLOYER_ADDRESS to a funded testnet address for gas estimation",
+    );
   const tx = await api.contracts.callContractFunction(
     config.addresses.registry,
     labels.registry,

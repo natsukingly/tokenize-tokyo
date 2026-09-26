@@ -1,3 +1,4 @@
+import { assetKindFromMetadata } from "./catalog";
 import {
   EMPTY,
   parseMetadata,
@@ -7,6 +8,32 @@ import {
   type Right,
 } from "./model";
 const str = (v: unknown) => String(v ?? "");
+function indexedArray(value: unknown): unknown[] {
+  const result = typeof value === "string" ? JSON.parse(value) : value;
+  if (!Array.isArray(result)) throw new Error("Invalid indexed array");
+  return result;
+}
+function bytes32(value: unknown): string {
+  if (typeof value === "string" && /^0x[0-9a-f]{64}$/i.test(value))
+    return value;
+  if (
+    Array.isArray(value) ||
+    (typeof value === "string" && value.startsWith("["))
+  ) {
+    const bytes = indexedArray(value);
+    if (
+      bytes.length !== 32 ||
+      bytes.some(
+        (v) => !Number.isInteger(v) || Number(v) < 0 || Number(v) > 255,
+      )
+    )
+      throw new Error("Invalid indexed bytes32");
+    return (
+      "0x" + bytes.map((v) => Number(v).toString(16).padStart(2, "0")).join("")
+    );
+  }
+  return str(value);
+}
 const sum = (es: ChainEvent[], name: string, key: string) =>
   es
     .filter((e) => e.name === name)
@@ -17,12 +44,33 @@ export function project(
   rightsAddress: string,
 ): MarketState {
   const state: MarketState = { ...structuredClone(EMPTY), events };
+  // Index once so expanding the city does not repeatedly scan every event per asset.
+  const byName = new Map<string, ChainEvent[]>();
+  const byAsset = new Map<string, ChainEvent[]>();
+  const byRight = new Map<string, ChainEvent[]>();
+  const byListing = new Map<string, ChainEvent[]>();
+  const add = (
+    index: Map<string, ChainEvent[]>,
+    key: string,
+    event: ChainEvent,
+  ) => {
+    const bucket = index.get(key);
+    if (bucket) bucket.push(event);
+    else index.set(key, [event]);
+  };
+  for (const e of events) {
+    add(byName, e.name, e);
+    if (e.args.assetId !== undefined) add(byAsset, str(e.args.assetId), e);
+    if (e.args.rightId !== undefined) add(byRight, str(e.args.rightId), e);
+    if (e.args.listingId !== undefined)
+      add(byListing, str(e.args.listingId), e);
+  }
   const has = (name: string, key: string, id: string) =>
-    events.some((e) => e.name === name && str(e.args[key]) === id);
-  for (const e of events.filter((e) => e.name === "AssetRegistered")) {
+    (byName.get(name) || []).some((e) => str(e.args[key]) === id);
+  for (const e of byName.get("AssetRegistered") || []) {
     const a = e.args,
       id = str(a.assetId),
-      updates = events.filter(
+      updates = (byAsset.get(id) || []).filter(
         (e) => e.name === "AssetUpdated" && str(e.args.assetId) === id,
       );
     const uri = str(updates.at(-1)?.args.metadataURI ?? a.metadataURI),
@@ -38,10 +86,7 @@ export function project(
       issuer: str(a.issuer),
       name: str(m.name) || `Urban asset ${id}`,
       district: str(m.district) || "Tokyo",
-      kind:
-        (["Rooftop", "Vacant Home", "Idle Land", "Other"] as const)[
-          Number(a.assetType)
-        ] || "Other",
+      kind: assetKindFromMetadata(Number(a.assetType), m.kind),
       coordinates,
       area: Number(m.area) || 0,
       capacity: Number(m.capacity) || 0,
@@ -56,7 +101,7 @@ export function project(
           AssetVerified: "Verified",
         } as Record<string, Asset["status"]>
       )[
-        events
+        (byAsset.get(id) || [])
           .filter(
             (event) =>
               [
@@ -70,17 +115,17 @@ export function project(
           .at(-1)!.name
       ],
       metadataURI: uri,
-      geoReference: str(a.geoReference),
+      geoReference: bytes32(a.geoReference),
       simulated: true,
     } satisfies Asset);
   }
-  for (const e of events.filter((e) => e.name === "RightCreated")) {
+  for (const e of byName.get("RightCreated") || []) {
     const a = e.args,
       id = str(a.rightId),
-      verified = events.find(
+      verified = (byRight.get(id) || []).find(
         (e) => e.name === "RightVerified" && str(e.args.rightId) === id,
       );
-    const scope = events.find(
+    const scope = (byRight.get(id) || []).find(
       (e) => e.name === "RightScopeDefined" && str(e.args.rightId) === id,
     )?.args;
     const approved =
@@ -95,11 +140,11 @@ export function project(
         ] || "Other",
       supply: str(a.supply),
       termsURI: str(a.termsURI),
-      termsHash: str(a.termsHash),
+      termsHash: bytes32(a.termsHash),
       startAt: Number(a.startAt),
       endAt: Number(a.endAt),
       scope: Number(scope?.scope ?? (Number(a.rightType) === 1 ? 0 : 1)),
-      purpose: str(scope?.purpose),
+      purpose: bytes32(scope?.purpose),
       exclusive: scope?.exclusive === true || scope?.exclusive === "true",
       policy:
         (["Open", "Allowlist", "Nontransferable"] as const)[
@@ -116,10 +161,10 @@ export function project(
             : "Pending verification",
     } satisfies Right);
   }
-  for (const e of events.filter((e) => e.name === "ListingCreated")) {
+  for (const e of byName.get("ListingCreated") || []) {
     const a = e.args,
       id = str(a.listingId),
-      sold = events
+      sold = (byListing.get(id) || [])
         .filter(
           (e) => e.name === "ListingPurchased" && str(e.args.listingId) === id,
         )
@@ -137,13 +182,14 @@ export function project(
       cancelled: has("ListingCancelled", "listingId", id),
     });
   }
-  for (const e of events.filter((e) => e.name === "BasketCreated")) {
+  for (const e of byName.get("BasketCreated") || []) {
     const a = e.args;
     state.baskets.push({
       id: str(a.basketId),
-      rightIds: (a.rightIds as unknown[]).map(str),
-      units: (a.unitsPerShare as unknown[]).map(str),
-      name: str(parseMetadata(str(a.metadataURI)).name) || "Tokyo Solar Basket",
+      rightIds: indexedArray(a.rightIds).map(str),
+      units: indexedArray(a.unitsPerShare).map(str),
+      name:
+        str(parseMetadata(str(a.metadataURI)).name) || "Urban Income Basket",
     });
   }
   state.metrics = {

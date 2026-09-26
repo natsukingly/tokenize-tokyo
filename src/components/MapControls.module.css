@@ -1,0 +1,128 @@
+.controls {
+  position: absolute;
+  z-index: 9;
+  top: 22px;
+  left: 24px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  max-width: calc(100% - 48px);
+}
+.funding {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  font-size: 11px;
+  background: #191b1feb;
+}
+.funding b {
+  font-size: 10px;
+  color: var(--muted);
+  font-weight: 500;
+}
+.funding[aria-pressed="true"] {
+  color: var(--lime);
+  border-color: var(--lime);
+}
+.controls summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  list-style: none;
+  cursor: pointer;
+  color: var(--text);
+  font-size: 11px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: #191b1feb;
+  backdrop-filter: blur(12px);
+}
+.controls summary::-webkit-details-marker {
+  display: none;
+}
+.controls summary:focus-visible {
+  outline: 2px solid var(--lime);
+  outline-offset: 3px;
+}
+.controls details[open] > summary,
+.controls summary[data-filtered="true"] {
+  border-color: var(--lime);
+}
+.panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: min(330px, calc(100vw - 112px));
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #191b1ff5;
+  backdrop-filter: blur(18px);
+  box-shadow: 0 12px 30px #0005;
+  max-height: calc(100dvh - 240px);
+  overflow: auto;
+}
+.label {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+.controls .panel .content :global(.explore-filters),
+.controls .panel .content :global(.map-lenses) {
+  position: static;
+  inset: auto;
+  margin: 0;
+  width: 100%;
+  max-width: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  pointer-events: auto;
+}
+.controls .panel .content :global(.segmented) {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  box-shadow: none;
+}
+.controls .panel .content :global(.segmented button) {
+  padding: 10px;
+  justify-content: flex-start;
+}
+.controls .panel .content :global(.stage-filter) {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+.controls .panel .content :global(.filter-actions) {
+  width: 100%;
+  justify-content: space-between;
+}
+.controls .panel .content :global(.map-lenses) {
+  flex-direction: column;
+}
+.controls .panel .content :global(.map-lenses button) {
+  display: flex;
+  width: 100%;
+  font-size: 12px;
+  padding: 12px;
+}
+.controls .panel .content :global(.lens-count) {
+  width: 100%;
+  max-width: none;
+  box-shadow: none;
+}
+@media (max-width: 700px) {
+  .controls {
+    top: 16px;
+    left: 14px;
+  }
+  .controls summary {
+    padding: 9px 11px;
+  }
+}
