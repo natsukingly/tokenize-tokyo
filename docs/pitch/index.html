@@ -296,14 +296,8 @@
   .tree-panel .tree-row .tag{color:#93ab7f;font-size:15px;}
   .tree-panel .tree-row b{color:var(--lime2);font-weight:500;}
 
-  .s3-bottom{
-    display:flex;
-    align-items:stretch;
-    gap:16px;
-    margin-top:20px;
-  }
   .conflict-bar{
-    flex:1;
+    margin-top:20px;
     border:1px solid #3d4c30;
     border-radius:6px;
     background:#1d241a;
@@ -315,9 +309,15 @@
     align-items:center;
   }
 
+  .s2-bottom{
+    margin-top:auto;
+    display:flex;
+    justify-content:flex-end;
+  }
+
   .live-demo-cue{
     flex:none;
-    display:flex;
+    display:inline-flex;
     align-items:center;
     justify-content:center;
     font-family:var(--font-head);
@@ -327,22 +327,22 @@
     color:#16210f;
     background:var(--lime);
     border-radius:6px;
-    padding:0 24px;
+    padding:16px 26px;
     box-shadow:0 0 26px #d7f98566;
   }
 
   /* ============ SLIDE 4 ============ */
   #s4 h1{
-    font-size:44px;
+    font-size:40px;
     font-weight:500;
     letter-spacing:-1.4px;
+    line-height:1.18;
     margin-top:18px;
   }
   .infra-body{
     display:flex;
     gap:40px;
-    margin-top:34px;
-    flex:1;
+    margin-top:26px;
   }
   .infra-stack{
     flex:1.15;
@@ -354,15 +354,15 @@
     border:1px solid var(--line);
     border-radius:7px;
     background:#171f1a;
-    padding:16px 20px;
+    padding:11px 20px;
   }
   .infra-tier .tier-name{
-    font-size:14px;
+    font-size:18px;
     font-weight:600;
     color:var(--text);
   }
   .infra-tier .tier-detail{
-    font-size:11.5px;
+    font-size:14px;
     color:#93a689;
     margin-top:5px;
     line-height:1.5;
@@ -372,18 +372,20 @@
     background:#1d2b1d;
   }
   .infra-tier.protocol .tier-name{color:var(--lime);}
+  .infra-tier.namespace{border-color:#529b81;background:#172b23;}
+  .infra-tier.namespace .tier-name{color:var(--teal);}
   .infra-down{
     display:flex;
     justify-content:center;
     color:#4b5c46;
     font-size:16px;
-    padding:6px 0;
+    padding:2px 0;
   }
   .infra-side{
     flex:1;
     display:flex;
     flex-direction:column;
-    justify-content:center;
+    justify-content:flex-start;
     border-left:1px solid var(--line);
     padding-left:34px;
   }
@@ -404,6 +406,11 @@
     font-family:var(--font);
     font-weight:600;
   }
+  .namespace-tree{margin:8px 0 24px;font:17px/1.8 monospace;white-space:pre;color:#b6c4ac;}
+  .namespace-tree b{color:var(--teal);font-weight:600;}
+  .infra-side .delegation{font-size:21px;line-height:1.45;color:var(--lime);}
+  .infra-side .scope-note{margin-top:12px;font-size:16px;}
+  .infra-status{margin-top:auto;padding-top:14px;border-top:1px solid var(--line);font-size:13px;line-height:1.6;color:#a7b69f;}
 
   /* ============ SLIDE 5 ============ */
   #s5{
@@ -615,6 +622,9 @@
         <div class="actor-box"><span>USER</span><p>"I want access."</p></div>
       </div>
       <div class="thesis">We're not competing for the real estate market. We're creating a <b>market for urban capacity</b> that isn't marketable today.</div>
+      <div class="s2-bottom">
+        <div class="live-demo-cue">→ LIVE DEMO</div>
+      </div>
     </section>
 
     <section class="slide" id="s3">
@@ -637,42 +647,48 @@
         <div class="tree-row"><span class="glyph">└</span><span>Solar project</span><b>Revenue share</b></div>
       </div>
 
-      <div class="s3-bottom">
-        <div class="conflict-bar">Overlapping exclusive space × time is rejected on-chain. Revenue rights can coexist with usage rights.</div>
-        <div class="live-demo-cue">→ LIVE DEMO</div>
-      </div>
+      <div class="conflict-bar">Overlapping exclusive space × time is rejected on-chain. Revenue rights can coexist with usage rights.</div>
     </section>
 
     <section class="slide" id="s4">
       <div class="slide-index">04 <span>/</span> 05</div>
-      <div class="eyebrow">The infrastructure</div>
-      <h1>The infrastructure</h1>
+      <div class="eyebrow">Innovation · target architecture</div>
+      <h1>From physical space<br>to an onchain namespace</h1>
       <div class="infra-body">
         <div class="infra-stack">
           <div class="infra-tier">
-            <div class="tier-name">3D Tokyo</div>
-            <div class="tier-detail">MapLibre · OpenStreetMap</div>
+            <div class="tier-name">PLATEAU · Physical space</div>
+            <div class="tier-detail">Where the space is · planned data source</div>
+          </div>
+          <div class="infra-down">↓</div>
+          <div class="infra-tier namespace">
+            <div class="tier-name">ENSv2 · Spatial namespace</div>
+            <div class="tier-detail">Space identity + scoped authority · planned</div>
           </div>
           <div class="infra-down">↓</div>
           <div class="infra-tier protocol">
             <div class="tier-name">Urban Rights Protocol</div>
-            <div class="tier-detail">ERC-1155 rights · Spatial/Temporal Conflict Engine · Revenue Vault · Baskets</div>
+            <div class="tier-detail">What the space can do · scoped rights, conflicts, revenue</div>
           </div>
           <div class="infra-down">↓</div>
           <div class="infra-tier">
             <div class="tier-name">Curvegrid MultiBaas</div>
-            <div class="tier-detail">event queries · contract calls · webhooks</div>
-          </div>
-          <div class="infra-down">↓</div>
-          <div class="infra-tier">
-            <div class="tier-name">EVM</div>
+            <div class="tier-detail">Issue, trade and track · queries, transactions, webhooks</div>
           </div>
         </div>
         <div class="infra-side">
-          <div class="tag">LIVE DASHBOARD</div>
-          <p>MultiBaas indexes every <code>AssetVerified</code>, <code>RightCreated</code>, <code>ListingPurchased</code> and <code>RevenueDeposited</code> event so the dashboard is a live view of the city's rights.</p>
+          <div class="tag">ILLUSTRATIVE NAMESPACE · NOT REGISTERED</div>
+          <div class="namespace-tree">tokenizetokyo.eth
+└─ chiyoda
+   └─ building-1024
+      ├─ <b>rooftop</b>
+      │  └─ solar-2037
+      └─ floor-2</div>
+          <p class="delegation">Building owner → Rooftop operator</p>
+          <p class="scope-note">Delegate the rooftop namespace.<br>Keep Floor 2 separate.<br>Right issuance needs a protocol adapter.</p>
         </div>
       </div>
+      <p class="infra-status">Today: MapLibre / OpenStreetMap + locally tested contracts. MultiBaas integration awaits a live run.<br>ENSv2 delegation and PLATEAU are proposed. Namespace control does not prove property ownership.</p>
     </section>
 
     <section class="slide with-photo" id="s5">
@@ -682,11 +698,12 @@
       <div class="roadmap-cols">
         <div>
           <div class="rmap-block">
-            <div class="tag">TODAY</div>
+            <div class="tag">TODAY · DEMO ASSETS</div>
             <ul>
               <li>Rooftop <span class="arrow">→</span> <b>Solar</b></li>
               <li>Vacant home <span class="arrow">→</span> <b>Usage</b></li>
               <li>Idle land <span class="arrow">→</span> <b>Temporary use</b></li>
+              <li>Parking · storage · advertising</li>
             </ul>
           </div>
         </div>
@@ -694,14 +711,16 @@
           <div class="rmap-block">
             <div class="tag">NEXT</div>
             <div class="rmap-tags">
-              <span>Parking</span><span>EV charging</span><span>Advertising</span><span>Warehouses</span>
+              <span>EV charging</span><span>Operator proposals</span>
             </div>
           </div>
           <div class="rmap-block">
             <div class="tag">FINANCIAL LAYER</div>
-            <div class="rmap-tags">
-              <span>Revenue rights</span><span>Secondary markets</span><span>Baskets</span><span>Lending</span><span>Collateral</span>
-            </div>
+            <ul>
+              <li>Protocol: revenue · resale · baskets</li>
+              <li>Mock: fractional shares · rental access</li>
+              <li>Future: collateral loans</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -727,9 +746,9 @@
   var notes = [
     "Tokyo doesn't have a shortage of physical assets. It has a massive amount of assets sitting idle. We call it dormant capital.",
     "Rooftops exist but aren't connected to operators or equipment capital; vacant homes exist but don't reach users; idle land exists but can't meet short-term demand.",
-    "Opportunity Lens → X-ray → create right → conflict rejected → purchase → activated.",
-    "Curvegrid RWA prize framing: what becomes possible once ownership, transactions, permissions and cash flows are programmable.",
-    ""
+    "0:50–2:40: Opportunity Lens → X-ray → scoped right → conflict rejected → purchase → revenue → secondary sale → basket. Use prepared demo state and say that browser transactions are simulated. ENS delegation is not available in today's app; show its planned flow on slide 4, not as a completed transaction.",
+    "2:40–3:15. Our target architecture has four layers: PLATEAU tells us where. ENS tells us what space it is and who can control its namespace. Urban Rights define what that space can do. Curvegrid turns those rights into a market. Today our map is MapLibre/OpenStreetMap; PLATEAU and ENS are planned, and MultiBaas awaits live verification. Point to rooftop: the proposed owner delegates only this namespace; Floor 2 remains separate. An explicit protocol adapter must check the delegated scope before a right can be issued. ENS is not property verification. Official sources: https://docs.ens.domains/ensv2/permissioned-registry/ and https://docs.ens.domains/ensv2/enhanced-access-control/ . Full present-day and future live-demo scripts: ../PITCH_DEMO.md.",
+    "3:40–4:00. Six asset categories are available as fictional demo listings. Revenue, resale and baskets have local contract coverage; the fractional and rental market is a separate interactive mock. Collateral loans remain future work. We tokenize Tokyo to put dormant assets back to work."
   ];
   var current = 0;
   var total = slides.length;
