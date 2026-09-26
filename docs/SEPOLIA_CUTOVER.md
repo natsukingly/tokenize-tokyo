@@ -1,6 +1,6 @@
 # Sepolia connection and data provenance
 
-Updated 2026-09-27. This is a separate test deployment, not a bridge or migration of balances.
+Updated 2026-09-27. The [hosted main application](https://tokenize-tokyo.vercel.app/) now uses Sepolia. Production deployment: `dpl_4cbF55bu8bXPukdkk8XT7boWmJqC`. This is a separate test deployment, not a bridge or migration of balances.
 
 ## What stays on Curvegrid Testnet
 
@@ -8,7 +8,7 @@ The existing 50 assets and 448 scripted transactions remain on chain `2017072401
 
 ## Sepolia integration
 
-Nine contracts are linked to the separate Sepolia MultiBaas deployment: the six market contracts, `UrbanNamespaceAuthority`, the building's ENSv2 registry and its resolver. The public DApp key can read contracts and compose unsigned transactions; it cannot list or administer API keys. CORS permits the production application and the two local development origins. Credentials stay in ignored local configuration.
+Nine contracts are linked to the separate Sepolia MultiBaas deployment: the six market contracts, `UrbanNamespaceAuthority`, the building's ENSv2 registry and its resolver. The public DApp key can read contracts and compose unsigned transactions; it cannot list or administer API keys. CORS permits the production application and local development origins. Credentials stay in ignored local configuration.
 
 The free plan permits indexing from up to 100 blocks before the chain head. The initial ENS-linked asset and its first right were created before that window. Their **six market events and four ENS permission events** are preserved as verified public Sepolia RPC logs through finalized block `11786879`, with its canonical block hash. MultiBaas indexes subsequent events from **`11786880`**. The archive is [public JSON](../src/lib/generated/sepolia-bootstrap.json), not simulated activity and not a claim that MultiBaas backfilled those records.
 
@@ -33,12 +33,14 @@ flowchart LR
 npx tsx scripts/link-ens-multibaas.ts --env .env.sepolia \
   --bootstrap src/lib/generated/sepolia-bootstrap.json
 npx tsx scripts/verify-sepolia-integration.ts --env .env.sepolia
+# Verify the completed seed snapshot, before additional user trades change its totals.
+npx tsx scripts/verify-sepolia-integration.ts --env .env.sepolia --scenario
 
 # Read-only checks by default. --broadcast explicitly executes/resumes the bounded scenario.
 npx tsx scripts/seed-sepolia.ts --env .env.sepolia
 ```
 
-The small Sepolia scenario uses the existing ENS-issued rooftop right, parking income, advertising income and vacant-space usage. It exercises purchase, resale, activation, deposited income and a mixed basket. Its maximum budget is 0.018 test ETH including actor funding, and it journals signed hashes before broadcast to avoid repeated actions after interruption. Confirmed transactions are published separately in `deployments/sepolia-demo-receipts.json`. A prepared scenario is not evidence of completion: consult its receipts and the latest `sepolia-multibaas-verification.json`.
+The small Sepolia scenario uses the existing ENS-issued rooftop right, parking income, advertising income and vacant-space usage. It exercises purchase, resale, activation, deposited income and a mixed basket. Its maximum budget is 0.018 test ETH including actor funding, and it journals signed hashes before broadcast to avoid repeated actions after interruption. Confirmed transactions are published separately in `deployments/sepolia-demo-receipts.json`. The completed run used 0.017101395808561817 test ETH including actor funding. Its 51 confirmed transactions include 41 market actions, all matched by transaction hash and block to indexed events. The snapshot contains four assets, four rights (three active), one mixed basket, 37,700 MockJPY traded and 5,800 MockJPY deposited. Each of the three underlying rights has two units held in the basket vault, backing one share for the issuer and one for the test investor after redemption. See the [public receipts](../deployments/sepolia-demo-receipts.json) and [verification report](../deployments/sepolia-multibaas-verification.json). These amounts are test tokens, not real returns.
 
 ## 日本語
 
@@ -46,4 +48,6 @@ The small Sepolia scenario uses the existing ENS-issued rooftop right, parking i
 
 Sepolia用MultiBaasへ9契約を接続しました。無料プランの過去ログ取得範囲より前に作成した1資産・1権利については、確定済みの公開RPCログを初期記録として保存しています。それ以降の取引はMultiBaasで索引・取得します。初期記録と新規記録のブロック範囲を分け、二重集計を防いでいます。
 
-実演用にはENS付き屋根・駐車場収益・広告収益・空きスペース利用の少数案件を用意します。実所有権の確認、KYB、現実の収益や金融規制への準拠を実証するものではありません。ウォレットからの通し操作と公開サイトの切り替えは、SDK接続の成功とは別に確認します。
+実演用にENS付き屋根・駐車場収益・広告収益・空きスペース利用の4資産・4権利を発行し、3権利を稼働状態にしました。混合バスケット1件を作成し、購入・収益分配・償還を含む51件のテスト取引が成功。41件の市場操作をMultiBaasのイベントと照合し、売買37,700 MockJPY・収益入金5,800 MockJPY・預託された原資産の数量も一致しました。公開サイトのSepolia表示とENS登録・権限履歴を確認済みです。実ウォレット拡張による全工程の手動リハーサルは残ります。
+
+これは実所有権の確認、KYB、現実の収益や金融規制への準拠を実証するものではありません。MockJPYに金銭的価値はなく、既存チェーンからの残高移行も行っていません。

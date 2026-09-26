@@ -1,0 +1,487 @@
+{
+  "chainId": 11155111,
+  "registry": "0x0e627aec81902fc6f0873a6bef8dda02eac78235",
+  "simulated": true,
+  "description": "Scripted testnet scenarios. Not organic activity, real vacancies or investment returns.",
+  "startedAt": "2026-09-26T15:07:34.270Z",
+  "updatedAt": "2026-09-26T15:26:33.149Z",
+  "actors": {
+    "owner": "0x71bE0c03F807Ad83F290aDddb842f14652c80554",
+    "investorB": "0x83D04B1C4511Fb874eBBFeC6A816355d1e0f7cc8"
+  },
+  "confirmedTransactions": 51,
+  "transactions": [
+    {
+      "name": "setup/investor/gas",
+      "hash": "0x9e4c42d0057a51c60c2160b58b8da515c33be4e7236bd937ebad1401a1a03088",
+      "action": "setup/investor/gas",
+      "actor": "owner",
+      "value": "3000000000000000",
+      "block": "11786989",
+      "gasCost": "21173047014000"
+    },
+    {
+      "name": "setup/owner/cash",
+      "hash": "0xec040ce9b9141adeaccf1b62bb7b813630cbb973360ca0b37f6e861e5a4609be",
+      "action": "setup/owner/cash",
+      "actor": "owner",
+      "value": "0",
+      "block": "11786992",
+      "gasCost": "68068737719697"
+    },
+    {
+      "name": "setup/owner/approve-market",
+      "hash": "0x0445f45f132ea5041b68996383478f72e0b2b4cb65cd143874b38fb94038d511",
+      "action": "setup/owner/approve-market",
+      "actor": "owner",
+      "value": "0",
+      "block": "11786995",
+      "gasCost": "45533678258838"
+    },
+    {
+      "name": "setup/owner/trade-rights",
+      "hash": "0x83ef9aad58e5c5ecaa6b57c13ee2b5b151df0cca88707faf8bb2829a45dc7d8e",
+      "action": "setup/owner/trade-rights",
+      "actor": "owner",
+      "value": "0",
+      "block": "11786998",
+      "gasCost": "45358380912390"
+    },
+    {
+      "name": "setup/investorB/cash",
+      "hash": "0x55b8b7241c9dbc8c509a5fb47e82925927a20b6fb6f9939def9ee5ff488d1075",
+      "action": "setup/investorB/cash",
+      "actor": "owner",
+      "value": "0",
+      "block": "11787004",
+      "gasCost": "48655025137277"
+    },
+    {
+      "name": "setup/investorB/approve-market",
+      "hash": "0xc30782b11543de4aca9b006c6c6f5adbce63cbac4f7fd3f602530e3c11b85f1c",
+      "action": "setup/investorB/approve-market",
+      "actor": "investorB",
+      "value": "0",
+      "block": "11787010",
+      "gasCost": "62583676663893"
+    },
+    {
+      "name": "setup/investorB/trade-rights",
+      "hash": "0xb2c550809de6a4fed10a00806a9b33664a0b1d0cda0973e328a6818aeb79d536",
+      "action": "setup/investorB/trade-rights",
+      "actor": "investorB",
+      "value": "0",
+      "block": "11787012",
+      "gasCost": "64629478242420"
+    },
+    {
+      "name": "setup/approve-revenue",
+      "hash": "0x46c23ed0dc08a85b293607c1da5b2b5c526f8d1caf01909097ececbec938b6e3",
+      "action": "setup/approve-revenue",
+      "actor": "owner",
+      "value": "0",
+      "block": "11787014",
+      "gasCost": "57118172502690"
+    },
+    {
+      "name": "setup/approve-basket",
+      "hash": "0xf5b9fdae2b161fae00d7c1bfcbcec0f7983083ba3409f898d6303cb04a0c9805",
+      "action": "setup/approve-basket",
+      "actor": "owner",
+      "value": "0",
+      "block": "11787016",
+      "gasCost": "61725131511696"
+    },
+    {
+      "name": "setup/trade-basket",
+      "hash": "0x3109d7fc693ae557804c87f3bb1bf85f97da150bb1c636aa53d731e7413d3997",
+      "action": "setup/trade-basket",
+      "actor": "owner",
+      "value": "0",
+      "block": "11787018",
+      "gasCost": "64110798915516"
+    },
+    {
+      "name": "roof/verify",
+      "hash": "0xa0e31d073a8ea118506fe373bfea6acdf7a2dee6526322a55495ab2676340263",
+      "action": "roof/verify",
+      "actor": "owner",
+      "value": "0",
+      "block": "11787020",
+      "gasCost": "43379905039654"
+    },
+    {
+      "name": "roof/list",
+      "hash": "0xafbde8762dcd8b0118c8560b13081f421eee411690dfcb849026f2a1c827c925",
+      "action": "roof/list",
+      "actor": "owner",
+      "value": "0",
+      "outputId": "1",
+      "block": "11787021",
+      "gasCost": "201311381591110"
+    },
+    {
+      "name": "roof/purchase",
+      "hash": "0xb09ca5256562dfd44d3cd9aa8843d64188ef0f0604eb1f83c5bdb8c6c6f8b9b3",
+      "action": "roof/purchase",
+      "actor": "investorB",
+      "value": "0",
+      "block": "11787022",
+      "gasCost": "185866202194822"
+    },
+    {
+      "name": "roof/activate",
+      "hash": "0x18a77a16f02012cfd92b13161818d9393c52273f227a5fd356c025c89a2f1d10",
+      "action": "roof/activate",
+      "actor": "owner",
+      "value": "0",
+      "block": "11787024",
+      "gasCost": "56226993034650"
+    },
+    {
+      "name": "roof/revenue",
+      "hash": "0xc16eef7ed0ed531a05824f217d87568e5d3a1d6d4f9012e1252d04bf7652d5d5",
+      "action": "roof/revenue",
+      "actor": "owner",
+      "value": "0",
+      "block": "11787025",
+      "gasCost": "122943407957880"
+    },
+    {
+      "name": "roof/claim",
+      "hash": "0x5dc6545942d2ff6ea504954feaf4d50d13135c3fcc9db4cdab6c34319370e09e",
+      "action": "roof/claim",
+      "actor": "investorB",
+      "value": "0",
+      "block": "11787027",
+      "gasCost": "106221633854507"
+    },
+    {
+      "name": "roof/resell",
+      "hash": "0x1bab57300b9104ab2d70e9b86f78e8ea72bb6c758454192de18baf03af85b5da",
+      "action": "roof/resell",
+      "actor": "investorB",
+      "value": "0",
+      "outputId": "2",
+      "block": "11787028",
+      "gasCost": "201059074628445"
+    },
+    {
+      "name": "roof/resale-purchase",
+      "hash": "0x6e9416fd54296af5a7ce5d45939f00fab9b05620c9f21942668b25a45135029e",
+      "action": "roof/resale-purchase",
+      "actor": "owner",
+      "value": "0",
+      "block": "11787030",
+      "gasCost": "211171911521350"
+    },
+    {
+      "name": "space-0/register",
+      "hash": "0xdad2fd1f6d040a0ea3380c2ead0e818aa42b1cbefc3d8f86ef0089779f7f62fa",
+      "action": "space-0/register",
+      "actor": "owner",
+      "value": "0",
+      "outputId": "2",
+      "block": "11787032",
+      "gasCost": "2398637380139664"
+    },
+    {
+      "name": "space-0/submit",
+      "hash": "0xfe96171e598265e677a60bd64a2a83f25aa87ecb3b4ce04ef9fb114968d946f5",
+      "action": "space-0/submit",
+      "actor": "owner",
+      "value": "0",
+      "block": "11787033",
+      "gasCost": "38768396932640"
+    },
+    {
+      "name": "space-0/verify-asset",
+      "hash": "0x5dd2a77e79a4e5d6d587ec2015b1da149d394c98d446dcacc64fa73c9103504d",
+      "action": "space-0/verify-asset",
+      "actor": "owner",
+      "value": "0",
+      "block": "11787034",
+      "gasCost": "79728825139920"
+    },
+    {
+      "name": "space-0/issue",
+      "hash": "0xe76bae990e10eeb0d70c5255453fec523ca1a0fb296ec467339c7387fed9628d",
+      "action": "space-0/issue",
+      "actor": "owner",
+      "value": "0",
+      "outputId": "2",
+      "block": "11787035",
+      "gasCost": "751228454175828"
+    },
+    {
+      "name": "space-0/verify-right",
+      "hash": "0xd8fffc7d4cdac25282505e1849ce2d2407b89da6dd4fe6c5932963248c4b0166",
+      "action": "space-0/verify-right",
+      "actor": "owner",
+      "value": "0",
+      "block": "11787036",
+      "gasCost": "45551486119496"
+    },
+    {
+      "name": "space-0/list",
+      "hash": "0xa1bd500c8ba9704a806abebe57c81587890bda0334f6f1198db6ad763f7f2da5",
+      "action": "space-0/list",
+      "actor": "owner",
+      "value": "0",
+      "outputId": "3",
+      "block": "11787038",
+      "gasCost": "218513489980464"
+    },
+    {
+      "name": "space-0/purchase",
+      "hash": "0xf5be2350dbb756e122b185c61ca386a807afd41b8c65b205ee0207c4c69dcd96",
+      "action": "space-0/purchase",
+      "actor": "investorB",
+      "value": "0",
+      "block": "11787039",
+      "gasCost": "168905621321182"
+    },
+    {
+      "name": "space-0/activate",
+      "hash": "0x27d484ef029bab5ef6c153392a1ade3c9cea446988e97f615c831fa829757413",
+      "action": "space-0/activate",
+      "actor": "owner",
+      "value": "0",
+      "block": "11787041",
+      "gasCost": "53951191017108"
+    },
+    {
+      "name": "space-0/revenue",
+      "hash": "0x17f5f37c0c69a7dcd6f67a813b8a7d55d35bbdce47d6c06c1598baf4b36485b2",
+      "action": "space-0/revenue",
+      "actor": "owner",
+      "value": "0",
+      "block": "11787042",
+      "gasCost": "104651421341790"
+    },
+    {
+      "name": "space-1/register",
+      "hash": "0x4df5c60a9af04af6c8adb35c58032c4df8aa472411aad33673ab4027360e435e",
+      "action": "space-1/register",
+      "actor": "owner",
+      "value": "0",
+      "outputId": "3",
+      "block": "11787043",
+      "gasCost": "2374666209334380"
+    },
+    {
+      "name": "space-1/submit",
+      "hash": "0xa2528f1593596fcb05b9729f21d869e9b22def1169687a320d0bac98fd6ee153",
+      "action": "space-1/submit",
+      "actor": "owner",
+      "value": "0",
+      "block": "11787045",
+      "gasCost": "38965185262052"
+    },
+    {
+      "name": "space-1/verify-asset",
+      "hash": "0xbbd4c757b1f4c410417e5a5b8394ad1ad5efad761e3e1fa601bfca9bbd95a6d4",
+      "action": "space-1/verify-asset",
+      "actor": "owner",
+      "value": "0",
+      "block": "11787047",
+      "gasCost": "76065582806784"
+    },
+    {
+      "name": "space-1/issue",
+      "hash": "0x9fabc9e1289918cdd34a1792c45b60230f92d702a3b8abaf2ace66e14497d030",
+      "action": "space-1/issue",
+      "actor": "owner",
+      "value": "0",
+      "outputId": "3",
+      "block": "11787049",
+      "gasCost": "771813539651700"
+    },
+    {
+      "name": "space-1/verify-right",
+      "hash": "0x753a2862ee3f4f2a346f54dafdda02ea5e2c5d4247285ec440358f722b867b56",
+      "action": "space-1/verify-right",
+      "actor": "owner",
+      "value": "0",
+      "block": "11787051",
+      "gasCost": "45770524934480"
+    },
+    {
+      "name": "space-1/list",
+      "hash": "0x948ae1ec9ef01d6916baa7a0f10da516bf0a329d3e316d121af8e1806f73fac5",
+      "action": "space-1/list",
+      "actor": "owner",
+      "value": "0",
+      "outputId": "4",
+      "block": "11787052",
+      "gasCost": "224694528024490"
+    },
+    {
+      "name": "space-1/purchase",
+      "hash": "0xc81434e5424e9927f76133dcbeeabf2ef3c1de148c3818fc349a7f744538116c",
+      "action": "space-1/purchase",
+      "actor": "investorB",
+      "value": "0",
+      "block": "11787053",
+      "gasCost": "172914306969386"
+    },
+    {
+      "name": "space-1/activate",
+      "hash": "0x0091a11decce17edc45b5383fa56da5e5554eb3531926bc176c0a1f950f19be7",
+      "action": "space-1/activate",
+      "actor": "owner",
+      "value": "0",
+      "block": "11787055",
+      "gasCost": "49537776117504"
+    },
+    {
+      "name": "space-1/revenue",
+      "hash": "0xb986457c943af0559a34e790e15737e557aa60090c95bb504197a40c097e18d3",
+      "action": "space-1/revenue",
+      "actor": "owner",
+      "value": "0",
+      "block": "11787057",
+      "gasCost": "119714729051283"
+    },
+    {
+      "name": "space-2/register",
+      "hash": "0x4dcb51cd198494f87577f9dc0df142635ca2e54859c72b66932ee9ff35aedcba",
+      "action": "space-2/register",
+      "actor": "owner",
+      "value": "0",
+      "outputId": "4",
+      "block": "11787059",
+      "gasCost": "793589150685842"
+    },
+    {
+      "name": "space-2/submit",
+      "hash": "0x0d2bde1182fe90ddefd94e4bee682aa3fae30ce95b422ec29f21abd6b1ca6080",
+      "action": "space-2/submit",
+      "actor": "owner",
+      "value": "0",
+      "block": "11787061",
+      "gasCost": "41673016133400"
+    },
+    {
+      "name": "space-2/verify-asset",
+      "hash": "0x53ce8abfe64b74cf000f2ae6ef325c90458c87a7d20e04a409e870387ffb7167",
+      "action": "space-2/verify-asset",
+      "actor": "owner",
+      "value": "0",
+      "block": "11787063",
+      "gasCost": "74894318017920"
+    },
+    {
+      "name": "space-2/issue",
+      "hash": "0x8cfcf1eef161a127ed504ae58d9834fff2f80d87e0c3a3b42e04c678841054a8",
+      "action": "space-2/issue",
+      "actor": "owner",
+      "value": "0",
+      "outputId": "4",
+      "block": "11787064",
+      "gasCost": "805017803000994"
+    },
+    {
+      "name": "space-2/verify-right",
+      "hash": "0xf4046d1f9b2a7369b2ebe82a56c209f20e8556732d1e5c267a8dbb27703d0f43",
+      "action": "space-2/verify-right",
+      "actor": "owner",
+      "value": "0",
+      "block": "11787065",
+      "gasCost": "71974051046590"
+    },
+    {
+      "name": "space-2/list",
+      "hash": "0x997c569c0c9a22a4bdf7532b643b3acf3fef8ba78f42ec099350ab0ef09fbe84",
+      "action": "space-2/list",
+      "actor": "owner",
+      "value": "0",
+      "outputId": "5",
+      "block": "11787066",
+      "gasCost": "216851426046010"
+    },
+    {
+      "name": "basket/create",
+      "hash": "0x668c9b3442efa976a0e2fafbfd1b42afbd13b5094eab4bcbf46dca2ccff7e0b6",
+      "action": "basket/create",
+      "actor": "owner",
+      "value": "0",
+      "outputId": "1",
+      "block": "11787067",
+      "gasCost": "570650470202592"
+    },
+    {
+      "name": "basket/mint",
+      "hash": "0x52e95e8371f2d2bcbd34731a4758efe5f09530e356cc8dee651f67f31623c17f",
+      "action": "basket/mint",
+      "actor": "owner",
+      "value": "0",
+      "block": "11787068",
+      "gasCost": "660010368243798"
+    },
+    {
+      "name": "basket/list",
+      "hash": "0x58b8c1fa48ffe3bc4b5b24bd03eae85e02fd78b77d5b935fa3743c8efb607c1f",
+      "action": "basket/list",
+      "actor": "owner",
+      "value": "0",
+      "outputId": "6",
+      "block": "11787070",
+      "gasCost": "247714609808973"
+    },
+    {
+      "name": "basket/purchase",
+      "hash": "0xded802ed63966e6b76d07e3983b079f17160ea0ce0d0a0ed1441edeb9a201c8c",
+      "action": "basket/purchase",
+      "actor": "investorB",
+      "value": "0",
+      "block": "11787071",
+      "gasCost": "281138149085672"
+    },
+    {
+      "name": "basket/revenue-1",
+      "hash": "0xe8034c425591d404749ea79af90edf4c948a885b8eaf592f9a7053efe13ecf1e",
+      "action": "basket/revenue-1",
+      "actor": "owner",
+      "value": "0",
+      "block": "11787072",
+      "gasCost": "90705471937041"
+    },
+    {
+      "name": "basket/revenue-2",
+      "hash": "0xe2e0143068bb815cfc0427b2e0e4c88a6c446eac823539d82ec691628e00f0e3",
+      "action": "basket/revenue-2",
+      "actor": "owner",
+      "value": "0",
+      "block": "11787074",
+      "gasCost": "84688122079977"
+    },
+    {
+      "name": "basket/revenue-3",
+      "hash": "0x355dd7f2563a4de5c6caae47aa411d8e642e8e7b716a85ebe0d18506ce4fc966",
+      "action": "basket/revenue-3",
+      "actor": "owner",
+      "value": "0",
+      "block": "11787075",
+      "gasCost": "89879994303216"
+    },
+    {
+      "name": "basket/claim",
+      "hash": "0x55d6bd99adb677de8868364629361c62cd3b9e1e3e92f9b20ee321505d7fbb66",
+      "action": "basket/claim",
+      "actor": "investorB",
+      "value": "0",
+      "block": "11787076",
+      "gasCost": "290182076551356"
+    },
+    {
+      "name": "basket/redeem",
+      "hash": "0x29c86f83cac4132a437eb489bb2a05f160a18b1d7aa335417c7257e2da70517b",
+      "action": "basket/redeem",
+      "actor": "owner",
+      "value": "0",
+      "block": "11787077",
+      "gasCost": "381211496397450"
+    }
+  ]
+}

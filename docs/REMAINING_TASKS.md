@@ -1,6 +1,14 @@
 # 残タスクと完成条件
 
-更新: 2026-09-26。現状の根拠は[機能一覧](FEATURE_STATUS.md)、[実tx記録](../deployments/testnet-demo-receipts.json)。完了を判定する基準は機能数ではなく、Register → Verify → Tokenize → Trade → Earn → Composeの通し実演。
+更新: 2026-09-27。現状の根拠は[機能一覧](FEATURE_STATUS.md)、[実tx記録](../deployments/testnet-demo-receipts.json)。完了を判定する基準は機能数ではなく、Register → Verify → Tokenize → Trade → Earn → Composeの通し実演。
+
+## 最新の接続状況 — 2026-09-27
+
+公開メインは **Sepolia (`11155111`)** へ切替済み。MultiBaasの9契約link、DApp権限、CORS、未署名取引の組み立て、ENS名と発行権限の読取りを確認。英語コミット `996ccf2` / `bb3c5a2`。公開deployment: `dpl_4cbF55bu8bXPukdkk8XT7boWmJqC`。旧Curvegrid Testnetの50資産・448取引は保持し、全件移行しない。初期記録の扱いと最新の実行証跡は [SEPOLIA_CUTOVER.md](SEPOLIA_CUTOVER.md) を参照。
+
+Sepoliaの追加シナリオも完了。4資産・4権利（稼働3件）・混合バスケット1件、51取引成功。41市場操作の索引、37,700 MockJPYの売買、5,800 MockJPYの入金、償還後の原資産預託数量を照合済み。公開ENS Indexの登録表示・権限履歴・Explorerリンクも確認。
+
+残りは実ウォレット拡張での通し実演、外部Webhookの実配送と永続化、ピッチのリハーサル。下記の旧deployment番号・「公開メインはCurvegrid」等は各作業時点の履歴。
 
 ## 追加の地図・ENS・データ改善
 

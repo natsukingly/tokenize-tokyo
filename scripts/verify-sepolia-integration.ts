@@ -1,7 +1,7 @@
 import "./env";
-import { writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { AdminApi, Configuration } from "@curvegrid/multibaas-sdk";
-import { config, labels, type ContractKey } from "../src/lib/config";
+import { config, labels } from "../src/lib/config";
 import { clients, loadMarket, readContract } from "../src/lib/multibaas";
 import { loadEnsBinding } from "../src/lib/ens/authority";
 import { loadEnsAudit } from "../src/lib/ens/events";
@@ -82,6 +82,96 @@ async function main() {
     );
   }
   if (!denied) throw new Error("Frontend key is not restricted");
+  let scenario;
+  if (process.argv.includes("--scenario")) {
+    const receipts = JSON.parse(
+      readFileSync("deployments/sepolia-demo-receipts.json", "utf8"),
+    ) as {
+      chainId: number;
+      registry: string;
+      actors: Record<string, string>;
+      confirmedTransactions: number;
+      transactions: {
+        name: string;
+        hash: string;
+        block: string;
+        outputId?: string;
+      }[];
+    };
+    if (
+      receipts.chainId !== config.chainId ||
+      receipts.registry.toLowerCase() !==
+        config.addresses.registry.toLowerCase()
+    )
+      throw new Error("Scenario receipts belong to another deployment");
+    const actions = receipts.transactions.filter(
+      (tx) => !tx.name.startsWith("setup/"),
+    );
+    if (!actions.some((tx) => tx.name === "basket/redeem"))
+      throw new Error("Scenario has not finished");
+    for (const tx of actions) {
+      if (
+        !state.events.some(
+          (event) =>
+            event.txHash.toLowerCase() === tx.hash.toLowerCase() &&
+            event.block === Number(tx.block),
+        )
+      )
+        throw new Error(`Scenario action is not indexed: ${tx.name}`);
+    }
+    const basketId = actions.find(
+      (tx) => tx.name === "basket/create",
+    )?.outputId;
+    const basket = state.baskets.find((item) => item.id === basketId);
+    if (
+      !basket ||
+      basket.rightIds.length !== 3 ||
+      basket.units.some((unit) => unit !== "1")
+    )
+      throw new Error("Expected the three-component mixed basket");
+    for (const id of basket.rightIds) {
+      if (
+        String(
+          await readContract("rights", "balanceOf", [
+            config.addresses.basket,
+            id,
+          ]),
+        ) !== "2"
+      )
+        throw new Error(`Basket custody mismatch for right ${id}`);
+    }
+    for (const actor of ["owner", "investorB"]) {
+      if (
+        String(
+          await readContract("basket", "balanceOf", [
+            receipts.actors[actor],
+            basket.id,
+          ]),
+        ) !== "1"
+      )
+        throw new Error(`Basket balance mismatch for ${actor}`);
+    }
+    // This is a snapshot check for the bounded seed, not an invariant after subsequent user trades.
+    if (
+      formatEther(BigInt(state.metrics.volume)) !== "37700" ||
+      formatEther(BigInt(state.metrics.deposited)) !== "5800"
+    )
+      throw new Error(
+        "Seed totals differ; inspect subsequent activity before accepting the snapshot",
+      );
+    scenario = {
+      confirmedTransactions: receipts.confirmedTransactions,
+      indexedMarketActions: actions.length,
+      activeRights: state.rights.filter((right) => right.status === "Active")
+        .length,
+      basketId: basket.id,
+      basketComponents: basket.rightIds,
+      custodyUnitsPerRight: "2",
+      ownerBasketShares: "1",
+      investorBasketShares: "1",
+      snapshotTotalsMatched: true,
+    };
+  }
   const report = {
     checkedAt: new Date().toISOString(),
     chainId: 11155111,
@@ -99,6 +189,7 @@ async function main() {
     ensAuditRecords: audit.length,
     unsignedComposition: true,
     dappAdminAccessDenied: denied,
+    ...(scenario ? { scenario } : {}),
     limitations: [
       "Fictional assets and simulated ownership verification",
       "Initial records use RPC bootstrap, not MultiBaas backfill",

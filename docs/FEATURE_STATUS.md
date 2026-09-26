@@ -1,6 +1,6 @@
 # 基本機能と実装状況
 
-更新: 2026-09-26。**トークナイズ後の売買・収益分配・Basket運用は、実際のSolidityで動作する。公開サイトのメイン画面は `multibaas` モードで実ウォレット取引。`/demo` は別のシミュレーション。** この区別をピッチでも明示する。
+更新: 2026-09-27。**トークナイズ後の売買・収益分配・Basket運用は、実際のSolidityで動作する。公開サイトのメイン画面は `multibaas` モードで実ウォレット取引。`/demo` は別のシミュレーション。** この区別をピッチでも明示する。
 
 最新のウォレット更新: TypeScript / production build、78 unit tests、公開サイトの購入→Portfolio→再出品→取消E2Eが通過。[実取引レポート](../deployments/browser-wallet-verification.json)。以前のコントラクト検証では25 Foundry tests、既存画面では15 browser E2Eが通過。MultiBaas側は630 events、426 scenario actionのhash/event一致、3 Basketのcustody・残高を照合済み。[実接続検証レポート](../deployments/testnet-demo-verification.json)。
 
@@ -35,18 +35,18 @@
 
 | 機能 | 現在の状態 |
 | --- | --- |
-| EVMネットワーク | Curvegrid Testnet / chain ID `2017072401`。Ethereum mainnet/Sepoliaとは別 |
-| コントラクト | Registry / Rights / Marketplace / RevenueVault / BasketVault / MockJPYの6本を配置・link済み |
+| EVMネットワーク | 公開メインは Ethereum Sepolia / chain ID `11155111`。旧Curvegrid Testnet (`2017072401`) の50資産・448取引も保持。残高移行やbridgeはしない |
+| コントラクト | Sepoliaに市場6契約＋ENS Authority / building registry / resolverの計9契約をlink済み |
 | MultiBaas SDK | state read / unsigned compose / DApp key権限制限を実接続確認 |
 | Event Indexing / Queries | lifecycle取得、売買高・入金・出金の集計を実接続確認。追加取引は索引に反映されるまで待機が必要 |
 | 再現可能な証跡 | `deployments/testnet-demo-receipts.json`に448件。`npm run demo:verify:testnet`で各scenario actionのeventとcustodyを照合 |
-| Browser wallet | EIP-6963/注入wallet接続、ネットワーク追加/切替、署名付きテストETH取得、MockJPY mint、購入、取引状態表示。opt-inブラウザテストは制御したテスト署名者を使用。外部ウォレット拡張の手動確認は別途 |
+| Browser wallet | EIP-6963/注入wallet接続、ネットワーク追加/切替、Curvegrid専用の署名付きテストETH取得（Sepoliaは外部faucet）、MockJPY mint、購入、取引状態表示。opt-inブラウザテストは制御したテスト署名者を使用。外部ウォレット拡張の手動確認は別途 |
 | Transaction Explorer | `/tx/[hash]`。MultiBaas SDKから取引・receipt・decoded関数/events。Activity/送信直後/ウォレット履歴からリンク |
 | API keys | frontend DApp key / server admin keyを分離。admin endpoint拒否を確認 |
 | Webhook | HMAC、時刻、delivery重複排除、revision polling実装・ローカル確認。**実サービスからの配送は未確認** |
 | Cloud Wallet / TXM | adapter実装済み、Azure/Cloud Wallet未設定・未実行 |
 | Safe | 未実装 |
-| ENSv2 | ENS Index画面で階層プレビュー・検索・地図連携。名前生成・registry読取・限定roleのunsigned descriptorを実装。**登録・解決・権限委譲・ERC-1155発行連携を実装。公式コントラクト15テスト／ローカルSepolia fork検証済み。公開Sepoliaの登録・限定発行・取消検証済み。Sepolia MultiBaasのAPI設定とサイト切替は残り。ENSV2_DESIGN.md参照** |
+| ENSv2 | ENS Index画面で階層プレビュー・検索・地図連携。名前生成・registry読取・限定roleのunsigned descriptorを実装。**登録・解決・権限委譲・ERC-1155発行連携を実装。公式コントラクト15テスト／ローカルSepolia fork検証済み。公開Sepoliaの登録・限定発行・取消検証済み。Sepolia MultiBaasのAPI設定・9契約link・公開サイト切替済み。初期記録の出典はSEPOLIA_CUTOVER.md参照。実ウォレット拡張による通し署名は別途確認** |
 | コンプライアンス | 譲渡制限/allowlist/Verifier権限は実装。KYC/AML、実所有権確認、規制対応、法的契約は未実装。準拠済みと説明しない |
 
 ## 「何のトークンか」

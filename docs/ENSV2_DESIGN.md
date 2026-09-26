@@ -1,15 +1,15 @@
 # ENSv2: registered spaces and delegated issuance
 
-Status: **public Sepolia registration, resolution, asset binding and delegated ERC-1155 issuance are verified**. The operator issued 10 units of right #1 to the asset issuer; interior/other-asset issuance and issuance after ENS-role revocation were rejected. Test permissions were revoked afterward. The hosted main app remains on Curvegrid Testnet while the newly created Sepolia MultiBaas deployment is being configured.
+Status: **public Sepolia registration, resolution, asset binding and delegated ERC-1155 issuance are verified**. The operator issued 10 units of right #1 to the asset issuer; interior/other-asset issuance and issuance after ENS-role revocation were rejected. Test permissions were revoked afterward. The hosted main app now uses Sepolia MultiBaas. Nine contracts are linked; the registered space, binding and permission history are available in ENS Index. The original Curvegrid Testnet deployment remains intact. See [cutover and data provenance](SEPOLIA_CUTOVER.md).
 
-日本語: **公開Sepoliaで登録・名前解決・資産との紐付け・委譲先からのERC-1155発行を確認済み**。担当者から登録者へRight #1を10口発行し、内装・別資産・ENS権限取消後の発行は拒否された。検証後の権限は取消済み。Sepolia用MultiBaasの無料環境は作成済みで、API設定・索引・サイト切替が残る。公開サイトはまだCurvegrid Testnetを使用する。
+日本語: **公開Sepoliaで登録・名前解決・資産との紐付け・委譲先からのERC-1155発行を確認済み**。担当者から登録者へRight #1を10口発行し、内装・別資産・ENS権限取消後の発行は拒否された。検証後の権限は取消済み。Sepolia用MultiBaasへの9契約の接続・DApp権限制限・CORS設定・公開サイト切替が完了。ENS Indexから登録済み空間と権限履歴を確認できる。既存Curvegrid Testnetの資産・履歴は保持する。
 
 ## Public evidence
 
 - Network: Ethereum Sepolia (`11155111`). [Deployment manifest](../deployments/11155111.json), [delegation proof](../deployments/ens-v2-sepolia-delegation-proof.json).
 - Registered name: `rooftop.building-1.chiyoda.tokenizetokyo-demo-2026.eth`.
 - [Parent registration](https://sepolia.etherscan.io/tx/0xa4e8e8fe110aa51bbe10f9f4e2c43af58af20f51bd769e5c73604f90dc4db858), [space binding](https://sepolia.etherscan.io/tx/0xb6e13414008b877a8e3feb6332146869a7bacd257c170431f009b299a1535078), [delegated issuance](https://sepolia.etherscan.io/tx/0x10da73ed264c75e700f147fc687b0a4298a04cd818c1e72c18eca09df4cd0696), [ENS-role revocation](https://sepolia.etherscan.io/tx/0xa4ca4b5be431ebb9fe19f819d142288058cafbe88fd54fda586afb1a5dbf0989).
-- New MultiBaas deployment: `tokenize-tokyo-sepolia`, Ethereum Sepolia, Free plan. API permissions, nine contract links and hosted-app cutover are pending; creation alone is not a working app integration.
+- New MultiBaas deployment: `tokenize-tokyo-sepolia`, Ethereum Sepolia, Free plan. DApp permissions, nine contract links, unsigned composition, ENS binding reads and hosted cutover are verified. Initial finalized RPC records cover the setup before MultiBaas indexing starts; they are explicitly labelled. Browser-extension signing of the entire delegated issuance flow remains a separate rehearsal.
 - Fifteen official-bytecode Foundry integration tests (including 256 quota fuzz cases), the full 41-test contract suite and the local Sepolia fork also passed.
 
 ## Why the rights also move to Sepolia
