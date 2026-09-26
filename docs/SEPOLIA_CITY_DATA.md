@@ -15,6 +15,14 @@ Evidence: [public receipts](../deployments/sepolia-city-receipts.json), [contrac
 
 The issuer's actual outflow and network fees are reported separately from the conservative budget counter. Adding investor gas allocations to network fees counts some allocated gas twice; it is a safety allowance, not the issuer's net spending.
 
+## Operator gas is held in the Cloud Wallet
+
+The operating wallet is **`0xE90FB4cABa8bE81391389A2dA4E2192c69151a17`**, a Sepolia Cloud Wallet linked to MultiBaas and verified by recovering a fresh signature. It is separate from the deployer/issuer `0x71bE0c03F807Ad83F290aDddb842f14652c80554` used by the city seed.
+
+At the user's request, the operator was topped up to **0.05 Sepolia ETH** on 2026-09-27 JST. The transfer added 0.048241259602139388 ETH; receipt-time balances are preserved in the [funding report](../deployments/sepolia-cloud-wallet-funding.json) and [Sepolia transaction](https://sepolia.etherscan.io/tx/0x8f6c169fcc91d34de86bc9d8e94e529ba151fcbe2bf5bf6f0b8e84561ad1a992). Later authorized operator transactions may consume that gas. The seed uses only the deployer's remaining funds, with a separate 0.003 ETH deployer buffer. It never signs with or spends the Cloud Wallet. This incoming transfer does not grant contract roles or enable sponsored user transactions.
+
+日本語: 運営用のガス代は、デプロイ用アドレスとは別の**Cloud Walletに0.05 Sepolia ETHを補充済み**です。追加データの発行はデプロイ用ウォレットの残額だけで行い、こちらにも0.003 ETHを残します。運営用の残高をデータ発行で消費しません。補充は権限付与や利用者のガス代肩代わり機能の有効化とは別工程です。
+
 ## Catalog and lifecycle
 
 The additional catalog contains 28 examples of each kind: rooftop, vacant home, idle land, parking, storage, advertising and other community space. There are also 28 examples of each lifecycle below, distributed across those seven kinds.

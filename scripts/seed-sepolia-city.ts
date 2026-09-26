@@ -34,6 +34,8 @@ import { clients } from "../src/lib/multibaas";
 
 // Additive testnet-only scenario. No contract migration, role changes or historical backdating.
 const MAX_SPEND = parseEther("0.28");
+// Deployer buffer only. The operator's 0.05 ETH is funded separately in its
+// Cloud Wallet; this script never signs with or spends that wallet.
 const OWNER_RESERVE = parseEther("0.003");
 let runBudget = MAX_SPEND;
 const MAX_GAS_PRICE = 3_000_000_000n;

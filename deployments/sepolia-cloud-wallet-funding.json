@@ -1,0 +1,14 @@
+{
+  "verifiedAt": "2026-09-26T17:13:35.952Z",
+  "chainId": 11155111,
+  "from": "0x71bE0c03F807Ad83F290aDddb842f14652c80554",
+  "to": "0xE90FB4cABa8bE81391389A2dA4E2192c69151a17",
+  "transferredETH": "0.048241259602139388",
+  "hash": "0x8f6c169fcc91d34de86bc9d8e94e529ba151fcbe2bf5bf6f0b8e84561ad1a992",
+  "block": "11787588",
+  "gasFeeETH": "0.00002810993745",
+  "cloudWalletBalanceETH": "0.05",
+  "deployerBalanceETH": "0.059496157650994785",
+  "cloudWalletSigningVerified": true,
+  "description": "Sepolia gas funding for the configured Cloud Wallet operator. Incoming funding does not enable sponsored tokenization or grant roles."
+}
