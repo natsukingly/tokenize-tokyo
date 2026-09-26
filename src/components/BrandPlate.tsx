@@ -1,8 +1,8 @@
 "use client";
 import { useLayoutEffect, useRef, useState } from "react";
 /** Logo lab picks, rendered inline so app fonts apply. variant: "plate" (10-A1), "stack" (01-A1), "grid" (09-x3). */
-export type BrandVariant = "plate" | "stack" | "stackw" | "grid" | "jp" | "bar" | "mono" | "terminal";
-export const BRAND_VARIANTS: BrandVariant[] = ["stack", "stackw", "plate", "grid", "jp", "bar", "mono", "terminal"];
+export type BrandVariant = "plate" | "stack" | "stackw" | "grid" | "jp" | "bar" | "mono" | "monow" | "terminal";
+export const BRAND_VARIANTS: BrandVariant[] = ["stack", "stackw", "plate", "grid", "jp", "bar", "mono", "monow", "terminal"];
 const Y = "#f0df37", MUTED = "#8b9098", INK = "#f1f2f3";
 function Steps({ x, y, s, color = Y }: { x: number; y: number; s: number; color?: string }) {
   return (
@@ -10,6 +10,14 @@ function Steps({ x, y, s, color = Y }: { x: number; y: number; s: number; color?
       <path d="M24 6h16l3 9H21Z" />
       <rect x="16" y="19" width="32" height="10" rx="1" />
       <path d="M10 33h44v11a2 2 0 0 1-2 2H42L32 61 22 46H12a2 2 0 0 1-2-2Z" />
+    </g>
+  );
+}
+function Ring({ cx, cy, r, color }: { cx: number; cy: number; r: number; color: string }) {
+  return (
+    <g>
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke={color} strokeWidth={r * 0.42} />
+      <circle cx={cx} cy={cy} r={r * 0.29} fill={color} />
     </g>
   );
 }
@@ -24,7 +32,7 @@ function PinRoof({ x, y, s, color = Y, grid = color }: { x: number; y: number; s
 export function BrandMark({ size = 32, className = "", variant = "stack" }: { size?: number; className?: string; variant?: BrandVariant }) {
   return (
     <svg className={className} width={size} height={size} viewBox="0 0 64 64" aria-hidden="true" style={{ color: Y }}>
-      {variant === "stack" ? <PinRoof x={0} y={0} s={64} /> : variant === "stackw" ? <PinRoof x={0} y={0} s={64} color={INK} grid={Y} /> : <Steps x={0} y={0} s={64} />}
+      {variant === "mono" || variant === "monow" ? <Ring cx={32} cy={32} r={22} color={variant === "monow" ? INK : Y} /> : variant === "stack" ? <PinRoof x={0} y={0} s={64} /> : variant === "stackw" ? <PinRoof x={0} y={0} s={64} color={INK} grid={Y} /> : <Steps x={0} y={0} s={64} />}
     </svg>
   );
 }
@@ -79,7 +87,7 @@ export default function BrandPlate({ className = "", width = 190, variant = "sta
       </svg>
     );
   }
-  if (variant === "mono") return <MonoWordmark className={className} width={width} label={label} />;
+  if (variant === "mono" || variant === "monow") return <MonoWordmark className={className} width={width} label={label} ring={variant === "monow" ? INK : Y} />;
   if (variant === "terminal") {
     const height = Math.round((width * 64) / 190);
     return (
@@ -107,7 +115,7 @@ export default function BrandPlate({ className = "", width = 190, variant = "sta
 }
 
 /** "TOKENIZE TOKY" + a target ring standing in for the last O; the ring is placed from the measured text width. */
-function MonoWordmark({ className, width, label }: { className: string; width: number; label: string }) {
+function MonoWordmark({ className, width, label, ring }: { className: string; width: number; label: string; ring: string }) {
   const textRef = useRef<SVGTextElement>(null);
   const [end, setEnd] = useState(150);
   useLayoutEffect(() => {
@@ -122,8 +130,7 @@ function MonoWordmark({ className, width, label }: { className: string; width: n
   return (
     <svg className={className} width={width} height={height} viewBox="0 0 190 64" role="img" aria-label={label}>
       <text ref={textRef} x="0" y="30" fontFamily="'Manrope', 'DM Sans', sans-serif" fontWeight="800" fontSize="21" fill={INK} style={{ ...upright, letterSpacing: "-0.4px" }}>TOKENIZE TOKY</text>
-      <circle cx={cx} cy="22.6" r={r} fill="none" stroke={Y} strokeWidth="3" />
-      <circle cx={cx} cy="22.6" r="2.1" fill={Y} />
+      <Ring cx={cx} cy={22.6} r={r} color={ring} />
       <text x="0.5" y="50" fontFamily="'DM Sans', 'Noto Sans JP', sans-serif" fontWeight="500" fontSize="7" fill={MUTED} style={{ ...upright, letterSpacing: "2.4px" }}>東京トークン化計画 · URBAN RIGHTS</text>
     </svg>
   );
