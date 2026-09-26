@@ -95,6 +95,12 @@
     box-shadow:0 0 10px #d7f98588;
   }
 
+  /* ---------- TOKENIZE TOKY[O] wordmark logo ---------- */
+  .tt-logo-row{display:flex;align-items:center;gap:16px;}
+  .tt-logo-svg{display:block;flex:none;}
+  .tt-logo-footer{margin-top:16px;}
+  .tt-event-tag{font-size:10px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase;color:#a7b69f;white-space:nowrap;}
+
   .slide-index{
     position:absolute;
     top:64px; right:76px;
@@ -610,10 +616,19 @@
   .right-dimensions{margin:12px 0 34px;display:grid;gap:20px;}
   .right-dimensions p{font-size:22px;display:flex;align-items:center;gap:24px;}
   .right-dimensions span{display:inline-block;width:64px;color:var(--teal);font-size:12px;letter-spacing:1.4px;}
-  #s5 h1{font-size:45px;line-height:1.1;}
-  #s5 .roadmap-cols{margin-top:28px;}
-  #s5 .rmap-block{padding:21px 26px;}
-  #s5 .closing-line{margin-top:26px;padding-top:20px;font-size:22px;}
+  #s5 h1{font-size:42px;line-height:1.1;}
+  #s5 .roadmap-cols{margin-top:20px;}
+  #s5 .rmap-block{padding:16px 22px;}
+  #s5 .rmap-block + .rmap-block{margin-top:14px;}
+  #s5 .rmap-block ul{gap:8px;margin-top:10px;}
+  #s5 .rmap-block li{font-size:14px;}
+  #s5 .rmap-tags{gap:8px;margin-top:10px;}
+  #s5 .rmap-tags span, #s5 .portability-row span{padding:6px 12px;font-size:12px;}
+  #s5 .portability-row{margin-top:16px;}
+  #s5 .portability-caption{margin-top:6px;font-size:11px;}
+  #s5 .closing-line{margin-top:14px;padding-top:12px;font-size:18px;}
+  #s5 .tt-logo-footer{margin-top:10px;}
+  #s5 .footer-note{margin-top:6px;}
   #rehearsal{position:fixed;top:14px;right:18px;z-index:50;display:none;color:var(--lime);background:#0d1310e8;padding:8px 12px;border:1px solid var(--line);border-radius:5px;font:13px var(--font);font-variant-numeric:tabular-nums;pointer-events:none;}
   #rehearsal.visible{display:block;}
   #rehearsal.over{color:#ffbdad;}
@@ -629,7 +644,17 @@
 
     <section class="slide with-photo active" id="s1">
       <div class="slide-index">01 <span>/</span> 05</div>
-      <div class="eyebrow">ETHGlobal Tokyo 2026 · TOKENIZE TOKYO</div>
+      <div class="tt-logo-row">
+        <svg class="tt-logo-svg" width="300" height="50.5" viewBox="0 0 380 64" role="img" aria-label="TOKENIZE TOKYO — Urban Rights Protocol">
+          <g class="tt-logo">
+            <text class="tt-word" x="0" y="40" font-family="Manrope, DM Sans, sans-serif" font-weight="800" font-size="40" letter-spacing="-0.8" fill="#f1f2f3">TOKENIZE TOKY</text>
+            <circle class="tt-ring" cx="331" cy="27" r="13.5" fill="none" stroke="#f1f2f3" stroke-width="5.6"/>
+            <circle class="tt-dot" cx="331" cy="27" r="3.9" fill="#f1f2f3"/>
+            <text class="tt-sub" x="0" y="58" font-family="Manrope, DM Sans, sans-serif" font-size="9" letter-spacing="3" fill="#8b9098">東京トークン化計画 · URBAN RIGHTS PROTOCOL</text>
+          </g>
+        </svg>
+        <div class="tt-event-tag">ETHGlobal Tokyo 2026</div>
+      </div>
       <h1>Tokyo is full of<br>dormant urban capacity.</h1>
       <div class="stat-row">
         <div class="stat">
@@ -765,6 +790,14 @@
       <div class="portability-row"><span>Any 3D basemap</span><span>Any verifier network</span><span>Same rights protocol</span></div>
       <p class="portability-caption">Tokyo is the first instance, not the product.</p>
       <div class="closing-line">We don't tokenize Tokyo to speculate on it. <b>We tokenize it to put dormant assets back to work.</b></div>
+      <svg class="tt-logo-svg tt-logo-footer" width="220" height="37.05" viewBox="0 0 380 64" role="img" aria-label="TOKENIZE TOKYO">
+        <g class="tt-logo">
+          <text class="tt-word" x="0" y="40" font-family="Manrope, DM Sans, sans-serif" font-weight="800" font-size="40" letter-spacing="-0.8" fill="#f1f2f3">TOKENIZE TOKY</text>
+          <circle class="tt-ring" cx="331" cy="27" r="13.5" fill="none" stroke="#f1f2f3" stroke-width="5.6"/>
+          <circle class="tt-dot" cx="331" cy="27" r="3.9" fill="#f1f2f3"/>
+          <text class="tt-sub" x="0" y="58" font-family="Manrope, DM Sans, sans-serif" font-size="9" letter-spacing="3" fill="#8b9098">東京トークン化計画 · URBAN RIGHTS PROTOCOL</text>
+        </g>
+      </svg>
       <div class="footer-note">Demo data · simulated verification · no real property is sold</div>
     </section>
 
@@ -798,6 +831,24 @@
   var notesPanel = document.getElementById('notes-panel');
   var notesText = document.getElementById('notes-text');
 
+  function initTTLogos(){
+    document.querySelectorAll('.tt-logo').forEach(function(g){
+      var word = g.querySelector('.tt-word');
+      var ring = g.querySelector('.tt-ring');
+      var dot = g.querySelector('.tt-dot');
+      if (!word || !ring || !dot) return;
+      var svg = g.closest('svg');
+      if (svg && svg.getClientRects().length === 0) return;
+      var end;
+      try { end = word.getComputedTextLength(); } catch(e){ return; }
+      if (!end) return;
+      var r = 13.5;
+      var cx = end + 6 + r;
+      ring.setAttribute('cx', cx);
+      dot.setAttribute('cx', cx);
+    });
+  }
+
   function render(){
     slides.forEach(function(s, i){
       s.classList.toggle('active', i === current);
@@ -805,6 +856,7 @@
     counterCur.textContent = String(current + 1).padStart(2, '0');
     notesText.textContent = notes[current] || '(no notes for this slide)';
     history.replaceState(null, '', '#' + (current + 1));
+    initTTLogos();
   }
 
   function goTo(i){
@@ -871,6 +923,9 @@
   });
 
   render();
+  if (document.fonts && document.fonts.ready){
+    document.fonts.ready.then(initTTLogos);
+  }
 })();
 </script>
 

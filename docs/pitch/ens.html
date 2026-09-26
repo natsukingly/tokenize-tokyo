@@ -7,7 +7,7 @@
 <meta name="description" content="TOKENIZE TOKYO — ETHGlobal Tokyo 2026 pitch deck" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Manrope:wght@800&display=swap" rel="stylesheet" />
 <style>
   :root{
     --bg:#040705;
@@ -102,6 +102,12 @@
     color:var(--accent);
     font-weight:700;
   }
+
+  /* ---------- TOKENIZE TOKY[O] wordmark logo (deck text colour, not off-white) ---------- */
+  .tt-logo-row{display:flex;align-items:center;gap:16px;}
+  .tt-logo-svg{display:block;flex:none;}
+  .tt-logo-footer{margin-top:16px;}
+  .tt-event-tag{font-size:10px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);white-space:nowrap;}
 
   .slide-index{
     position:absolute;
@@ -851,6 +857,7 @@
   #s5 .portability-caption{ margin-top:6px !important; font-size:11px !important; }
   #s5 .closing-line{ margin-top:12px !important; padding-top:10px !important; font-size:17px !important; }
   #s5 .footer-note{ margin-top:6px !important; }
+  #s5 .tt-logo-footer{ margin-top:8px !important; }
 
 </style>
 </head>
@@ -868,7 +875,17 @@
         <p>&gt; resolving tokenizetokyo.eth … ok</p>
         <p>&gt; indexing urban rights … 7 events</p>
       </div>
-      <div class="eyebrow">ETHGlobal Tokyo 2026 · TOKENIZE TOKYO · ENS TRACK</div>
+      <div class="tt-logo-row">
+        <svg class="tt-logo-svg" width="300" height="50.5" viewBox="0 0 380 64" role="img" aria-label="TOKENIZE TOKYO — Urban Rights Protocol">
+          <g class="tt-logo">
+            <text class="tt-word" x="0" y="40" font-family="Manrope, DM Sans, sans-serif" font-weight="800" font-size="40" letter-spacing="-0.8" fill="#b9ffc4">TOKENIZE TOKY</text>
+            <circle class="tt-ring" cx="331" cy="27" r="13.5" fill="none" stroke="#b9ffc4" stroke-width="5.6"/>
+            <circle class="tt-dot" cx="331" cy="27" r="3.9" fill="#b9ffc4"/>
+            <text class="tt-sub" x="0" y="58" font-family="Manrope, DM Sans, sans-serif" font-size="9" letter-spacing="3" fill="#8b9098">東京トークン化計画 · URBAN RIGHTS PROTOCOL</text>
+          </g>
+        </svg>
+        <div class="tt-event-tag">ETHGlobal Tokyo 2026 · ENS TRACK</div>
+      </div>
       <h1>Tokyo is full of<br>dormant urban capacity.<span class="cursor" aria-hidden="true"></span></h1>
       <div class="stat-row">
         <div class="stat">
@@ -1030,6 +1047,14 @@
       <div class="portability-row"><span>Any 3D basemap</span><span>Any verifier network</span><span>Same rights protocol</span></div>
       <p class="portability-caption">Tokyo is the first instance, not the product.</p>
       <div class="closing-line">We don't tokenize Tokyo to speculate on it. <b>We tokenize it to put dormant assets back to work.</b></div>
+      <svg class="tt-logo-svg tt-logo-footer" width="220" height="37.05" viewBox="0 0 380 64" role="img" aria-label="TOKENIZE TOKYO">
+        <g class="tt-logo">
+          <text class="tt-word" x="0" y="40" font-family="Manrope, DM Sans, sans-serif" font-weight="800" font-size="40" letter-spacing="-0.8" fill="#b9ffc4">TOKENIZE TOKY</text>
+          <circle class="tt-ring" cx="331" cy="27" r="13.5" fill="none" stroke="#b9ffc4" stroke-width="5.6"/>
+          <circle class="tt-dot" cx="331" cy="27" r="3.9" fill="#b9ffc4"/>
+          <text class="tt-sub" x="0" y="58" font-family="Manrope, DM Sans, sans-serif" font-size="9" letter-spacing="3" fill="#8b9098">東京トークン化計画 · URBAN RIGHTS PROTOCOL</text>
+        </g>
+      </svg>
       <div class="footer-note">Demo data · simulated verification · no real property is sold</div>
     </section>
 
@@ -1064,6 +1089,24 @@
   var notesPanel = document.getElementById('notes-panel');
   var notesText = document.getElementById('notes-text');
 
+  function initTTLogos(){
+    document.querySelectorAll('.tt-logo').forEach(function(g){
+      var word = g.querySelector('.tt-word');
+      var ring = g.querySelector('.tt-ring');
+      var dot = g.querySelector('.tt-dot');
+      if (!word || !ring || !dot) return;
+      var svg = g.closest('svg');
+      if (svg && svg.getClientRects().length === 0) return;
+      var end;
+      try { end = word.getComputedTextLength(); } catch(e){ return; }
+      if (!end) return;
+      var r = 13.5;
+      var cx = end + 6 + r;
+      ring.setAttribute('cx', cx);
+      dot.setAttribute('cx', cx);
+    });
+  }
+
   function render(){
     slides.forEach(function(s, i){
       s.classList.toggle('active', i === current);
@@ -1071,6 +1114,7 @@
     counterCur.textContent = String(current + 1).padStart(2, '0');
     notesText.textContent = notes[current] || '(no notes for this slide)';
     history.replaceState(null, '', '#' + (current + 1));
+    initTTLogos();
   }
 
   function goTo(i){
@@ -1137,6 +1181,9 @@
   });
 
   render();
+  if (document.fonts && document.fonts.ready){
+    document.fonts.ready.then(initTTLogos);
+  }
 })();
 </script>
 
