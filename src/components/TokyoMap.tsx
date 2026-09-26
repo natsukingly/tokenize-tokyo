@@ -1,12 +1,14 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { LoaderCircle } from "lucide-react";
+import { LoaderCircle, X } from "lucide-react";
 import * as maplibregl from "maplibre-gl";
 import { ASSET_KINDS, SPACE_TYPES } from "@/lib/catalog";
 import AssetIcon from "./AssetIcon";
 import type { Asset, Right } from "@/lib/model";
 import type { VisualTheme } from "@/lib/use-theme";
 import { lensMatch, type DormantSite, type LensKind } from "@/lib/dormant";
+import { clusterMapPoints, pickMapHighlights } from "@/lib/map-clusters";
+import "./MapMarkers.css";
 import type { FeatureCollection, Feature, Polygon, LineString } from "geojson";
 maplibregl.setWorkerUrl("/maplibre/maplibre-gl-worker.mjs");
 const EMPTY: FeatureCollection = { type: "FeatureCollection", features: [] };
@@ -63,6 +65,8 @@ export default function TokyoMap({
     iconTemplates = useRef<HTMLDivElement>(null),
     map = useRef<maplibregl.Map | null>(null),
     markers = useRef<maplibregl.Marker[]>([]),
+    clusterMarkers = useRef<maplibregl.Marker[]>([]),
+    [nearbyIds, setNearbyIds] = useState<string[]>([]),
     [ready, setReady] = useState(false),
     [basemapReady, setBasemapReady] = useState(false),
     [slow, setSlow] = useState(false),
@@ -271,6 +275,8 @@ export default function TokyoMap({
         resizeObserver.disconnect();
         markers.current.forEach((x) => x.remove());
         markers.current = [];
+        clusterMarkers.current.forEach((x) => x.remove());
+        clusterMarkers.current = [];
         m.remove();
         if (map.current === m) map.current = null;
       };
@@ -307,8 +313,6 @@ export default function TokyoMap({
         (funding ? " funding" : "");
       el.setAttribute("aria-label", "Explore " + a.name);
       el.dataset.assetId = a.id;
-      if (funding)
-        el.title = `Funding open · ${Math.round(funding.percent)}% subscribed`;
       const icon = document.createElement("span");
       icon.className = "map-pin-icon";
       icon.setAttribute("aria-hidden", "true");
@@ -321,6 +325,10 @@ export default function TokyoMap({
       const label = document.createElement("b");
       label.textContent = a.name;
       if (funding) {
+        const pickLabel = document.createElement("small");
+        pickLabel.className = "map-pin-pick";
+        pickLabel.textContent = "PROJECT PICK";
+        label.prepend(pickLabel);
         const status = document.createElement("small");
         status.className = "map-pin-funding";
         status.textContent = `Funding · ${Math.round(funding.percent)}%`;
@@ -349,6 +357,99 @@ export default function TokyoMap({
         .setLngLat(a.coordinates)
         .addTo(m);
     });
+    const updateClusters = () => {
+      const zoom = m.getZoom();
+      container.current?.classList.toggle("overview-markers", zoom < 15.5);
+      const canvas = m.getCanvas();
+      const points = assets.flatMap((asset, index) => {
+        const element = markers.current[index]?.getElement();
+        if (!element) return [];
+        element.classList.remove("featured");
+        if (asset.id === selected) {
+          element.style.display = "";
+          return [];
+        }
+        element.style.display = "none";
+        const point = m.project(asset.coordinates);
+        if (
+          !Number.isFinite(point.x) ||
+          !Number.isFinite(point.y) ||
+          point.x < -32 ||
+          point.y < -32 ||
+          point.x > canvas.clientWidth + 32 ||
+          point.y > canvas.clientHeight + 32
+        )
+          return [];
+        return [{ id: asset.id, x: point.x, y: point.y }];
+      });
+      clusterMarkers.current.forEach((marker) => marker.remove());
+      clusterMarkers.current = [];
+      const byId = new Map(
+        assets.map((asset, index) => [asset.id, markers.current[index]]),
+      );
+      const fundingIds = new Set(
+        fundingProjects.map((project) => project.assetId),
+      );
+      const assetById = new Map(assets.map((asset) => [asset.id, asset]));
+      const pointById = new Map(points.map((point) => [point.id, point]));
+      const current = selected && assetById.get(selected);
+      const featured = pickMapHighlights(
+        fundingProjects.flatMap((project) => {
+          const point = pointById.get(project.assetId);
+          return point
+            ? [{ ...point, kind: assetById.get(point.id)!.kind }]
+            : [];
+        }),
+        { width: canvas.clientWidth, height: canvas.clientHeight },
+        current ? [{ id: current.id, ...m.project(current.coordinates) }] : [],
+      );
+      const featuredIds = new Set(featured.map((point) => point.id));
+      for (const point of featured) {
+        const element = byId.get(point.id)!.getElement();
+        element.classList.add("featured");
+        element.style.display = "";
+      }
+      const groups = clusterMapPoints(
+        points.filter((point) => !featuredIds.has(point.id)),
+        zoom < 13.5 ? 76 : zoom < 15.5 ? 64 : 48,
+      );
+      for (const group of groups) {
+        if (group.members.length === 1) {
+          byId.get(group.members[0].id)!.getElement().style.display = "";
+          continue;
+        }
+        const ids = group.members.map((member) => member.id);
+        const fundingCount = ids.filter((id) => fundingIds.has(id)).length;
+        const element = document.createElement("button");
+        element.className = "map-cluster" + (fundingCount ? " funding" : "");
+        element.textContent = String(ids.length);
+        element.dataset.count = String(ids.length);
+        element.dataset.assetIds = ids.join(",");
+        element.setAttribute(
+          "aria-label",
+          `${ids.length} nearby spaces${fundingCount ? `, ${fundingCount} funding open` : ""}. ${zoom < 18 ? "Zoom in to explore" : "Choose a space"}`,
+        );
+        element.title = `${ids.length} spaces${fundingCount ? ` · ${fundingCount} funding open` : ""}`;
+        const center = m.unproject([group.x, group.y]);
+        element.onclick = (event) => {
+          event.stopPropagation();
+          if (zoom >= 18) {
+            setNearbyIds(ids);
+          } else {
+            setNearbyIds([]);
+            m.easeTo({ center, zoom: Math.min(18, zoom + 1.5), duration: 700 });
+          }
+        };
+        clusterMarkers.current.push(
+          new maplibregl.Marker({ element, anchor: "center" })
+            .setLngLat(center)
+            .addTo(m),
+        );
+      }
+    };
+    updateClusters();
+    m.on("moveend", updateClusters);
+    m.on("resize", updateClusters);
     const features: Feature<Polygon>[] = [];
     const buildings = m.querySourceFeatures("openmaptiles", {
       sourceLayer: "building",
@@ -563,6 +664,12 @@ export default function TokyoMap({
           });
       }
     }
+    return () => {
+      m.off("moveend", updateClusters);
+      m.off("resize", updateClusters);
+      clusterMarkers.current.forEach((marker) => marker.remove());
+      clusterMarkers.current = [];
+    };
   }, [
     assets,
     selected,
@@ -597,6 +704,7 @@ export default function TokyoMap({
       })),
     });
   }, [dormant, lens, lensKind, ready]);
+  const nearbyAssets = assets.filter((asset) => nearbyIds.includes(asset.id));
   return (
     <div
       className={"map-stage" + (pick ? " picking" : "")}
@@ -643,6 +751,33 @@ export default function TokyoMap({
             </button>
           )}
         </div>
+      )}
+      {nearbyAssets.length > 0 && (
+        <section className="map-nearby" aria-label="Nearby spaces">
+          <header>
+            <strong>Choose a space</strong>
+            <button
+              aria-label="Close nearby spaces"
+              onClick={() => setNearbyIds([])}
+            >
+              <X size={18} />
+            </button>
+          </header>
+          <div>
+            {nearbyAssets.map((asset) => (
+              <button
+                key={asset.id}
+                onClick={() => {
+                  setNearbyIds([]);
+                  onSelect(asset.id);
+                }}
+              >
+                <AssetIcon kind={asset.kind} size={18} />
+                <span>{asset.name}</span>
+              </button>
+            ))}
+          </div>
+        </section>
       )}
       <div className="map-label">
         <span>35°41′ N · 139°46′ E</span>

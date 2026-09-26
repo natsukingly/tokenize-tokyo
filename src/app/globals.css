@@ -519,7 +519,7 @@ h1 em,
   position: relative;
   background: #13231e;
 }
-.map-canvas {
+.map-stage > .map-canvas {
   position: absolute;
   inset: 0;
 }
@@ -557,7 +557,9 @@ h1 em,
 .map-pin.funding .map-pin-icon {
   border-bottom: 2px solid var(--lime);
 }
-.dense-markers .map-pin:not(.selected):not(:hover):not(:focus-visible) b {
+.dense-markers
+  .map-pin:not(.selected):not(.featured):not(:hover):not(:focus-visible)
+  b {
   display: none;
 }
 .map-connection-status {
@@ -785,7 +787,8 @@ h1 em,
   border-right: 6px solid transparent;
   border-top: 7px solid #71935c;
 }
-.map-canvas.compact-markers .map-pin:where(:not(.selected):not(.highlighted)) {
+.map-canvas.compact-markers
+  .map-pin:where(:not(.selected):not(.highlighted):not(.featured)) {
   width: 22px;
   height: 22px;
   padding: 0;
@@ -793,7 +796,7 @@ h1 em,
   border-radius: 50%;
 }
 .map-canvas.compact-markers
-  .map-pin:where(:not(.selected):not(.highlighted))
+  .map-pin:where(:not(.selected):not(.highlighted):not(.featured))
   > .map-pin-icon {
   flex-basis: 18px;
   width: 18px;
@@ -802,18 +805,18 @@ h1 em,
   background: transparent;
 }
 .map-canvas.compact-markers
-  .map-pin:where(:not(.selected):not(.highlighted))
+  .map-pin:where(:not(.selected):not(.highlighted):not(.featured))
   .map-pin-icon
   svg {
   width: 14px;
   height: 14px;
 }
 .map-canvas.compact-markers
-  .map-pin:where(:not(.selected):not(.highlighted)):after {
+  .map-pin:where(:not(.selected):not(.highlighted):not(.featured)):after {
   display: none;
 }
 .map-canvas.compact-markers
-  .map-pin:where(:not(.selected):not(.highlighted))
+  .map-pin:where(:not(.selected):not(.highlighted):not(.featured))
   b {
   display: none;
   position: absolute;
