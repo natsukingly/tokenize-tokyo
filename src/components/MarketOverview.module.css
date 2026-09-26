@@ -23,6 +23,15 @@
   font-size: 11px;
   line-height: 1.6;
 }
+.headingAside {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+.headingAside a {
+  margin: 0;
+}
 .grid,
 .bottom {
   display: grid;
@@ -417,6 +426,9 @@
   .heading {
     align-items: start;
     flex-direction: column;
+  }
+  .headingAside {
+    align-items: flex-start;
   }
 }
 @media (max-width: 600px) {

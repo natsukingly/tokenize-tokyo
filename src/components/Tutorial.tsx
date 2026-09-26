@@ -42,6 +42,7 @@ type Props = {
   onNavigate: (tab: string) => void;
   onActor: (actor: string) => void;
   onActive: (active: boolean) => void;
+  onPitch?: () => void;
 };
 export default function Tutorial(p: Props) {
   const [closed, setClosed] = useState(0),
@@ -377,6 +378,24 @@ export default function Tutorial(p: Props) {
             </p>
             <p className={styles.choicePrompt}>What would you like to try?</p>
             <div className={styles.choices}>
+              {p.demo && p.onPitch && (
+                <button
+                  aria-label="Finalist demo"
+                  onClick={() => {
+                    finish();
+                    p.onPitch?.();
+                  }}
+                >
+                  <span>
+                    <strong>Finalist demo</strong>
+                    <small>
+                      A prepared rooftop project, guided actions and recorded
+                      Sepolia evidence.
+                    </small>
+                  </span>
+                  <ArrowRight size={16} />
+                </button>
+              )}
               <button aria-label="Buy a right" onClick={() => start("buy")}>
                 <span>
                   <strong>Buy a right</strong>

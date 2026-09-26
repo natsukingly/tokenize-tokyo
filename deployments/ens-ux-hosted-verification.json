@@ -1,0 +1,39 @@
+{
+  "checkedAt": "2026-09-26T18:24:31.819Z",
+  "origin": "https://tokenize-tokyo.vercel.app",
+  "chainId": 11155111,
+  "registeredName": "rooftop.building-1.chiyoda.tokenizetokyo-demo-2026.eth",
+  "checks": [
+    "live binding verified",
+    "registered ancestors not marked preview",
+    "individual right opens registered parent",
+    "390px and 1512px fit",
+    "permissions page reachable",
+    "revoked reporter denied all three writes via live eth_call",
+    "RPC failure never shown as connected"
+  ],
+  "transactionsSent": 0,
+  "deploymentId": "dpl_Agtc3Hso221GYUeHcNSrW1V3tcdm",
+  "deploymentUrl": "https://tokenize-tokyo-eb4km2qnw-natsukiyamaguchi-8631s-projects.vercel.app",
+  "sourceBase": "d369585",
+  "validation": {
+    "ensUnitTestsPassed": 36,
+    "browserRegressionTestsPassed": 10,
+    "productionBuild": "passed",
+    "stripeAvailability": {
+      "available": true,
+      "testMode": true
+    }
+  },
+  "explorer": {
+    "url": "https://explorer.ens.dev/rooftop.building-1.chiyoda.tokenizetokyo-demo-2026.eth",
+    "overview": "owner, parent, resolver and history displayed",
+    "recordsAndAddressResolution": "external detail pages returned loading errors"
+  },
+  "sourceSha256": {
+    "src/components/NamespaceDashboard.tsx": "f3fddf0ae4fa19f5bbb5ed292c16bd21f1ff192443b01f6f95e87c60fbad1f9d",
+    "src/components/NamespaceDashboard.module.css": "faf744f89beb07cf7a220d9fa04ed02bd503c016b276b0c4994d1de8c6301e59",
+    "src/components/SpaceEnsPreview.tsx": "5911bc5308f44e0dd68aa15fee05e850b05e9b25354bbd4f22a83810dcc74f3c",
+    "tests/namespaces.spec.ts": "a7c4d65b1d91e519028455eeb711a58466afd3eea3bcab65e5d17f025f721f82"
+  }
+}

@@ -17,7 +17,7 @@ test("namespace dashboard shows a searchable hierarchy, honest status and the li
     exact: true,
   });
   await expect(dashboard).toContainText(
-    "No live ENS registrations or delegations are connected.",
+    "This simulated market shows example names.",
   );
   await expect(page.locator(".metrics")).toHaveCount(0);
   await expect(
@@ -65,7 +65,12 @@ test("namespace dashboard shows a searchable hierarchy, honest status and the li
   await details
     .getByText("What does ENS control allow?", { exact: true })
     .click();
-  await expect(details).toContainText("tested locally, but no live binding is connected");
+  await expect(details).toContainText(
+    "The connected Sepolia rooftop supports delegated issuance and report-only access.",
+  );
+  await expect(
+    details.getByRole("link", { name: "Open connected rooftop permissions" }),
+  ).toHaveAttribute("href", "/ens");
   await details.getByRole("button", { name: "View this space on map" }).click();
   await expect(page.locator(".asset-detail h2")).toHaveText(
     "Nihonbashi Solar Roof",

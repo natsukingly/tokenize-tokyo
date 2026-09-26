@@ -33,11 +33,20 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts",
+    ".data/ens-prize/next-dev/types/**/*.ts",
+    ".data/ens-prize/next-dev/dev/types/**/*.ts",
+    ".data/ens-prize/ci-demo/types/**/*.ts",
+    ".data/ens-prize/ci-demo/dev/types/**/*.ts",
+    ".data/account-e2e/next/types/**/*.ts",
+    ".data/account-e2e/next/dev/types/**/*.ts",
+    ".data/card-checkout/next-live/types/**/*.ts",
+    ".data/card-checkout/next-live/dev/types/**/*.ts",
+    ".data/cities/next-dev/types/**/*.ts",
+    ".data/cities/next-dev/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
-    "contracts/lib",
-    ".data"
+    "contracts/lib"
   ]
 }

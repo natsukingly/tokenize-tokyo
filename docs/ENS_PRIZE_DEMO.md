@@ -6,6 +6,12 @@
 
 **Network:** public Ethereum Sepolia (11155111). Test assets and test tokens only.
 
+**Live entry points:** [space permissions](https://tokenize-tokyo.vercel.app/ens), [ENS Index](https://tokenize-tokyo.vercel.app/?view=namespaces), and the [registered rooftop on ENS Explorer](https://explorer.ens.dev/rooftop.building-1.chiyoda.tokenizetokyo-demo-2026.eth).
+
+The ENS Index starts with the connected rooftop and verifies its binding before showing registration status. Individual `right-N` names remain unregistered previews and link back to the rooftop's permissions. The public browser checks are recorded in [ens-ux-hosted-verification.json](../deployments/ens-ux-hosted-verification.json).
+
+On September 27, 2026 JST, the external ENS Explorer overview displayed the rooftop owner, parent, resolver and history. Its Records and Address Resolution detail pages returned loading errors during inspection; do not depend on those pages in the live presentation. No payment address is configured for this name.
+
 ## Why ENSv2 is central
 
 The rooftop has an ENSv2 registry path, not just a generated display label:

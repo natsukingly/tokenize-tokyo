@@ -13,6 +13,17 @@ const config: NextConfig = {
           { key: "X-Frame-Options", value: "DENY" },
         ],
       },
+      {
+        // The wallet-free demo can be embedded by our own presentation page.
+        // Wallet and transaction pages retain the default DENY policy.
+        source: "/demo",
+        headers: [{ key: "X-Frame-Options", value: "SAMEORIGIN" }],
+      },
+      {
+        // The static animated diagram is another presentation-only surface.
+        source: "/pitch/architecture/index.html",
+        headers: [{ key: "X-Frame-Options", value: "SAMEORIGIN" }],
+      },
     ];
   },
 };

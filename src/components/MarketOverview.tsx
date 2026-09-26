@@ -7,6 +7,7 @@ import { marketAnalytics, type ActivityPeriod } from "@/lib/analytics";
 import type { AssetKind } from "@/lib/catalog";
 import styles from "./MarketOverview.module.css";
 import PlatformCharts from "./PlatformCharts";
+import ActivityFeed from "./ActivityFeed";
 
 const money = (n: bigint) =>
   Number(formatEther(n)).toLocaleString("en", { maximumFractionDigits: 1 });
@@ -52,10 +53,15 @@ export default function MarketOverview({
           <span>FROM ACTIVITY TO ACTION</span>
           <h2>Is the city being put to work?</h2>
         </div>
-        <small>
-          {demo ? "Simulated browser events" : "MultiBaas indexed events"} ·
-          {periodLabels[period]} · UTC
-        </small>
+        <div className={styles.headingAside}>
+          <small>
+            {demo ? "Simulated browser events" : "MultiBaas indexed events"} ·
+            {periodLabels[period]} · UTC
+          </small>
+          <a className={styles.chartLink} href="#dashboard-activity">
+            View activity <ArrowRight size={12} />
+          </a>
+        </div>
       </div>
       <PlatformCharts data={data} onFilter={onFilter} />
       <div className={styles.grid}>
@@ -219,6 +225,7 @@ export default function MarketOverview({
           </p>
         </article>
       </div>
+      <ActivityFeed state={state} demo={demo} />
     </section>
   );
 }

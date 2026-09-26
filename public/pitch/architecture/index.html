@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tokenize Tokyo · Platform architecture</title>
+<style>
+:root{color-scheme:dark;--bg:#101214;--paper:#f7f7ef;--muted:#aab2b8;--yellow:#efef30;--blue:#8bcded}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--paper);font-family:Arial,Helvetica,sans-serif;overflow:hidden}
+#stage{width:1920px;height:1080px;position:absolute;transform-origin:top left;background:var(--bg)}h1,p,h2{margin:0}
+header{position:absolute;left:104px;top:117px}h1{font-size:65px;letter-spacing:-2px;line-height:1.15}
+.logo{position:absolute;right:100px;top:108px;width:315px;height:auto}
+#caption{position:absolute;left:106px;top:209px;font-size:30px;color:var(--muted)}
+#flow{position:absolute;left:0;top:306px;width:1920px;height:486px}
+.node{position:absolute;top:0;width:460px;text-align:center}.node:nth-of-type(1){left:100px}.node:nth-of-type(2){left:730px}.node:nth-of-type(3){left:1360px}
+.node svg{width:300px;height:200px;fill:none;stroke:var(--yellow);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;overflow:visible}
+.node h2{font-size:51px;letter-spacing:-1.3px;line-height:1.15;margin-top:28px;white-space:nowrap}
+.node p{font-size:27px;line-height:1.35;color:var(--muted);margin-top:18px;white-space:nowrap}.details{display:grid;gap:12px;margin-top:26px;font-size:25px;line-height:1.3;color:#d1d6d9}.details span{display:block;white-space:nowrap}
+.connections{position:absolute;inset:0;width:1920px;height:405px;pointer-events:none}.connections path{fill:none;stroke:#647078;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#overview-support{position:absolute;left:104px;right:104px;top:851px;display:grid;grid-template-columns:1fr 1fr;gap:74px;padding-top:27px;border-top:1px solid #3c444a}#overview-support strong{display:block;color:var(--blue);font-size:30px;font-weight:500}#overview-support span{display:block;color:#bcc4c9;font-size:25px;line-height:1.4;margin-top:13px}#overview-support[hidden]{display:none}
+#support{position:absolute;left:104px;right:104px;top:846px;padding-top:30px;border-top:1px solid #3c444a;display:flex;gap:34px;align-items:baseline;font-size:29px;line-height:1.4}#support strong{color:var(--blue);font-weight:500;font-size:31px;white-space:nowrap}#support span{color:#bcc4c9}#support[hidden]{display:none}
+#controls{position:fixed;bottom:15px;left:50%;transform:translateX(-50%);display:none;gap:8px;padding:8px;background:#20262bec;border:1px solid #606b72;z-index:10}body.show-controls #controls{display:flex}
+button{font:15px Arial;padding:9px 14px;border:1px solid #6b757a;color:var(--paper);background:#242a2e;cursor:pointer}button:focus-visible{outline:2px solid var(--yellow);outline-offset:3px}
+#notes{position:fixed;inset:auto 24px 80px;padding:22px 28px;background:#10181af7;border:1px solid #7a858b;font-size:19px;line-height:1.6;z-index:11;max-height:45vh;overflow:auto}#notes[hidden]{display:none}#notes a{color:var(--yellow)}#notes p+p{margin-top:10px}
+body.capture #controls,body.capture #notes{display:none!important}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<main id="stage" aria-label="Tokenize Tokyo platform architecture">
+ <header><h1>RWA Tokenization Platform</h1></header>
+ <img class="logo" src="logo.png" alt="Tokenize Tokyo">
+ <p id="caption" aria-live="polite"></p>
+ <div id="flow">
+  <svg class="connections" viewBox="0 0 1920 405" aria-hidden="true"><path d="M578 102H709M696 89L709 102L696 115M1208 102H1339M1326 89L1339 102L1326 115"/></svg>
+  <section class="node"><svg viewBox="0 0 300 200" aria-hidden="true"></svg><h2></h2><p></p><div class="details"></div></section>
+  <section class="node"><svg viewBox="0 0 300 200" aria-hidden="true"></svg><h2></h2><p></p><div class="details"></div></section>
+  <section class="node"><svg viewBox="0 0 300 200" aria-hidden="true"></svg><h2></h2><p></p><div class="details"></div></section>
+ </div>
+ <section id="overview-support" aria-label="Shared Curvegrid services"><div><strong>Curvegrid MultiBaas</strong><span>Contract calls · Event Queries · aggregation</span></div><div><strong>Curvegrid CloudWallet</strong><span>Card purchase execution · operator-paid gas</span></div></section>
+ <p id="support" hidden><strong></strong><span></span></p>
+</main>
+<nav id="controls" aria-label="Architecture controls"><button id="prev">←</button><button id="next">→</button><button id="play">Play · P</button><button id="overview">Overview · 0</button><button id="notes-toggle">Notes · N</button><button id="hide">Hide · H</button></nav>
+<aside id="notes" hidden>
+ <p><strong>操作</strong> → / Spaceで進む、←で戻る、0で全体、Pで自動再生、Hで操作バー、Nで台本。発表画面ではAが構成図、Dがデモ、Sが導入スライド。図の線は機能間の関係を示し、実取引を発生させません。</p>
+ <p id="narration"></p>
+ <p><strong>実装範囲</strong> 小口化は現在のERC-1155収益権の口数を示します。BasketVaultは固定比率で2–8種類の互換収益権を預託し、持分発行・売買・収益請求・原資産償還に対応。取得済みの1口をさらに細分化するFractionVaultは別の拡張で、Anvil検証済み・公開配置待ちです。自動リバランスや担保融資は含めていません。</p>
+ <p><strong>サービスの役割</strong> Privyはログインと利用者ウォレット、CloudWalletは運営者によるカード購入の署名・送信。全操作を代理送信するわけではありません。カード決済はStripeテストモード、受渡しはSepoliaの実取引。Privyの公開ログインUIは検証済み、本人の認証完了・ウォレット生成・署名の通し確認は別です。</p>
+ <p><strong>展開方針</strong> 他都市には資産データと地域の契約・運営条件を合わせて展開。T-REX / ERC-3643は今後の追加開発。実物件ではトークンと利用・収益分配の義務を結ぶ契約を整備します。</p>
+ <p><a href="README.md">構成・実装根拠・日英台本</a> · <a href="https://sepolia.etherscan.io/tx/0x8e5d49e8f3e84ccd479e039dbd2501fb1592c38455e6d12d1e930a1322dfffbc" target="_blank" rel="noopener">CloudWallet purchase receipt</a></p>
+</aside>
+<script>
+const stage=document.getElementById('stage');
+const steps=[
+ {id:'overview',title:'One connected platform',nodes:[['Tokenize','Make idle space financeable','tokenize'],['Launch & trade','Fund projects. Exchange rights.','trade'],['Bundle & operate','Combine assets. Follow income.','bundle']],support:null,ja:'都市の資産を権利にし、募集・売買・バスケット運用までつなぐ、一つのRWAプラットフォームです。'},
+ {id:'issue',title:'Structure + launch',nodes:[['Urban space','Define scope + terms','asset'],['Revenue units','Issue fractional rights','units'],['Launchpad','Open a primary offer','offer']],support:['ENSv2','Space identity + delegated authority'],ja:'空間と条件を定め、資産と権利を審査し、小口の収益権を発行してLaunchpadで募集します。ENSは空間の識別と委任を支えます。'},
+ {id:'buy',title:'Participate + trade',nodes:[['Card checkout','Pay for the selected right','card'],['CloudWallet','Operator signs + pays gas','wallet'],['Buyer','Receives the right','received']],support:['Privy','Google / email login'],ja:'カード購入を受けてCloudWalletが取引を署名・送信し、運営者がガスを払い、購入者へ権利が届きます。参加の入口にはPrivyのGoogle・メールログインを使います。'},
+ {id:'bundle',title:'Bundle + manage',nodes:[['Revenue rights','2–8 compatible rights','units'],['BasketVault','Deposit rights together','bundle'],['Basket shares','Trade · claim · redeem','shares']],support:null,ja:'互換性のある2〜8種類の収益権をBasketVaultに預け、まとめた持分を発行します。持分の売買、収益請求、元の権利への償還までつなぎます。'},
+ {id:'income',title:'Operate + follow the money',nodes:[['Project income','Deposit settlement tokens','income'],['RevenueVault','Account for deposits','vault'],['Holders','Claim their share','received']],support:['Curvegrid MultiBaas','Contract calls · Event Queries · aggregation → Dashboard'],ja:'事業からの入金をRevenueVaultで会計し、保有者やバスケットへ配分します。MultiBaasのコントラクト呼出し、Event Queries、集計でDashboardの表示を支えます。'}
+];
+const details={
+ overview:[['Asset + right review','ERC-1155 fractional revenue units'],['Launchpad · primary offers','Marketplace · resale'],['BasketVault · bundle rights','RevenueVault · distribute income']],
+ issue:[['Rooftops · vacant homes · idle land'],['Purpose · period · transfer terms'],['Track fundraising progress']],
+ buy:[['Selected rights + recipient'],['No buyer gas or purchase signature'],['Confirmed Sepolia delivery']],
+ bundle:[['Check right compatibility'],['Fixed composition + token custody'],['Redeem for underlying rights']],
+ income:[['Only funds actually deposited'],['Transfer-aware income accounting'],['Individual or basket holdings']]
+};
+const symbols={
+ asset:'<rect x="96" y="30" width="118" height="142" rx="2"/><path d="M118 61H192M118 82H173"/>',
+ units:'<rect x="57" y="43" width="48" height="48"/><rect x="127" y="43" width="48" height="48"/><rect x="197" y="43" width="48" height="48"/><rect x="57" y="113" width="48" height="48"/><rect x="127" y="113" width="48" height="48"/><rect x="197" y="113" width="48" height="48"/>',
+ tokenize:'<rect x="12" y="51" width="75" height="100"/><path d="M108 101H156M144 89L156 101L144 113"/><rect x="185" y="57" width="34" height="34"/><rect x="238" y="57" width="34" height="34"/><rect x="185" y="111" width="34" height="34"/><rect x="238" y="111" width="34" height="34"/>',
+ trade:'<rect x="18" y="67" width="56" height="74"/><rect x="224" y="67" width="56" height="74"/><path d="M98 79H201M188 66L201 79L188 92M201 130H98M111 117L98 130L111 143"/>',
+ bundle:'<rect x="47" y="28" width="210" height="148"/><rect x="72" y="56" width="39" height="92"/><rect x="132" y="56" width="39" height="92"/><rect x="192" y="56" width="39" height="92"/>',
+ offer:'<path d="M38 171V117H92V171M124 171V80H178V171M210 171V36H264V171"/><path d="M24 185H276"/>',
+ card:'<rect x="40" y="42" width="225" height="134" rx="6"/><path d="M40 84H265M64 141H113"/>',
+ wallet:'<rect x="57" y="55" width="195" height="118" rx="5"/><path d="M57 55V36H226V55M206 99H267V136H206Z"/><circle cx="227" cy="117" r="3"/>',
+ received:'<rect x="36" y="41" width="89" height="125"/><circle cx="216" cy="100" r="48"/><path d="M191 100L209 117L242 81"/>',
+ shares:'<rect x="45" y="53" width="80" height="99"/><path d="M142 101H183M173 91L183 101L173 111"/><rect x="204" y="48" width="38" height="38"/><rect x="255" y="48" width="38" height="38"/><rect x="204" y="113" width="38" height="38"/><rect x="255" y="113" width="38" height="38"/>',
+ income:'<path d="M150 27V113M131 94L150 113L169 94M70 122V174H230V122"/><path d="M91 144H210"/>',
+ vault:'<rect x="53" y="31" width="199" height="147"/><circle cx="152" cy="105" r="37"/><path d="M152 68V142M115 105H189"/>'
+};
+let current=0,timer=null,visible=true;
+const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+function fit(){const scale=Math.min(innerWidth/1920,innerHeight/1080);stage.style.transform=`scale(${scale})`;stage.style.left=(innerWidth-1920*scale)/2+'px';stage.style.top=(innerHeight-1080*scale)/2+'px'}
+function show(index){
+ current=Math.max(0,Math.min(steps.length-1,index));const step=steps[current];stage.dataset.step=step.id;
+ document.querySelectorAll('.node').forEach((node,i)=>{
+  const [title,description,symbol]=step.nodes[i];
+  node.querySelector('h2').textContent=title;node.querySelector('p').textContent=description;
+  node.querySelector('svg').innerHTML=symbols[symbol];
+  node.querySelector('.details').replaceChildren(...details[step.id][i].map(text=>Object.assign(document.createElement('span'),{textContent:text}))); 
+ });
+ document.getElementById('caption').textContent=step.title;
+ document.getElementById('overview-support').hidden=step.id!=='overview';
+ const support=document.getElementById('support');support.hidden=!step.support;
+ if(step.support){support.querySelector('strong').textContent=step.support[0];support.querySelector('span').textContent=step.support[1]}
+ document.getElementById('narration').textContent=step.ja;
+ if(!reduced.matches&&!document.body.classList.contains('capture'))document.getElementById('flow').animate([{opacity:0,transform:'translateY(10px)'},{opacity:1,transform:'translateY(0)'}],{duration:380,easing:'ease-out'});
+ history.replaceState(null,'','#'+step.id)
+}
+function stop(){clearInterval(timer);timer=null;document.getElementById('play').textContent='Play · P'}
+function play(){if(timer){stop();return}if(!visible)return;timer=setInterval(()=>{if(current===steps.length-1){stop();return}show(current+1)},5200);document.getElementById('play').textContent='Pause · P';if(current===steps.length-1)show(0)}
+function manual(index){stop();show(index)}
+function visibility(next){visible=next;stage.classList.toggle('paused',!next);if(!next)stop()}
+document.getElementById('prev').onclick=()=>manual(current-1);document.getElementById('next').onclick=()=>manual(current+1);document.getElementById('play').onclick=play;document.getElementById('overview').onclick=()=>manual(0);document.getElementById('notes-toggle').onclick=()=>{document.getElementById('notes').hidden=!document.getElementById('notes').hidden};document.getElementById('hide').onclick=()=>document.body.classList.remove('show-controls');
+addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey||e.target.closest('input,textarea,select,[contenteditable=true]'))return;const key=e.key.toLowerCase();if(['arrowright','arrowleft',' ','0','p','h','n'].includes(key))e.preventDefault();if(key==='arrowright'||key===' ')manual(current+1);if(key==='arrowleft')manual(current-1);if(key==='0')manual(0);if(key==='p')play();if(key==='h')document.body.classList.toggle('show-controls');if(key==='n')document.getElementById('notes-toggle').click()});
+addEventListener('message',e=>{if(e.source===parent&&e.origin===location.origin&&e.data?.type==='pitch-visibility')visibility(Boolean(e.data.visible))});
+document.addEventListener('visibilitychange',()=>visibility(!document.hidden));addEventListener('resize',fit);
+if(new URLSearchParams(location.search).has('capture'))document.body.classList.add('capture');fit();show(Math.max(0,steps.findIndex(s=>s.id===location.hash.slice(1))));window.showArchitecture=show;window.architectureSteps=steps;if(new URLSearchParams(location.search).has('autoplay')&&!reduced.matches&&window.top===window)play();
+</script>
+</html>

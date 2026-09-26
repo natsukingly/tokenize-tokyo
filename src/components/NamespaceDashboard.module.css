@@ -33,6 +33,64 @@
 .layout {
   min-width: 0;
 }
+.connected {
+  border: 1px solid color-mix(in srgb, var(--lime) 32%, var(--line));
+  border-radius: 7px;
+  background: var(--panel);
+  padding: 22px;
+  margin-bottom: 24px;
+}
+.connected h2 {
+  font-size: clamp(20px, 3vw, 28px);
+  line-height: 1.3;
+  margin: 14px 0 10px;
+}
+.connected p {
+  max-width: 680px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.bindingStatus {
+  display: grid;
+  gap: 7px;
+  margin-top: 18px;
+  font-size: 12px;
+}
+.bindingStatus strong {
+  color: var(--lime);
+}
+.bindingStatus code,
+.delegation code {
+  overflow-wrap: anywhere;
+}
+.bindingStatus small {
+  color: var(--muted);
+}
+.bindingStatus button {
+  text-align: left;
+  text-decoration: underline;
+}
+.connectedActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+.connectedActions a,
+.connectedActions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 12px 14px;
+  font-size: 12px;
+}
+.connectedActions a {
+  background: var(--lime);
+  color: var(--bg);
+}
 .dialog {
   width: min(660px, calc(100vw - 32px));
   max-width: none;

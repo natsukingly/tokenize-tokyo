@@ -1,0 +1,82 @@
+{
+  "checkedAt": "2026-09-26T21:16:20.581Z",
+  "chainId": 11155111,
+  "name": "rooftop.building-1.chiyoda.tokenizetokyo-demo-2026.eth",
+  "reportTransaction": "0xb58ae01b1e05604007b63d50b028d82c2d514b5927a02162762894d4e925c3a9",
+  "sender": "0x1a202fa63513be1db3be8b7a4b3b0bc64cde34d0",
+  "resolver": "0x0a5e20fDf2152d048dafEaCad7D6A2A48c78da82",
+  "writeBlock": "11787680",
+  "currentBlock": "11788790",
+  "report": {
+    "period": "2026-09",
+    "energyKWh": "125.50",
+    "source": "operator-reported test data"
+  },
+  "checks": {
+    "transactionSucceeded": true,
+    "senderAndCalldataMatch": true,
+    "textUpdatedEventMatches": true,
+    "universalResolverReadAtWriteBlockMatches": true,
+    "reportPreservedAfterRevocation": true,
+    "latestReadMatches": true,
+    "reportOnlyPermissionBeforeRevocation": true,
+    "allWritesDeniedAfterRevocation": true
+  },
+  "permissionChecks": [
+    {
+      "account": "0x1A202fa63513BE1dB3be8b7A4B3b0bC64cde34d0",
+      "blockNumber": "11787665",
+      "checks": [
+        {
+          "key": "urban.energyReport",
+          "result": "allowed"
+        },
+        {
+          "key": "urban.assetId",
+          "result": "denied"
+        },
+        {
+          "key": "urban.rightsContract",
+          "result": "denied"
+        }
+      ]
+    },
+    {
+      "account": "0x1A202fa63513BE1dB3be8b7A4B3b0bC64cde34d0",
+      "blockNumber": "11787685",
+      "checks": [
+        {
+          "key": "urban.energyReport",
+          "result": "denied"
+        },
+        {
+          "key": "urban.assetId",
+          "result": "denied"
+        },
+        {
+          "key": "urban.rightsContract",
+          "result": "denied"
+        }
+      ]
+    },
+    {
+      "account": "0x1A202fa63513BE1dB3be8b7A4B3b0bC64cde34d0",
+      "blockNumber": "11788790",
+      "checks": [
+        {
+          "key": "urban.energyReport",
+          "result": "denied"
+        },
+        {
+          "key": "urban.assetId",
+          "result": "denied"
+        },
+        {
+          "key": "urban.rightsContract",
+          "result": "denied"
+        }
+      ]
+    }
+  ],
+  "transactionsSentByThisCheck": 0
+}

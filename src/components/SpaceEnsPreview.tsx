@@ -26,6 +26,13 @@ export default function SpaceEnsPreview({
     namespaceHierarchy([asset], rights, setting?.parent),
   );
   const space =
+    nodes.find(
+      (n) =>
+        n.kind === "Space" &&
+        setting?.assetId === asset.id &&
+        n.label ===
+          ["rooftop", "interior", "wall", "land", "whole"][setting.scope],
+    ) ||
     nodes.find((n) => n.kind === "Space") ||
     nodes.find((n) => n.kind === "Asset");
   if (!space) return null;
@@ -36,7 +43,9 @@ export default function SpaceEnsPreview({
           <Network size={13} /> ENS
         </span>
         <small>
-          {setting?.assetId === asset.id
+          {setting?.assetId === asset.id &&
+          space.label ===
+            ["rooftop", "interior", "wall", "land", "whole"][setting.scope]
             ? "Inspect Sepolia binding"
             : "Unregistered preview"}
         </small>

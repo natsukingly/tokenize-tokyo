@@ -25,7 +25,11 @@ import {
 } from "@/lib/ens/hierarchy";
 import styles from "./NamespaceDashboard.module.css";
 import EnsDelegation from "./EnsDelegation";
-import { ensBindingConfiguration } from "@/lib/ens/authority";
+import {
+  ensBindingConfiguration,
+  loadEnsBinding,
+  type LiveEnsBinding,
+} from "@/lib/ens/authority";
 import { config } from "@/lib/config";
 import type { WalletProvider } from "@/lib/transactions";
 
@@ -73,15 +77,55 @@ export default function NamespaceDashboard({
   const backdropPress = useRef(false);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [copyMessage, setCopyMessage] = useState("");
+  const [live, setLive] = useState<LiveEnsBinding | null>(null);
+  const [bindingError, setBindingError] = useState(false);
+  const [revision, setRevision] = useState(0);
+  useEffect(() => {
+    let active = true;
+    setLive(null);
+    setBindingError(false);
+    if (configured)
+      loadEnsBinding()
+        .then((value) => {
+          if (active) setLive(value);
+        })
+        .catch(() => {
+          if (active) setBindingError(true);
+        });
+    return () => {
+      active = false;
+    };
+  }, [configured, revision]);
   const filtered = filterNamespaces(root, query);
   const all = flattenNamespaces(root);
   const selected = all.find((node) => node.name === selection);
-  const hasBinding =
-    !!configured &&
-    selected?.kind === "Space" &&
-    selected.assetId === configured.assetId &&
-    selected.label ===
-      ["rooftop", "interior", "wall", "land", "whole"][configured.scope];
+  const connectedSpace = all.find(
+    (node) =>
+      !!configured &&
+      node.kind === "Space" &&
+      node.assetId === configured.assetId &&
+      node.label ===
+        ["rooftop", "interior", "wall", "land", "whole"][configured.scope],
+  );
+  const hasBinding = !!selected && selected.name === connectedSpace?.name;
+  const registeredNode = live?.binding.path.find(
+    (_, index) =>
+      [...live.binding.path.slice(0, index + 1)]
+        .reverse()
+        .map((node) => node.label)
+        .join(".") +
+        ".eth" ===
+      selected?.name,
+  );
+  const inConfiguredPath =
+    !!selected &&
+    !!connectedSpace &&
+    (selected.name === connectedSpace.name ||
+      connectedSpace.name.endsWith(`.${selected.name}`));
+  const usesConnectedSpace =
+    selected?.kind === "Right" &&
+    !!connectedSpace &&
+    selected.name.endsWith(`.${connectedSpace.name}`);
   const showDetails = detailsOpen && !!selected;
   useEffect(() => {
     const element = dialog.current;
@@ -170,26 +214,63 @@ export default function NamespaceDashboard({
           </strong>
           <p>
             {configured
-              ? "Select a space to inspect its registered binding and manage delegated issuance. Other generated names remain previews."
-              : "Explore the proposed hierarchy for your urban rights. No live ENS registrations or delegations are connected."}
+              ? "Start with the connected rooftop to manage who can issue rights or report energy. Other spaces show proposed names."
+              : "This simulated market shows example names. Open the Sepolia rooftop to explore connected ENS permissions."}
           </p>
         </div>
         <span>{configured ? "SEPOLIA" : "PREVIEW"}</span>
       </div>
+      <section className={styles.connected} aria-label="Connected ENS space">
+        <div className={styles.sectionLabel}>
+          <ShieldCheck size={15} /> SPACE PERMISSIONS
+        </div>
+        <h2>Give each person the access they need.</h2>
+        <p>
+          The rooftop operator prepares rights within the owner's limits. The
+          energy reporter updates one report. The owner can revoke either
+          permission.
+        </p>
+        {configured && (
+          <div role="status" className={styles.bindingStatus}>
+            {live ? (
+              <>
+                <strong>Connected on Sepolia</strong>
+                <code>{live.name}</code>
+                <small>Binding checked at block {live.block.toString()}</small>
+              </>
+            ) : bindingError ? (
+              <>
+                <span>Connection check unavailable. Please retry.</span>
+                <button onClick={() => setRevision((value) => value + 1)}>
+                  Retry ENS connection
+                </button>
+              </>
+            ) : (
+              <span>Checking the registered rooftop on Sepolia…</span>
+            )}
+          </div>
+        )}
+        <div className={styles.connectedActions}>
+          <a href="/ens">
+            Open rooftop permissions <ArrowUpRight size={14} />
+          </a>
+          {live && (
+            <a
+              href={`https://explorer.ens.dev/${encodeURIComponent(live.name)}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              View on ENS Explorer <ArrowUpRight size={14} />
+            </a>
+          )}
+          {live && connectedSpace?.name === live.name && (
+            <button onClick={() => choose(live.name)}>
+              Inspect connected rooftop
+            </button>
+          )}
+        </div>
+      </section>
       <div className={styles.layout}>
-        <a
-          href="/ens"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 8,
-            color: "var(--lime)",
-            marginBottom: 16,
-            fontSize: 13,
-          }}
-        >
-          Open the ENSv2 permissions demo <ArrowUpRight size={14} />
-        </a>
         <section className={styles.treePanel} aria-label="ENS hierarchy">
           <div className={styles.treeHeader}>
             <span>SPACE HIERARCHY</span>
@@ -247,7 +328,11 @@ export default function NamespaceDashboard({
               <div className={styles.inspectorHeader}>
                 <span>{selected.kind.toUpperCase()} ENS NAME</span>
                 <span className={styles.badge}>
-                  {hasBinding ? "Inspect on Sepolia" : "Unregistered preview"}
+                  {registeredNode
+                    ? "Registered on Sepolia"
+                    : inConfiguredPath
+                      ? "Check Sepolia binding"
+                      : "Unregistered preview"}
                 </span>
                 <button
                   ref={closeButton}
@@ -273,14 +358,22 @@ export default function NamespaceDashboard({
                 <code>{selected.name}</code>
                 <button
                   aria-label={
-                    hasBinding ? "Copy ENS name" : "Copy example ENS name"
+                    hasBinding || registeredNode
+                      ? "Copy ENS name"
+                      : "Copy example ENS name"
                   }
-                  title={hasBinding ? "Copy ENS name" : "Copy example ENS name"}
+                  title={
+                    hasBinding || registeredNode
+                      ? "Copy ENS name"
+                      : "Copy example ENS name"
+                  }
                   onClick={async () => {
                     try {
                       await navigator.clipboard.writeText(selected.name);
                       setCopyMessage(
-                        hasBinding ? "ENS name copied" : "Example name copied",
+                        hasBinding || registeredNode
+                          ? "ENS name copied"
+                          : "Example name copied",
                       );
                     } catch {
                       setCopyMessage("Select the name to copy it manually");
@@ -302,6 +395,27 @@ export default function NamespaceDashboard({
                   provider={provider}
                   onConnect={onConnect}
                 />
+              ) : inConfiguredPath ? (
+                <div className={styles.delegation}>
+                  <p>
+                    {registeredNode
+                      ? "This name is part of the registered rooftop's ENS hierarchy. Manage issuance and reporting at the rooftop."
+                      : bindingError
+                        ? "Could not verify this name's registration. Retry the ENS connection before managing permissions."
+                        : "Checking this name against the connected rooftop's ENS hierarchy. Registration is shown only after verification."}
+                  </p>
+                  {registeredNode && (
+                    <p>
+                      Name controller: <code>{registeredNode.controller}</code>
+                    </p>
+                  )}
+                  <button
+                    className={styles.mapAction}
+                    onClick={() => choose(connectedSpace!.name)}
+                  >
+                    Open connected rooftop <ArrowUpRight size={14} />
+                  </button>
+                </div>
               ) : (
                 <>
                   <dl className={styles.facts}>
@@ -315,7 +429,7 @@ export default function NamespaceDashboard({
                     </div>
                     <div>
                       <dt>ENS target network</dt>
-                      <dd>Sepolia · planned</dd>
+                      <dd>Sepolia</dd>
                     </div>
                     <div>
                       <dt>ENS controller</dt>
@@ -353,7 +467,7 @@ export default function NamespaceDashboard({
                   </p>
                   <div className={styles.delegation}>
                     <div className={styles.sectionLabel}>
-                      <ShieldCheck size={15} /> SCOPED CONTROL · PLANNED
+                      <ShieldCheck size={15} /> THIS NAME IS A PREVIEW
                     </div>
                     <div className={styles.controlFlow}>
                       <span>Asset issuer</span>
@@ -363,18 +477,18 @@ export default function NamespaceDashboard({
                       <span>Operator</span>
                     </div>
                     <p>
-                      Delegate one space, without giving control of the entire
-                      building. No operator has been granted permissions here.
+                      {usesConnectedSpace
+                        ? "This right uses its parent rooftop's ENS identity. A separate ENS name has not been registered for this individual right."
+                        : "This example name is not connected to ENS. Permissions cannot be managed for it yet."}
                     </p>
                     <details>
                       <summary>What does ENS control allow?</summary>
                       <p>
-                        ENS permissions manage the name and its subregistry.
-                        Issuing an Urban Right will also require a separate
-                        issuer-approved application grant. That contract
-                        integration is implemented and tested locally, but no
-                        live binding is connected for this preview. Property
-                        verification stays separate.
+                        The connected Sepolia rooftop supports delegated
+                        issuance and report-only access. Issuance checks both an
+                        ENS role and the owner's separate limits. Reporting
+                        access only allows the energy report to be updated.
+                        Property verification stays separate.
                       </p>
                       <a
                         href="https://docs.ens.domains/ensv2/enhanced-access-control/"
@@ -384,6 +498,19 @@ export default function NamespaceDashboard({
                         ENSv2 access control <ArrowUpRight size={12} />
                       </a>
                     </details>
+                    {usesConnectedSpace ? (
+                      <button
+                        className={styles.mapAction}
+                        onClick={() => choose(connectedSpace!.name)}
+                      >
+                        Manage this right's rooftop <ArrowUpRight size={14} />
+                      </button>
+                    ) : (
+                      <a href="/ens">
+                        Open connected rooftop permissions{" "}
+                        <ArrowUpRight size={14} />
+                      </a>
+                    )}
                   </div>
                 </>
               )}

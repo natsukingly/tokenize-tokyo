@@ -95,9 +95,10 @@ import { compactMetadataURI } from "@/lib/model";
 import { ProjectEconomics } from "./ProjectPlan";
 import TokenizeDialog from "./TokenizeDialog";
 import Tutorial from "./Tutorial";
+import PitchTutorial from "./PitchTutorial";
+import { pitchForm, type PitchStep } from "@/lib/pitch-tour";
 import MarketOverview from "./MarketOverview";
 import MapControls from "./MapControls";
-import ActivityFeed from "./ActivityFeed";
 import NamespaceDashboard from "./NamespaceDashboard";
 import MapFunding from "./MapFunding";
 import SpaceEnsPreview from "./SpaceEnsPreview";
@@ -280,7 +281,17 @@ function DashboardContent({ demo }: { demo: boolean }) {
     [guideActive, setGuideActive] = useState(false),
     [flowVersion, setFlowVersion] = useState(0),
     [createdGeo, setCreatedGeo] = useState("");
+  const [pitchActive, setPitchActive] = useState(false);
+  const [pitchStep, setPitchStep] = useState<PitchStep | null>(null);
   useEffect(() => {
+    if (
+      DEMO &&
+      new URLSearchParams(window.location.search).get("pitch") === "1"
+    ) {
+      setPitchActive(true);
+      setGuideActive(true);
+      return;
+    }
     if (new URLSearchParams(window.location.search).get("tour") === "1")
       setTutorialRequest((n) => n + 1);
   }, []);
@@ -954,6 +965,56 @@ function DashboardContent({ demo }: { demo: boolean }) {
       )}
     </div>
   );
+  const preparePitch = (step: PitchStep, assetId?: string) => {
+    if (!DEMO) return;
+    setPitchStep(step);
+    setWalletOpen(false);
+    if (step === "discover" || step === "finish") {
+      closeTokenize();
+      openExplore();
+      setCityDetailsOpen(false);
+      setLens(false);
+      return;
+    }
+    if (step === "define") {
+      setActor("Owner A");
+      setForm(pitchForm(form, state));
+      openTokenize(true);
+    } else if (["verify-asset", "verify-right"].includes(step)) {
+      setActor("Demo verifier");
+      setTokenizeOpen(true);
+    } else if (step === "issue" || step === "publish") {
+      setActor("Owner A");
+      setTokenizeOpen(true);
+    } else if (step === "purchase" && assetId) {
+      closeTokenize();
+      setActor("Investor B");
+      viewAssetOnMap(assetId);
+    } else if (step === "activate" && assetId) {
+      setActor("Demo verifier");
+      setFlowTarget(assetId);
+      setCreatedGeo("");
+      setFlowVersion((v) => v + 1);
+      setFlowStarted(true);
+      setTokenizeOpen(true);
+    } else if (step === "claim" || step === "resale") {
+      closeTokenize();
+      setActor("Investor B");
+      setTab("Portfolio");
+    } else if (step === "dashboard" || step === "proof") {
+      closeTokenize();
+      setCityFocus(false);
+      setTab("Explore");
+    }
+  };
+  useEffect(() => {
+    if (!DEMO || !pitchActive) return;
+    if (pitchStep === "purchase") setQuantity("10");
+    if (pitchStep === "resale") {
+      setQuantity("2");
+      setListPrice("1000");
+    }
+  }, [DEMO, pitchActive, pitchStep, active, directorySelection]);
   return (
     <div
       className={
@@ -1011,7 +1072,6 @@ function DashboardContent({ demo }: { demo: boolean }) {
                 { name: "Dashboard", icon: LayoutDashboard },
                 { name: "Markets", icon: Store },
                 { name: "Namespaces", icon: Network },
-                { name: "Activity", icon: Activity },
               ],
             },
             {
@@ -1162,63 +1222,85 @@ function DashboardContent({ demo }: { demo: boolean }) {
             "main-content" + (tab === "Tokenize" ? " focused-page" : "")
           }
         >
-          <Tutorial
-            container={
-              walletOpen
-                ? walletTourContainer
-                : tokenizeOpen
-                  ? tutorialContainer
-                  : null
-            }
-            request={tutorialRequest}
-            state={state}
-            hasSelectedSpace={!!asset && (!cityView || cityDetailsOpen)}
-            hasOpenOffer={listings.length > 0}
-            account={DEMO ? active : account}
-            chainId={wallet.chainId}
-            gasBalance={walletGasBalance}
-            transactions={recentTransactions}
-            demo={DEMO}
-            onActive={setGuideActive}
-            onActor={(name) => setActor(name as keyof typeof ACTORS)}
-            onNavigate={(next) => {
-              if (next === "Wallet") {
-                setWalletOpen(true);
-                return;
-              }
-              setWalletOpen(false);
-              if (next === "Funding") {
+          {DEMO && pitchActive ? (
+            <PitchTutorial
+              state={state}
+              busy={!!busy || !marketLoaded}
+              container={tokenizeOpen ? tutorialContainer : null}
+              onPrepare={preparePitch}
+              onClose={() => {
+                setPitchActive(false);
+                setPitchStep(null);
+                setGuideActive(false);
                 closeTokenize();
-                setFinanceSource("");
-                setMarketView("funding");
-                setMarketRequest((n) => n + 1);
-                setTab("Markets");
-                return;
+              }}
+            />
+          ) : (
+            <Tutorial
+              onPitch={() => {
+                setTutorialRequest(0);
+                setPitchActive(true);
+                setGuideActive(true);
+              }}
+              container={
+                walletOpen
+                  ? walletTourContainer
+                  : tokenizeOpen
+                    ? tutorialContainer
+                    : null
               }
-              if (next === "Owner workspace") {
-                if (!flowStarted) openTokenize(true);
-                else setTokenizeOpen(true);
-                return;
-              }
-              if (next === "Inspect right") {
-                openExplore();
-                setCityDetailsOpen(true);
-                document
-                  .querySelectorAll('[aria-label="Map controls"] details[open]')
-                  .forEach((item) => item.removeAttribute("open"));
-                return;
-              }
-              if (next === "Tokenize") openTokenize(true);
-              else {
-                closeTokenize();
-                if (next === "Explore") openExplore();
-                else setTab(next);
-              }
-              setKind("All assets");
-              setStatus("All stages");
-              setOwnedOnly(false);
-            }}
-          />
+              request={tutorialRequest}
+              state={state}
+              hasSelectedSpace={!!asset && (!cityView || cityDetailsOpen)}
+              hasOpenOffer={listings.length > 0}
+              account={DEMO ? active : account}
+              chainId={wallet.chainId}
+              gasBalance={walletGasBalance}
+              transactions={recentTransactions}
+              demo={DEMO}
+              onActive={setGuideActive}
+              onActor={(name) => setActor(name as keyof typeof ACTORS)}
+              onNavigate={(next) => {
+                if (next === "Wallet") {
+                  setWalletOpen(true);
+                  return;
+                }
+                setWalletOpen(false);
+                if (next === "Funding") {
+                  closeTokenize();
+                  setFinanceSource("");
+                  setMarketView("funding");
+                  setMarketRequest((n) => n + 1);
+                  setTab("Markets");
+                  return;
+                }
+                if (next === "Owner workspace") {
+                  if (!flowStarted) openTokenize(true);
+                  else setTokenizeOpen(true);
+                  return;
+                }
+                if (next === "Inspect right") {
+                  openExplore();
+                  setCityDetailsOpen(true);
+                  document
+                    .querySelectorAll(
+                      '[aria-label="Map controls"] details[open]',
+                    )
+                    .forEach((item) => item.removeAttribute("open"));
+                  return;
+                }
+                if (next === "Tokenize") openTokenize(true);
+                else {
+                  closeTokenize();
+                  if (next === "Explore") openExplore();
+                  else setTab(next);
+                }
+                setKind("All assets");
+                setStatus("All stages");
+                setOwnedOnly(false);
+              }}
+            />
+          )}
 
           <h1 className="sr-only">{navigationLabel}</h1>
           {activeNavigation === "Dashboard" && (
@@ -1295,7 +1377,7 @@ function DashboardContent({ demo }: { demo: boolean }) {
               )}
             </div>
           )}
-          {marketLoaded && tab === "Explore" && !cityFocus && !guideActive && (
+          {marketLoaded && tab === "Explore" && !cityFocus && (!guideActive || pitchActive) && (
             <MarketOverview
               state={state}
               rightsAddress={addresses.rights}
@@ -1799,7 +1881,11 @@ function DashboardContent({ demo }: { demo: boolean }) {
                       BigInt(state.claimable[x.token + ":" + x.id] || "0") > 0n,
                   )
                   .map((x) => (
-                    <article className="holding" key={x.token + x.id}>
+                    <article
+                      className="holding"
+                      key={x.token + x.id}
+                      data-holding={`${x.token}:${x.id}`}
+                    >
                       <div className="card-icon">
                         {x.token === "basket" ? (
                           <Layers3 />
@@ -2308,27 +2394,6 @@ function DashboardContent({ demo }: { demo: boolean }) {
                 openExplore();
               }}
             />
-          )}
-          {marketLoaded && tab === "Activity" && (
-            <section className="workspace">
-              <div className="section-title">
-                <h2>Urban activity ledger</h2>
-                <span>
-                  {DEMO ? "SIMULATED EVENTS" : "MULTIBAAS EVENT QUERIES"}
-                </span>
-              </div>
-              <ActivityFeed events={state.events} demo={DEMO} />
-              {!DEMO && (
-                <a
-                  className="text-button"
-                  href={config.url}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Open MultiBaas Transaction Explorer <ExternalLink size={13} />
-                </a>
-              )}
-            </section>
           )}
           {marketLoaded && activeNavigation === "Dashboard" && (
             <section className="impact">
