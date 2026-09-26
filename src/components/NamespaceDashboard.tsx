@@ -177,6 +177,19 @@ export default function NamespaceDashboard({
         <span>{configured ? "SEPOLIA" : "PREVIEW"}</span>
       </div>
       <div className={styles.layout}>
+        <a
+          href="/ens"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+            color: "var(--lime)",
+            marginBottom: 16,
+            fontSize: 13,
+          }}
+        >
+          Open the ENSv2 permissions demo <ArrowUpRight size={14} />
+        </a>
         <section className={styles.treePanel} aria-label="ENS hierarchy">
           <div className={styles.treeHeader}>
             <span>SPACE HIERARCHY</span>

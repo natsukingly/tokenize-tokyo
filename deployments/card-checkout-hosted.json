@@ -1,0 +1,35 @@
+{
+  "publishedAt": "2026-09-26T17:34:08.843Z",
+  "origin": "https://tokenize-tokyo.vercel.app",
+  "deployment": {
+    "id": "dpl_AYySSubX1V6PsinYuUsSvVeCijY4",
+    "url": "https://tokenize-tokyo-ipmhiuxhf-natsukiyamaguchi-8631s-projects.vercel.app",
+    "previousId": "dpl_4cbF55bu8bXPukdkk8XT7boWmJqC",
+    "region": "hnd1"
+  },
+  "database": {
+    "provider": "Neon",
+    "plan": "free_v3",
+    "region": "sin1",
+    "resourceId": "store_h77kYA5heIhQ4vgV",
+    "projectId": "cold-bar-92099663",
+    "pooled": true,
+    "tlsCertificateVerification": true,
+    "tables": [
+      "card_orders",
+      "card_checkout_limits"
+    ]
+  },
+  "stripe": {
+    "testMode": true,
+    "webhookEndpointId": "we_1UJzG4EUsoBNLOwpdcOpkBDT",
+    "webhookUrl": "https://tokenize-tokyo.vercel.app/api/webhooks/stripe",
+    "events": [
+      "checkout.session.completed",
+      "checkout.session.async_payment_succeeded",
+      "checkout.session.expired"
+    ]
+  },
+  "chainId": 11155111,
+  "verification": "card-checkout-hosted-verification.json"
+}

@@ -3,14 +3,27 @@ import { useMemo, useState } from "react";
 import { formatEther } from "viem";
 import { ArrowRight } from "lucide-react";
 import type { MarketState } from "@/lib/model";
-import { marketAnalytics } from "@/lib/analytics";
+import { marketAnalytics, type ActivityPeriod } from "@/lib/analytics";
 import type { AssetKind } from "@/lib/catalog";
 import styles from "./MarketOverview.module.css";
+import PlatformCharts from "./PlatformCharts";
 
 const money = (n: bigint) =>
   Number(formatEther(n)).toLocaleString("en", { maximumFractionDigits: 1 });
 const proportion = (a: bigint, b: bigint) =>
   b > 0n ? Number((a * 10000n) / b) / 100 : 0;
+const periodLabels: Record<ActivityPeriod, string> = {
+  "12h": "Last 12 hours",
+  "24h": "Last 24 hours",
+  daily: "Last 7 days",
+  weekly: "Last 4 weeks",
+};
+const chartLabels: Record<ActivityPeriod, string> = {
+  "12h": "Twelve-hour",
+  "24h": "Twenty-four-hour",
+  daily: "Seven-day",
+  weekly: "Four-week",
+};
 export default function MarketOverview({
   state,
   rightsAddress,
@@ -26,14 +39,12 @@ export default function MarketOverview({
   onReview: () => void;
   onFunded: () => void;
 }) {
-  const [period, setPeriod] = useState<"daily" | "weekly">("daily");
+  const [period, setPeriod] = useState<ActivityPeriod>("24h");
   const data = useMemo(
     () => marketAnalytics(state, rightsAddress, Date.now(), period),
     [state, rightsAddress, period],
   );
   const maxCategory = Math.max(1, ...data.categories.map((c) => c.total));
-  const totalVolume =
-    data.primaryVolume + data.secondaryVolume + data.basketVolume;
   return (
     <section className={styles.overview} aria-label="Market analysis">
       <div className={styles.heading}>
@@ -43,9 +54,10 @@ export default function MarketOverview({
         </div>
         <small>
           {demo ? "Simulated browser events" : "MultiBaas indexed events"} ·
-          {period === "daily" ? "7 days" : "4 calendar weeks"} · UTC
+          {periodLabels[period]} · UTC
         </small>
       </div>
+      <PlatformCharts data={data} onFilter={onFilter} />
       <div className={styles.grid}>
         <article className={styles.card}>
           <div className={styles.cardHead}>
@@ -55,17 +67,21 @@ export default function MarketOverview({
               aria-label="Activity period"
               value={period}
               onChange={(event) =>
-                setPeriod(event.target.value as "daily" | "weekly")
+                setPeriod(event.target.value as ActivityPeriod)
               }
             >
-              <option value="daily">Last 7 days</option>
-              <option value="weekly">Last 4 weeks</option>
+              {Object.entries(periodLabels).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
             </select>
           </div>
           <ActivityChart days={data.daily} series="volume" period={period} />
           <ActivityChart days={data.daily} series="revenue" period={period} />
           <p className={styles.note}>
             mJPY · Test currency
+            {(period === "12h" || period === "24h") && " · Hourly · UTC"}
             {period === "weekly" ? " · Current week is partial" : ""}
           </p>
           {!demo &&
@@ -78,34 +94,6 @@ export default function MarketOverview({
                 See sample history <ArrowRight size={12} />
               </a>
             )}
-          <details className={styles.breakdownDetails}>
-            <summary>Trade breakdown · all time</summary>
-            <div className={styles.breakdown} aria-label="Trade composition">
-              {[
-                ["Primary rights", data.primaryVolume],
-                ["Secondary rights", data.secondaryVolume],
-                ["Basket trades", data.basketVolume],
-              ].map(([label, value]) => (
-                <div key={String(label)}>
-                  <span>{String(label)}</span>
-                  <b>
-                    {money(value as bigint)} <small>mJPY</small>
-                  </b>
-                  <i
-                    style={{
-                      width: `${proportion(value as bigint, totalVolume)}%`,
-                    }}
-                  />
-                </div>
-              ))}
-            </div>
-            {data.unmatchedVolume > 0n && (
-              <p className={styles.note}>
-                Some trades cannot yet be classified: their indexed right or
-                listing is missing.
-              </p>
-            )}
-          </details>
         </article>
         <article className={styles.card}>
           <div className={styles.cardHead}>
@@ -187,9 +175,9 @@ export default function MarketOverview({
             </div>
           </div>
           <p className={styles.note}>
-            mJPY · Withdrawals include income moved to BasketVault. The
-            remaining balance is not your personal claimable amount or a
-            promised yield.
+            mJPY · Withdrawals include income moved to BasketVault or
+            FractionVault. The remaining balance is not your personal claimable
+            amount or a promised yield.
           </p>
         </article>
         <article className={styles.card}>
@@ -242,23 +230,34 @@ function ActivityChart({
 }: {
   days: ReturnType<typeof marketAnalytics>["daily"];
   series: "volume" | "revenue";
-  period: "daily" | "weekly";
+  period: ActivityPeriod;
 }) {
-  const max = days.reduce(
-    (value, day) => (day[series] > value ? day[series] : value),
-    0n,
+  const hourly = period === "12h" || period === "24h";
+  const values = days.map((day) =>
+    series === "revenue" ? day.cumulativeRevenue : day.volume,
   );
+  const max = values.reduce((value, next) => (next > value ? next : value), 0n);
   const total = days.reduce((value, day) => value + day[series], 0n);
+  const labelEvery = hourly ? Math.ceil(days.length / 6) : 1;
+  const peakIndex =
+    series === "revenue" ? values.lastIndexOf(max) : values.indexOf(max);
   const compact = (value: bigint) =>
     Number(formatEther(value)).toLocaleString("en", {
       notation: "compact",
       maximumFractionDigits: 1,
     });
+  const points = values.map((value, i) => ({
+    x: (i + 0.5) * (490 / days.length),
+    y: 105 - proportion(value, max) * 0.75,
+  }));
+  const line = points.map((p) => `${p.x},${p.y}`).join(" ");
   return (
     <div className={styles.activityChart}>
       <div className={styles.metricHeading}>
         <span>
-          {series === "volume" ? "Rights traded" : "Income deposited"}
+          {series === "volume"
+            ? "Rights traded"
+            : "Income deposited · cumulative"}
         </span>
         <strong>
           {money(total)} <small>mJPY</small>
@@ -274,7 +273,7 @@ function ActivityChart({
         <svg
           viewBox="0 0 490 130"
           role="img"
-          aria-label={`${period === "daily" ? "Seven-day" : "Four-week"} ${series} in mJPY`}
+          aria-label={`${chartLabels[period]} ${series} in mJPY`}
         >
           <line
             x1="0"
@@ -284,44 +283,107 @@ function ActivityChart({
             stroke="currentColor"
             opacity=".2"
           />
+          {series === "revenue" && (
+            <>
+              <line
+                x1="0"
+                y1="30"
+                x2="490"
+                y2="30"
+                stroke="currentColor"
+                opacity=".12"
+                strokeDasharray="3 5"
+              />
+              <line
+                x1="0"
+                y1="67.5"
+                x2="490"
+                y2="67.5"
+                stroke="currentColor"
+                opacity=".12"
+                strokeDasharray="3 5"
+              />
+              <polygon
+                points={`${points[0].x},105 ${line} ${points.at(-1)!.x},105`}
+                fill="#91cafa"
+                opacity=".12"
+              />
+              <polyline
+                points={line}
+                fill="none"
+                stroke="#91cafa"
+                strokeWidth="2.5"
+                strokeLinejoin="round"
+              />
+            </>
+          )}
           {days.map((day, i) => {
-            const height = proportion(day[series], max) * 0.75;
+            const height = proportion(values[i], max) * 0.75;
             const center = (i + 0.5) * (490 / days.length);
             return (
               <g key={day.day}>
                 <title>
-                  {day.day}: {money(day[series])} mJPY
+                  {hourly
+                    ? `${day.day.slice(0, 10)} ${day.day.slice(11, 16)} UTC`
+                    : day.day}
+                  : {money(day[series])} mJPY
+                  {series === "revenue"
+                    ? ` deposited; ${money(values[i])} mJPY cumulative in this period`
+                    : " traded"}
                 </title>
-                <rect
-                  x={(i + 0.225) * (490 / days.length)}
-                  y={105 - height}
-                  width={(490 / days.length) * 0.55}
-                  height={height}
-                  rx="2"
-                  fill={series === "volume" ? "var(--lime)" : "#a8adb5"}
-                />
-                <text
-                  x={center}
-                  y={98 - height}
-                  textAnchor="middle"
-                  fill="currentColor"
-                  fontSize="12"
-                >
-                  {compact(day[series])}
-                </text>
-                <text
-                  x={center}
-                  y="125"
-                  textAnchor="middle"
-                  fill="currentColor"
-                  fontSize="12"
-                >
-                  {day.day.slice(5).replace("-", "/")}
-                </text>
+                {series === "volume" ? (
+                  <rect
+                    x={(i + 0.225) * (490 / days.length)}
+                    y={105 - height}
+                    width={(490 / days.length) * 0.55}
+                    height={height}
+                    rx="2"
+                    fill="var(--lime)"
+                  />
+                ) : (
+                  <circle
+                    cx={center}
+                    cy={105 - height}
+                    r="3.5"
+                    fill="#91cafa"
+                    stroke="var(--panel)"
+                    strokeWidth="2"
+                  />
+                )}
+                {values[i] > 0n && (!hourly || i === peakIndex) && (
+                  <text
+                    x={center}
+                    y={98 - height}
+                    textAnchor="middle"
+                    fill="currentColor"
+                    fontSize="12"
+                  >
+                    {compact(values[i])}
+                  </text>
+                )}
+                {(i % labelEvery === 0 || i === days.length - 1) && (
+                  <text
+                    x={center}
+                    y="125"
+                    textAnchor="middle"
+                    fill="currentColor"
+                    fontSize="12"
+                  >
+                    {hourly
+                      ? day.day.slice(11, 16)
+                      : day.day.slice(5).replace("-", "/")}
+                  </text>
+                )}
               </g>
             );
           })}
         </svg>
+      )}
+      {series === "revenue" && (
+        <p className={styles.note}>
+          Cumulative deposits within the selected period. Flat sections mean no
+          new deposits.
+        </p>
       )}
     </div>
   );

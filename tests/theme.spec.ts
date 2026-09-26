@@ -9,7 +9,7 @@ test("Cyberpunk sidebar branding and preview URLs preserve demo holdings", async
   await page
     .getByRole("button", { name: "Acquire right", exact: true })
     .click();
-  await expect(page.getByRole("status")).toContainText(
+  await expect(page.locator(".feedback[role='status']")).toContainText(
     "simulated successfully",
   );
   const before = await page.evaluate(() =>
@@ -97,7 +97,7 @@ test("Cyberpunk preview URL works on mobile and can return to Original", async (
   await page
     .getByRole("button", { name: "Acquire right", exact: true })
     .click();
-  await expect(page.getByRole("status")).toContainText(
+  await expect(page.locator(".feedback[role='status']")).toContainText(
     "simulated successfully",
   );
   await page.goto("/?theme=original");

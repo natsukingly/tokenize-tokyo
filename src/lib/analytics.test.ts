@@ -69,6 +69,113 @@ function event(
   };
 }
 describe("decision dashboard", () => {
+  it.each([
+    ["12h", 12],
+    ["24h", 24],
+  ] as const)(
+    "groups %s by hour across midnight using the exact rolling window",
+    (period, hours) => {
+      const s = fixture();
+      const clock = Date.parse("2026-09-26T02:30:00Z");
+      const cutoff = clock - hours * 3600000;
+      for (const [time, amount] of [
+        [cutoff - 1, "900"],
+        [cutoff, "100"],
+        [Math.ceil(cutoff / 3600000) * 3600000, "50"],
+        [clock - 60000, "25"],
+        [clock + 1, "800"],
+      ] as const) {
+        s.events.push(
+          event(
+            "RevenueDeposited",
+            { rightId: "1", amount },
+            new Date(time).toISOString(),
+          ),
+        );
+        s.events.push(
+          event(
+            "ListingPurchased",
+            { amount: "1", totalPrice: amount },
+            new Date(time).toISOString(),
+          ),
+        );
+      }
+      s.events.push(
+        event("RevenueDeposited", { rightId: "1", amount: "700" }, "invalid"),
+      );
+      const bins = marketAnalytics(s, token, clock, period).daily;
+      expect(bins).toHaveLength(hours + 1);
+      expect(bins[0].start).toBe(cutoff);
+      expect(bins[0].revenue).toBe(100n);
+      expect(bins[1].revenue).toBe(50n);
+      expect(bins.at(-1)?.revenue).toBe(25n);
+      expect(bins.reduce((sum, bin) => sum + bin.volume, 0n)).toBe(175n);
+      expect(bins.at(-1)?.cumulativeRevenue).toBe(175n);
+      expect(bins.some((bin) => bin.volume === 0n)).toBe(true);
+      expect(bins.some((bin) => bin.day.startsWith("2026-09-25"))).toBe(true);
+      expect(bins.some((bin) => bin.day.startsWith("2026-09-26"))).toBe(true);
+    },
+  );
+  it("attributes deposited income to physical asset types without counting vault transfers as new income", () => {
+    const s = fixture();
+    s.assets.push({
+      ...s.assets[0],
+      id: "2",
+      name: "Parking",
+      kind: "Parking",
+    });
+    s.rights.push(
+      { ...s.rights[0], id: "2" },
+      { ...s.rights[0], id: "3", assetId: "2" },
+    );
+    s.events.push(
+      event(
+        "RevenueDeposited",
+        { rightId: "1", amount: "100" },
+        "2026-01-01T00:00:00Z",
+      ),
+      event("RevenueDeposited", { rightId: "2", amount: "200" }),
+      event("RevenueDeposited", { rightId: "3", amount: "600" }),
+      event("RevenueDeposited", { rightId: "99", amount: "50" }),
+      event("RevenueClaimed", { rightId: "1", amount: "100" }),
+      event("BasketRevenueClaimed", { basketId: "1", amount: "100" }),
+    );
+    const result = marketAnalytics(s, token, now);
+    expect(result.revenueAssets).toBe(2);
+    expect(result.revenueComposition.filter((c) => c.amount > 0n)).toEqual([
+      { kind: "Rooftop", amount: 300n },
+      { kind: "Parking", amount: 600n },
+      { kind: "Unclassified", amount: 50n },
+    ]);
+    expect(result.categories.reduce((n, c) => n + c.total, 0)).toBe(2);
+  });
+  it("accumulates only deposits inside the displayed period and preserves zero-activity days", () => {
+    const s = fixture();
+    s.events.push(
+      event(
+        "RevenueDeposited",
+        { rightId: "1", amount: "900" },
+        "2026-09-19T23:59:59Z",
+      ),
+      event(
+        "RevenueDeposited",
+        { rightId: "1", amount: "100" },
+        "2026-09-20T00:00:00Z",
+      ),
+      event(
+        "RevenueDeposited",
+        { rightId: "1", amount: "50" },
+        "2026-09-26T11:00:00Z",
+      ),
+    );
+    expect(
+      marketAnalytics(s, token, now).daily.map((d) => d.cumulativeRevenue),
+    ).toEqual([100n, 100n, 100n, 100n, 100n, 100n, 150n]);
+    const empty = marketAnalytics(structuredClone(EMPTY), token, now);
+    expect(empty.revenueAssets).toBe(0);
+    expect(empty.revenueComposition.every((c) => c.amount === 0n)).toBe(true);
+    expect(empty.daily.every((d) => d.cumulativeRevenue === 0n)).toBe(true);
+  });
   it("groups weekly activity on UTC Mondays without filling empty periods", () => {
     const s = fixture();
     s.events.push(

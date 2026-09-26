@@ -1,0 +1,38 @@
+{
+  "checkedAt": "2026-09-26T15:25:59.422Z",
+  "chainId": 31337,
+  "network": "isolated Anvil",
+  "multibaas": "local wire-format fixture; not a live MultiBaas service verification",
+  "scenarios": [
+    "custody-backed fraction creation",
+    "fraction trading",
+    "deposited income claim",
+    "whole-unit redemption",
+    "rental payment and access",
+    "active withdrawal rejection",
+    "early return",
+    "owner recovery",
+    "indexed activity",
+    "mobile layout"
+  ],
+  "hashes": [
+    "0x5366ee4767975b80e5df10826235a53b676f73a804a00fc636215b8d2448c1e8",
+    "0xa40f66e16eff0d57655a59d639d0efd10265c8cc33d2e159a379d60bf41d36d7",
+    "0xac11868435a9e1dd0089d2325ccd4cc090c09e049af5e1e9daeaa9e7f3a3c117",
+    "0x25c176fca46d221e0b48b214d57ccd2f375cf33bb0f11e0b35d70de0fa305c58",
+    "0x807026bf091ebd68f33e30c578458b90aaac2e3285a15c49839f509ac8addabe",
+    "0x3637c90bc00ca015e94a6a5b658fe14ffd0205b64d6dd450c54192300d6a71de",
+    "0x006beb98b47804e2855b92ba7ea7b81928f0ef07fd80a25313b570e98a48568f",
+    "0x27e1a429682961644868344d1022f728e001ef1841ab997188ae7c823d3fb200",
+    "0xe168ad08fe6753e251efecb5162b6525b6641895fbc6a3a94309ef29e54ffe43",
+    "0x71a3d954c84b978402c15ed4a9e9e84fb97a6a439d974c1f4a090b5e2e11bb70",
+    "0x1ba84fe859d49f3a3a29450720137a3a789ddcd3dce1aba01c0045e6687e199d",
+    "0x048cf5f8859967086b6371789290c1dcf20cfe529cb9312eb6038dd5eeb76fc9",
+    "0x3ce610efb1b1cedc2ac3cdd380e64d52cba81fcc258e6d99003849ed0c0513cc",
+    "0xd072343c38b09a355645f6528d1a9e28f51402dafa46c6810bee8776c9af5fa3",
+    "0xc054878b3480b82a6809987a3bf5a1c5fd6c4a13d3e5c546bc3d52f0df1278ab",
+    "0x0d947f9ac13e7cdabf1f6e460e6e7ba5ecb94975ebb8e548e91cb7cd7f45f6ba",
+    "0x151fc0cca383f4b07d7e4937136792cdc5c8c9e2e32e390f8f666ef7ad1acdfd",
+    "0x056b449bfd15c567a742e9ab2585b36f1949ab55bcf77ceeb3f8bad273a82680"
+  ]
+}

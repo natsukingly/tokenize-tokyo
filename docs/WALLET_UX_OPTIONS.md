@@ -1,15 +1,15 @@
 # Account UX and Curvegrid Cloud Wallet options
 
-Status: 2026-09-26. Proposal only; the live app still uses user-signed browser wallets.
+Status: 2026-09-27. Optional Privy + MetaMask connection code is implemented; Privy local activation is pending. Azure Cloud Wallet is configured on Curvegrid Testnet and Sepolia, with live signature verification passed on both. The live app still uses user-signed browser wallets. See [setup instructions and exact activation status](WALLET_SETUP.md).
 
 ## Current implementation / 現在
 
 - Platform navigation: Explore, Dashboard, Markets, ENS Index, Activity. These show the shared city and market.
 - My workspace: My assets and Compose. Holdings and transactions use the connected address; My assets explains how to connect when signed out. Viewing a basket definition does not require owning it.
 - A browser wallet connection is not a server-authenticated login session. Demo role switching exists only in the explicit simulation.
-- `src/server/operator.ts` has a Cloud Wallet adapter for bounded operator actions (verification, activation and revenue deposits) and TXM status. It is not a per-user account service and has not been validated with a live Cloud Wallet.
+- `src/server/operator.ts` has a Cloud Wallet adapter for bounded operator actions (verification, activation and revenue deposits) and TXM status. It is not a per-user account service. Cloud Wallet signing has been verified live; the bounded operator transaction paths and TXM remain unverified.
 
-全体の市場を見るメニューと、自分の保有・組成を扱うメニューを分離した。現在の実取引は利用者のウォレット署名。メール／Googleログインや一般利用者向けCloud Walletは未実装。
+全体の市場を見るメニューと、自分の保有・組成を扱うメニューを分離した。現在の実取引は利用者のウォレット署名。メール／Googleログインの接続コードは実装済みで、Privyの有効化・実ログイン確認が残る。Cloud Walletは運営用として設定済み。
 
 ## Can the product work without MetaMask?
 

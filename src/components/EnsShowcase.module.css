@@ -1,0 +1,492 @@
+.page {
+  background: #111416;
+  color: #edf0e9;
+  min-height: 100svh;
+}
+.header {
+  height: 82px;
+  border-bottom: 1px solid #353b3d;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 0 38px;
+}
+.header > a,
+.header > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+.header > span {
+  color: #f0df37;
+}
+.page .main {
+  margin: 0 auto;
+  padding: 46px 38px 0;
+  width: 100%;
+  max-width: 1280px;
+}
+.eyebrow {
+  color: #e8db59;
+  font-size: 10px;
+  letter-spacing: 1.8px;
+  line-height: 1.8;
+}
+.page .hero h1 {
+  font-size: clamp(38px, 4.5vw, 62px);
+  line-height: 1.08;
+  letter-spacing: -2px;
+  margin: 18px 0;
+  font-style: normal;
+}
+.hero > p:not(.eyebrow) {
+  max-width: 710px;
+  color: #aab4b6;
+  line-height: 1.8;
+  font-size: 14px;
+}
+.namespace {
+  margin: 28px 0 30px;
+  padding: 20px;
+  background: #1c2224;
+  border: 1px solid #3b4649;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  min-width: 0;
+  border-radius: 4px;
+}
+.namespace svg {
+  flex-shrink: 0;
+  color: #f0df37;
+}
+.namespace code {
+  font-size: clamp(11px, 1.4vw, 16px);
+  overflow-wrap: anywhere;
+  line-height: 1.7;
+}
+.namespace > span {
+  font-size: 10px;
+  color: #cbd495;
+  margin-left: auto;
+  white-space: nowrap;
+}
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  border-bottom: 1px solid #3b4649;
+  flex-wrap: wrap;
+}
+.tabs {
+  display: flex;
+  gap: 20px;
+}
+.tabs button {
+  padding: 15px 4px;
+  color: #aab4b6;
+  font-size: 13px;
+  border-bottom: 2px solid transparent;
+}
+.tabs button[aria-selected="true"] {
+  color: #f0df37;
+  border-color: #f0df37;
+}
+.refresh {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 11px;
+  color: #b9c4c6;
+  padding: 8px;
+}
+.content {
+  padding: 28px 0 10px;
+}
+.roles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.roles article {
+  padding: 24px;
+  background: #1a2022;
+  border: 1px solid #343e41;
+  border-radius: 4px;
+}
+.roles svg {
+  width: 21px;
+  color: #f0df37;
+  margin-bottom: 20px;
+}
+.roles h2 {
+  font-size: 17px;
+  margin-bottom: 10px;
+}
+.roles p,
+.evidence p,
+.panel > p:not(.eyebrow),
+.grant p {
+  font-size: 12px;
+  line-height: 1.8;
+  color: #a5b0b2;
+}
+.sectionHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin: 34px 0 17px;
+}
+.sectionHeading h2 {
+  font-size: 20px;
+  letter-spacing: -0.5px;
+}
+.sectionHeading > span {
+  font-size: 10px;
+  color: #a5b0b2;
+}
+.evidence {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.evidence a {
+  display: flex;
+  gap: 17px;
+  padding: 20px;
+  border: 1px solid #343e41;
+  border-radius: 4px;
+}
+.evidence a:hover {
+  border-color: #d6ca52;
+  background: #1a2022;
+}
+.number {
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  color: #e7d85e;
+  padding-top: 2px;
+}
+.evidence h3 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+.evidence a > div {
+  flex: 1;
+}
+.evidence small {
+  font-size: 10px;
+  display: block;
+  margin-top: 12px;
+  color: #c0c9a7;
+}
+.note {
+  padding: 17px 19px;
+  margin: 20px 0;
+  border: 1px solid #3b4649;
+  border-radius: 4px;
+  color: #b5c0c2;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.note button,
+.note a {
+  color: #f0df37;
+}
+.note a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 18px;
+}
+.note svg {
+  vertical-align: middle;
+}
+.wallet {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  background: #20272a;
+  padding: 16px 20px;
+  border: 1px solid #465257;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  font-size: 12px;
+}
+.wallet code {
+  overflow-wrap: anywhere;
+}
+.wallet button {
+  color: #f0df37;
+  border: 1px solid #667041;
+  padding: 9px 12px;
+  border-radius: 3px;
+}
+.reportGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.panel {
+  padding: 25px;
+  border: 1px solid #3b4649;
+  border-radius: 4px;
+  background: #1a2022;
+  min-width: 0;
+}
+.panel h2 {
+  font-size: 22px;
+  line-height: 1.4;
+  letter-spacing: -0.6px;
+  margin: 12px 0 15px;
+}
+.key {
+  display: block;
+  color: #f0df37;
+  font-size: 13px;
+  margin-bottom: 15px;
+}
+.panel label {
+  display: grid;
+  gap: 8px;
+  font-size: 12px;
+  color: #cbd2cf;
+  margin-top: 20px;
+}
+.panel input {
+  width: 100%;
+  color: #edf0e9;
+  padding: 12px;
+  border: 1px solid #4b575a;
+  border-radius: 3px;
+  background: #121719;
+  font-family: inherit;
+  min-width: 0;
+  font-size: 13px;
+  color-scheme: dark;
+}
+.reading {
+  padding: 16px;
+  background: #101517;
+  border: 1px solid #343e41;
+  margin-top: 21px;
+}
+.reading > span {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.1px;
+  color: #d3ddc5;
+}
+.reading pre {
+  font-size: 12px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.8;
+  color: #d3dad6;
+  margin: 13px 0;
+}
+.reading small,
+.checks small,
+.grant small {
+  font-size: 10px;
+  color: #9ba9ad;
+  line-height: 1.7;
+  display: block;
+}
+.panel .small {
+  font-size: 11px;
+  color: #a5b0b2;
+  margin-top: 14px;
+  line-height: 1.8;
+}
+.primary,
+.secondary {
+  width: 100%;
+  padding: 13px 15px;
+  border-radius: 3px;
+  margin-top: 18px;
+  font-size: 12px;
+}
+.primary {
+  background: #f0df37;
+  color: #12150d;
+  font-weight: 600;
+}
+.secondary {
+  border: 1px solid #6c7450;
+  color: #e1dc9b;
+}
+.checks {
+  margin-top: 18px;
+  border: 1px solid #465257;
+  padding: 12px;
+}
+.checks > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px solid #354144;
+  padding: 12px 0;
+  font-size: 11px;
+}
+.checks code {
+  overflow-wrap: anywhere;
+}
+.checks strong {
+  font-weight: 500;
+  white-space: nowrap;
+}
+.checks [data-result="allowed"] {
+  color: #e3db67;
+}
+.checks [data-result="denied"] {
+  color: #9eccb1;
+}
+.checks [data-result="unavailable"] {
+  color: #e1a89c;
+}
+.checks small {
+  margin-top: 12px;
+}
+.grant {
+  margin-top: 26px;
+  padding-top: 24px;
+  border-top: 1px solid #3b4649;
+}
+.grant h3 {
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+.grant > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0 12px;
+}
+.grant button {
+  padding: 10px 12px;
+  border: 1px solid #6c7450;
+  font-size: 11px;
+  border-radius: 3px;
+}
+.error {
+  padding: 14px 18px;
+  background: #362424;
+  color: #f5beb8;
+  border: 1px solid #724942;
+  border-radius: 3px;
+  margin: 18px 0;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.page .footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  border-top: 1px solid #354144;
+  padding: 22px 0;
+  margin-top: 24px;
+  font-size: 11px;
+  color: #9da9ac;
+}
+.footer a {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #dadbad;
+}
+@media (max-width: 760px) {
+  .header {
+    height: 72px;
+    padding: 0 20px;
+  }
+  .header > span {
+    display: none;
+  }
+  .header > a {
+    font-size: 11px;
+  }
+  .page .main {
+    padding: 28px 20px 0;
+  }
+  .page .hero h1 {
+    font-size: 39px;
+  }
+  .hero > p:not(.eyebrow) {
+    font-size: 12px;
+  }
+  .namespace {
+    padding: 15px;
+    gap: 9px;
+    flex-wrap: wrap;
+  }
+  .namespace code {
+    max-width: calc(100% - 40px);
+  }
+  .namespace > span {
+    margin-left: 28px;
+  }
+  .toolbar {
+    gap: 8px;
+  }
+  .tabs {
+    gap: 14px;
+  }
+  .tabs button {
+    font-size: 12px;
+  }
+  .refresh {
+    margin-bottom: 8px;
+  }
+  .roles,
+  .evidence,
+  .reportGrid {
+    grid-template-columns: 1fr;
+  }
+  .roles article {
+    padding: 20px;
+  }
+  .roles svg {
+    margin-bottom: 12px;
+  }
+  .panel {
+    padding: 20px;
+  }
+  .panel h2 {
+    font-size: 20px;
+  }
+  .wallet {
+    padding: 15px;
+    line-height: 1.7;
+  }
+  .wallet > span {
+    min-width: 0;
+  }
+  .wallet code {
+    font-size: 10px;
+  }
+  .checks > div {
+    font-size: 10px;
+  }
+  .note a {
+    margin-left: 0;
+    display: flex;
+  }
+  .footer {
+    line-height: 1.8;
+  }
+}

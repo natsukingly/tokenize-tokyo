@@ -33,7 +33,7 @@ import {
 import { clients } from "../src/lib/multibaas";
 
 // Additive testnet-only scenario. No contract migration, role changes or historical backdating.
-const MAX_SPEND = parseEther("0.28");
+const MAX_SPEND = parseEther("0.30");
 // Deployer buffer only. The operator's 0.05 ETH is funded separately in its
 // Cloud Wallet; this script never signs with or spends that wallet.
 const OWNER_RESERVE = parseEther("0.003");
@@ -383,13 +383,21 @@ const a = (
 
 async function ensureInvestorGas(phase: string, names: string[]) {
   for (const name of new Set(names)) {
-    const id = `setup/${phase}/gas/${name}`;
+    const baseId = `setup/${phase}/gas/${name}`;
+    let id = baseId;
+    let refill = 0;
+    // A wave may resume after consuming its first gas allocation. Preserve that
+    // transfer and journal any additional allocation under a fresh, stable ID.
+    while (journal.steps[id]?.block)
+      id = `${baseId}/refill-${++refill}`;
     if (journal.steps[id] && !journal.steps[id].block)
       await confirm(journal.steps[id]);
-    if (
-      (await rpc.getBalance({ address: actors[name].address })) <
-      parseEther("0.0007")
-    ) {
+    const balance = await rpc.getBalance({ address: actors[name].address });
+    if (balance < parseEther("0.0015")) {
+      // Leave room for the wave's purchases and later claims, including the
+      // conservative gas reservations while several transactions are pending.
+      while (journal.steps[id]?.block)
+        id = `${baseId}/refill-${++refill}`;
       await batch(
         "Test investor gas",
         [
@@ -397,7 +405,7 @@ async function ensureInvestorGas(phase: string, names: string[]) {
             id,
             actor: "owner",
             to: actors[name].address,
-            value: parseEther("0.001"),
+            value: parseEther("0.002") - balance,
           },
         ],
         1,

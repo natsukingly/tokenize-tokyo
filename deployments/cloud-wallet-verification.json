@@ -1,0 +1,20 @@
+{
+  "verifiedAt": "2026-09-26T16:49:50.201Z",
+  "verification": "Unique personal_sign setup messages recovered with viem.verifyMessage; no on-chain transaction.",
+  "networks": [
+    {
+      "chainId": 2017072401,
+      "operatorAddress": "0xe7651562e2F34b5d3D668BEaD79B718f7db688bb",
+      "signingVerified": true,
+      "transactionSubmitted": false,
+      "tokenizationSponsored": false
+    },
+    {
+      "chainId": 11155111,
+      "operatorAddress": "0xE90FB4cABa8bE81391389A2dA4E2192c69151a17",
+      "signingVerified": true,
+      "transactionSubmitted": false,
+      "tokenizationSponsored": false
+    }
+  ]
+}

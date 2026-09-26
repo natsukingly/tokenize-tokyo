@@ -101,6 +101,23 @@
 .table tr:hover td {
   background: color-mix(in srgb, var(--panel) 55%, transparent);
 }
+.clickableRow {
+  cursor: pointer;
+}
+.clickableRow:focus-within td {
+  background: color-mix(in srgb, var(--panel) 55%, transparent);
+}
+.detailLink {
+  text-align: left;
+  color: inherit;
+  border-radius: 3px;
+}
+.clickableRow:hover .detailLink,
+.detailLink:focus-visible {
+  color: var(--lime);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
 .identity {
   display: flex;
   gap: 14px;

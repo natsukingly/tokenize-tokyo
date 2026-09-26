@@ -1,5 +1,7 @@
 # TOKENIZE TOKYO — 4-minute finalist script (v2, 2026-09-26)
 
+> **Superseded for recording (2026-09-27):** use the [four-version recording kit](submission-kit/README.md), [general bilingual script](submission-kit/general-script.md), and [sponsor-specific scripts](submission-kit/index.html). The historical script below contains stale environment, ENS and test-count claims; do not read it unchanged for submission.
+
 Decks: `pitch/index.html` (general, 5 slides), `pitch/curvegrid.html` (6 slides: 4 = Programmable rights, 5 = MultiBaas), `pitch/ens.html` (6 slides: 4 = Spatial namespace, 5 = Four layers). Slide numbers below are for the general deck; in the track decks, "Slide 4" below becomes slides 4 and 5, and "Slide 5" becomes slide 6.
 
 Format assumed: 4 min demo + 3 min Q&A. Judging axes: Technicality / Originality / Practicality / Usability / WOW.

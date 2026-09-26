@@ -21,6 +21,8 @@ interface ENSFactory is IENSv2Factory {
 }
 interface ENSResolver {
     function setText(bytes calldata name,string calldata key,string calldata value) external;
+    function grantSetterRoles(bytes calldata setter,address account) external returns(bool);
+    function revokeRoles(uint256 resource,uint256 roles,address account) external returns(bool);
 }
 interface UniversalResolver {
     function resolve(bytes calldata name,bytes calldata data) external view returns(bytes memory,address);
@@ -108,6 +110,20 @@ contract ENSDelegationTest is ProtocolBase {
         vm.prank(buyer); vm.expectRevert(); rights.verifyRight(id,true);
         rights.verifyRight(id,true); assertTrue(rights.isTradable(id));
         assertEq(authority.issuanceAvailable(binding,buyer),60);
+    }
+    function testReporterCanEditOnlyEnergyReportAndRevocationStopsWrites() public {
+        bytes memory name = hex"07726f6f66746f700a6275696c64696e672d3107636869796f64610a746f6b796f2d746573740365746800";
+        bytes memory setter=abi.encodeCall(ENSResolver.setText,(name,"urban.energyReport",""));
+        vm.prank(owner); ENSResolver(resolver).grantSetterRoles(setter,buyer);
+        vm.prank(buyer); ENSResolver(resolver).setText(name,"urban.energyReport","125.50 kWh");
+        vm.prank(buyer); vm.expectRevert(); ENSResolver(resolver).setText(name,"urban.assetId","999");
+        vm.prank(buyer); vm.expectRevert(); ENSResolver(resolver).setText(name,"urban.rightsContract","0x0000");
+        vm.prank(buyer); vm.expectRevert(); building.setResolver(roofHash,buyer);
+        vm.prank(buyer); vm.expectRevert(); rights.createScopedRightForIssuer(_request());
+        vm.prank(owner); ENSResolver(resolver).revokeRoles(uint256(keccak256("urban.energyReport")),1 << 4,buyer);
+        vm.prank(buyer); vm.expectRevert(); ENSResolver(resolver).setText(name,"urban.energyReport","999");
+        (bytes memory value,)=universal.resolveWithGateways(name,abi.encodeWithSignature("text(bytes32,string)",bytes32(0),"urban.energyReport"),new string[](0));
+        assertEq(abi.decode(value,(string)),"125.50 kWh");
     }
     function testRoofOperatorCannotIssueInteriorOrOtherAsset() public {
         _grant(); UrbanRightToken.RightRequest memory q=_request(); q.scope=1;

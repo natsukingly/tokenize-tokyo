@@ -1,6 +1,6 @@
 # TOKENIZE TOKYO — finalist pitch
 
-**最新の推奨構成は [Concept → Map → Tokenize → Funding](DEMO_SCENARIO.md) です。** 以下は競合検出・稼働開始を中心にした技術デモの別構成として残しています。
+**最新の推奨構成は [ひとつの屋根が、事業・権利・収益になる](DEMO_SCENARIO.md) です。** 以下は競合検出・稼働開始を中心にした旧シナリオの記録です。公開アプリのモード、ENSの進捗、画面名には古い記述があるため、そのまま提出用台本には使わないでください。現在の公開メインは実テストネット、`/demo`はシミュレーションです。ENSは公開Sepoliaで委任発行まで検証済みで、公開UI接続が残っています。
 
 **Remember this:** “We don't tokenize buildings. We tokenize what a city can do.”
 
@@ -14,17 +14,17 @@ The [Tokyo 2026 official guide](https://ethglobal.com/events/tokyo2026/info/deta
 2. Open [the deck](pitch/index.html). **← / →** changes slides, **N** opens notes, **D** opens `http://127.0.0.1:3000`, **T** starts/pauses the optional four-minute clock, **R** resets it. The clock continues while the app tab is in front; it never advances slides or submits transactions.
 3. Start the clock with the first sentence. At slide 3, switch to the app. Return to the deck at **2:55**, press → for slide 4, and end on slide 5.
 
-| Time | Screen | One thing to prove |
-| --- | --- | --- |
-| 0:00–0:25 | 1 · Problem | Existing urban capacity is underused. |
-| 0:25–0:40 | 2 · Solution | A place can offer a specific right. |
-| 0:40–1:05 | App · Discover | Search the city and see the relevant scope. |
-| 1:05–1:50 | App · Define | Issue a roof-specific use with a period and purpose. |
-| 1:50–2:10 | App · Conflict | A competing exclusive use is rejected. |
+| Time      | Screen                  | One thing to prove                                                   |
+| --------- | ----------------------- | -------------------------------------------------------------------- |
+| 0:00–0:25 | 1 · Problem             | Existing urban capacity is underused.                                |
+| 0:25–0:40 | 2 · Solution            | A place can offer a specific right.                                  |
+| 0:40–1:05 | App · Discover          | Search the city and see the relevant scope.                          |
+| 1:05–1:50 | App · Define            | Issue a roof-specific use with a period and purpose.                 |
+| 1:50–2:10 | App · Conflict          | A competing exclusive use is rejected.                               |
 | 2:10–2:55 | App · Fund and activate | Buying funds the right; an independent operator action activates it. |
-| 2:55–3:25 | 4 · Innovation | Space × Time × Usage × Rights, enforced by a common protocol. |
-| 3:25–3:50 | 5 · Scale | One rights model supports multiple assets and later markets. |
-| 3:50–4:00 | 5 · Closing | Put dormant assets back to work. |
+| 2:55–3:25 | 4 · Innovation          | Space × Time × Usage × Rights, enforced by a common protocol.        |
+| 3:25–3:50 | 5 · Scale               | One rights model supports multiple assets and later markets.         |
+| 3:50–4:00 | 5 · Closing             | Put dormant assets back to work.                                     |
 
 ## English narration
 
@@ -131,11 +131,11 @@ Real-chain evidence: [receipts](../deployments/testnet-demo-receipts.json) and [
 
 Checked on 2026-09-26:
 
-| Slide value | Meaning and source |
-| --- | --- |
-| 896.5K | 896,500 vacant homes in Tokyo, 2023; 214,200 exclude rental, sale and secondary homes. [TMG housing context, printed p.24](https://www.juutakuseisaku.metro.tokyo.lg.jp/documents/d/juutakuseisaku/r7-2_juuseishin_sannkou2#page=25). These are not all off-market or available. |
-| 1,303 ha | Tokyo’s 23 wards, 2021, the survey category **未利用地等** (“unused land, etc.”). [TMG land-use survey](https://www.toshiseibi.metro.tokyo.lg.jp/about/chousa/tochi_c/tochi_kekka_r3). This is not a count of marketable plots. |
-| 6.01% | Panel installation rate for **detached houses**, FY2022, not all buildings or all suitable roofs. [TMG solar survey, printed p.1](https://www.kankyo.metro.tokyo.lg.jp/documents/d/kankyo/2026-01-08-111239-896#page=2). The suggested 6.8% was not verified for this population/year. |
-| 4 + 3 minutes | Demo plus Q&A; Technicality, Originality, Practicality, Usability and WOW Factor. [ETHGlobal Tokyo 2026 guide](https://ethglobal.com/events/tokyo2026/info/details). |
+| Slide value   | Meaning and source                                                                                                                                                                                                                                                                     |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 896.5K        | 896,500 vacant homes in Tokyo, 2023; 214,200 exclude rental, sale and secondary homes. [TMG housing context, printed p.24](https://www.juutakuseisaku.metro.tokyo.lg.jp/documents/d/juutakuseisaku/r7-2_juuseishin_sannkou2#page=25). These are not all off-market or available.       |
+| 1,303 ha      | Tokyo’s 23 wards, 2021, the survey category **未利用地等** (“unused land, etc.”). [TMG land-use survey](https://www.toshiseibi.metro.tokyo.lg.jp/about/chousa/tochi_c/tochi_kekka_r3). This is not a count of marketable plots.                                                        |
+| 6.01%         | Panel installation rate for **detached houses**, FY2022, not all buildings or all suitable roofs. [TMG solar survey, printed p.1](https://www.kankyo.metro.tokyo.lg.jp/documents/d/kankyo/2026-01-08-111239-896#page=2). The suggested 6.8% was not verified for this population/year. |
+| 4 + 3 minutes | Demo plus Q&A; Technicality, Originality, Practicality, Usability and WOW Factor. [ETHGlobal Tokyo 2026 guide](https://ethglobal.com/events/tokyo2026/info/details).                                                                                                                   |
 
 Do not sum these different measures into TAM. They motivate the problem; they do not establish usable supply, customer demand or verified social impact.

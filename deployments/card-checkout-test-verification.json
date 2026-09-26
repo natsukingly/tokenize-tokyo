@@ -1,0 +1,30 @@
+{
+  "checkedAt": "2026-09-26T17:12:51.446Z",
+  "chainId": 11155111,
+  "stripe": {
+    "testMode": true,
+    "paymentStatus": "paid",
+    "currency": "jpy",
+    "amount": 2400,
+    "checkoutSessionId": "cs_test_a1Aad2R5zrytaI4GprEr9GI40BfMfPVlKNwQUTdXy4rWmCDEu38txQaA9C",
+    "eventId": "evt_1UJz8cEUsoBNLOwpTelvzq9F"
+  },
+  "orderId": "9bb609d7-a630-417e-8c68-487c8952ab12",
+  "operator": "0xe90fb4caba8be81391389a2da4e2192c69151a17",
+  "executor": "0x2a33b0466330b39e09b89d2cba96a621506a6b4d",
+  "recipient": "0x83D04B1C4511Fb874eBBFeC6A816355d1e0f7cc8",
+  "listingId": "1",
+  "rightId": "1",
+  "quantity": "1",
+  "balanceBefore": "2",
+  "balanceAfter": "3",
+  "transactionHash": "0x9433b707f9596954f018b11cb8076bed4dedb511b3a641a311ce686498d53813",
+  "block": "11787582",
+  "receiptStatus": "success",
+  "deliveryStatus": "fulfilled",
+  "replay": {
+    "method": "Same Stripe test event re-signed with local listener secret, plus explicit status reconciliation",
+    "httpStatus": 200,
+    "duplicateDelivery": false
+  }
+}

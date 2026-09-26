@@ -1,0 +1,115 @@
+{
+  "chainId": 11155111,
+  "checkedAt": "2026-09-26T17:32:51.001Z",
+  "name": "rooftop.building-1.chiyoda.tokenizetokyo-demo-2026.eth",
+  "resolver": "0x0a5e20fDf2152d048dafEaCad7D6A2A48c78da82",
+  "reporter": "0x1A202fa63513BE1dB3be8b7A4B3b0bC64cde34d0",
+  "issuer": "0x71bE0c03F807Ad83F290aDddb842f14652c80554",
+  "reportKey": "urban.energyReport",
+  "value": "{\"period\":\"2026-09\",\"energyKWh\":\"125.50\",\"source\":\"operator-reported test data\"}",
+  "permissionsAfterTest": "revoked",
+  "checks": [
+    {
+      "phase": "granted",
+      "account": "0x1A202fa63513BE1dB3be8b7A4B3b0bC64cde34d0",
+      "blockNumber": "11787668",
+      "checks": [
+        {
+          "key": "urban.energyReport",
+          "result": "allowed"
+        },
+        {
+          "key": "urban.assetId",
+          "result": "denied"
+        },
+        {
+          "key": "urban.rightsContract",
+          "result": "denied"
+        }
+      ]
+    },
+    {
+      "phase": "granted",
+      "account": "0x1A202fa63513BE1dB3be8b7A4B3b0bC64cde34d0",
+      "blockNumber": "11787670",
+      "checks": [
+        {
+          "key": "urban.energyReport",
+          "result": "allowed"
+        },
+        {
+          "key": "urban.assetId",
+          "result": "denied"
+        },
+        {
+          "key": "urban.rightsContract",
+          "result": "denied"
+        }
+      ]
+    },
+    {
+      "phase": "granted",
+      "account": "0x1A202fa63513BE1dB3be8b7A4B3b0bC64cde34d0",
+      "blockNumber": "11787677",
+      "checks": [
+        {
+          "key": "urban.energyReport",
+          "result": "allowed"
+        },
+        {
+          "key": "urban.assetId",
+          "result": "denied"
+        },
+        {
+          "key": "urban.rightsContract",
+          "result": "denied"
+        }
+      ]
+    },
+    {
+      "phase": "granted",
+      "account": "0x1A202fa63513BE1dB3be8b7A4B3b0bC64cde34d0",
+      "blockNumber": "11787665",
+      "checks": [
+        {
+          "key": "urban.energyReport",
+          "result": "allowed"
+        },
+        {
+          "key": "urban.assetId",
+          "result": "denied"
+        },
+        {
+          "key": "urban.rightsContract",
+          "result": "denied"
+        }
+      ]
+    },
+    {
+      "phase": "revoked",
+      "account": "0x1A202fa63513BE1dB3be8b7A4B3b0bC64cde34d0",
+      "blockNumber": "11787685",
+      "checks": [
+        {
+          "key": "urban.energyReport",
+          "result": "denied"
+        },
+        {
+          "key": "urban.assetId",
+          "result": "denied"
+        },
+        {
+          "key": "urban.rightsContract",
+          "result": "denied"
+        }
+      ]
+    }
+  ],
+  "transactions": {
+    "fund-reporter": "0x5a5e86fe761e355bf5e08f0878e738553cc4de1b8c70d7dda27e67da4d0c04a5",
+    "grant-report-key": "0x2fe1f2078e3c22961c270ef38647ef5c033c7f8200071124fb8d486f1dd026b4",
+    "fund-reporter-buffer": "0xa4050f9de42ec5562e194580122a803d76a1018d55909bbbd2f244009bba4295",
+    "write-energy-report": "0xb58ae01b1e05604007b63d50b028d82c2d514b5927a02162762894d4e925c3a9",
+    "revoke-report-key": "0x8bb1528fd2cd6df269aaec1233590c6dea04ec01cd673589714ad59da5fcf3ac"
+  }
+}

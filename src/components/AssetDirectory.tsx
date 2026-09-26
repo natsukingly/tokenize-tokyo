@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { ArrowUpRight, Search, ShieldCheck, X } from "lucide-react";
 import { formatEther } from "viem";
 import { ASSET_KINDS } from "@/lib/catalog";
 import type { Asset, Listing, Right } from "@/lib/model";
 import MapThumbnail from "./MapThumbnail";
+import AssetDetailsDialog from "./AssetDetailsDialog";
 import styles from "./AssetDirectory.module.css";
 
 export type DirectoryFilters = {
@@ -39,6 +41,8 @@ export default function AssetDirectory({
   onView: (id: string) => void;
   demo: boolean;
 }) {
+  const [detailId, setDetailId] = useState<string | null>(null);
+  const detailAsset = assets.find((asset) => asset.id === detailId);
   const search = filters.search.trim().toLocaleLowerCase();
   const rows = assets
     .map((asset) => {
@@ -201,7 +205,19 @@ export default function AssetDirectory({
           </thead>
           <tbody>
             {rows.map(({ asset, rights, status, price }) => (
-              <tr key={asset.id}>
+              <tr
+                key={asset.id}
+                className={styles.clickableRow}
+                onClick={(event) => {
+                  if ((event.target as HTMLElement).closest("button, a"))
+                    return;
+                  if (window.getSelection()?.toString()) return;
+                  event.currentTarget
+                    .querySelector("button")
+                    ?.focus({ preventScroll: true });
+                  setDetailId(asset.id);
+                }}
+              >
                 <td className={styles.space}>
                   <div className={styles.identity}>
                     <MapThumbnail
@@ -210,7 +226,13 @@ export default function AssetDirectory({
                       compact
                     />
                     <div>
-                      <strong>{asset.name}</strong>
+                      <button
+                        className={styles.detailLink}
+                        aria-label={`View details for ${asset.name}`}
+                        onClick={() => setDetailId(asset.id)}
+                      >
+                        <strong>{asset.name}</strong>
+                      </button>
                       <span>{asset.district}</span>
                       <small>
                         {asset.kind} · {asset.area.toLocaleString()} m²
@@ -277,6 +299,23 @@ export default function AssetDirectory({
             </button>
           )}
         </div>
+      )}
+      {detailAsset && (
+        <AssetDetailsDialog
+          asset={detailAsset}
+          rights={rights.filter((right) => right.assetId === detailAsset.id)}
+          listings={listingsFor(detailAsset)}
+          status={
+            detailAsset.status === "Verified"
+              ? stage(detailAsset)
+              : detailAsset.status
+          }
+          onClose={() => setDetailId(null)}
+          onView={() => {
+            setDetailId(null);
+            onView(detailAsset.id);
+          }}
+        />
       )}
       <p className={styles.note}>
         Prices are for the listed rights, not ownership of the building. Open a

@@ -1,0 +1,37 @@
+{
+  "checkedAt": "2026-09-26T17:33:33.240Z",
+  "origin": "https://tokenize-tokyo.vercel.app",
+  "chainId": 11155111,
+  "stripe": {
+    "testMode": true,
+    "amount": 2400,
+    "currency": "jpy",
+    "paymentStatus": "paid",
+    "checkoutSessionId": "cs_test_a1yifjMGLWMEuZFEzn62xz90NwYZkPSK7OmPM2pXzZ3py6RnR4eMeAwcUH",
+    "eventId": "evt_1UJzSaEUsoBNLOwpknDAj7vK",
+    "webhookEndpointId": "we_1UJzG4EUsoBNLOwpdcOpkBDT"
+  },
+  "orderId": "e0bf070b-0155-437b-8a5d-c04fea847984",
+  "operator": "0xe90fb4caba8be81391389a2da4e2192c69151a17",
+  "executor": "0x2a33b0466330b39e09b89d2cba96a621506a6b4d",
+  "recipient": "0x83D04B1C4511Fb874eBBFeC6A816355d1e0f7cc8",
+  "listingId": "1",
+  "rightId": "1",
+  "quantity": "1",
+  "balanceBefore": "3",
+  "balanceAfter": "4",
+  "transactionHash": "0x8e5d49e8f3e84ccd479e039dbd2501fb1592c38455e6d12d1e930a1322dfffbc",
+  "block": "11787684",
+  "receiptStatus": "success",
+  "deliveryStatus": "fulfilled",
+  "deliveryTrigger": "Hosted Stripe webhook; submitted state observed before any reconciliation POST",
+  "replay": {
+    "method": "Same test event re-signed with hosted endpoint secret, then explicit reconciliation",
+    "httpStatus": 200,
+    "duplicateDelivery": false
+  },
+  "guards": {
+    "unauthorizedOrderStatus": 404,
+    "unsignedWebhookStatus": 400
+  }
+}

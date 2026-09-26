@@ -10,6 +10,8 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:contracts": "forge test --root contracts",
+    "test:finance": "tsx scripts/test-finance.ts",
+    "finance:link": "tsx scripts/link-finance-multibaas.ts",
     "test:e2e": "playwright test",
     "multibaas:verify": "tsx scripts/verify-multibaas.ts",
     "ens:inspect": "tsx scripts/inspect-ens.ts",
@@ -17,11 +19,13 @@
     "ens:setup:sepolia": "tsx scripts/setup-ens-sepolia.ts",
     "ens:link:multibaas": "tsx scripts/link-ens-multibaas.ts",
     "ens:verify:delegation": "tsx scripts/verify-ens-delegation.ts",
+    "ens:verify:reports": "tsx scripts/verify-ens-reports.ts",
     "multibaas:link": "tsx scripts/link-multibaas.ts",
     "demo:seed": "tsx scripts/seed.ts",
     "demo:seed:testnet": "tsx scripts/seed-testnet.ts",
     "demo:verify:testnet": "tsx scripts/verify-testnet-demo.ts",
     "operator": "tsx scripts/operator.ts",
+    "cloud-wallet:setup": "tsx scripts/setup-cloud-wallet.ts",
     "deploy:local": "cd contracts && DEPLOYER_ADDRESS=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 forge script script/Deploy.s.sol:Deploy --rpc-url http://127.0.0.1:8545 --broadcast --unlocked --sender 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
     "anvil": "anvil --host 127.0.0.1 --port 8545 --silent",
     "predev": "node scripts/copy-maplibre-worker.mjs",
@@ -29,11 +33,19 @@
   },
   "dependencies": {
     "@curvegrid/multibaas-sdk": "^1.1.1",
+    "@privy-io/react-auth": "^3.45.0",
+    "@solana-program/memo": "^0.15.0",
+    "@solana-program/system": "^0.15.0",
+    "@solana-program/token": "^0.17.0",
+    "@solana/kit": "^8.3.0",
     "lucide-react": "^1.48.0",
     "maplibre-gl": "^6.11.2",
     "next": "^16.3.6",
+    "ox": "^0.8.9",
+    "postgres": "^3.4.9",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
+    "stripe": "^22.6.2",
     "viem": "^2.56.9",
     "zod": "^4.6.5"
   },
@@ -47,6 +59,9 @@
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vitest": "^4.1.11"
+  },
+  "overrides": {
+    "ws@^8.0.0": "8.21.0"
   },
   "type": "module"
 }

@@ -26,6 +26,8 @@ import type { TransactionProgress } from "@/lib/wallet";
 import styles from "./EnsDelegation.module.css";
 import { loadEnsAudit } from "@/lib/ens/events";
 import { positionalArguments } from "@/lib/ens/call";
+import LoadingOverlay from "./LoadingOverlay";
+import { transactionPhase } from "@/lib/wallet";
 
 export default function EnsDelegation({
   name,
@@ -256,6 +258,11 @@ export default function EnsDelegation({
   if (loading)
     return (
       <div className={styles.panel} role="status">
+        <LoadingOverlay
+          active
+          title="Verifying ENS delegation…"
+          detail="Checking the registered name on Sepolia."
+        />
         <LoaderCircle className={styles.spin} size={16} /> Checking the
         registered name on Sepolia…
       </div>
@@ -271,6 +278,15 @@ export default function EnsDelegation({
     );
   return (
     <section className={styles.panel} aria-label="ENS delegated issuance">
+      <LoadingOverlay
+        active={busy}
+        title="Updating ENS delegation…"
+        detail={
+          progress
+            ? transactionPhase[progress.phase]
+            : "Preparing your reviewed action."
+        }
+      />
       <div className={styles.heading}>
         <strong>Registered space · Sepolia</strong>
         <span>Binding #{live.binding.nonce.toString()}</span>

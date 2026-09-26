@@ -1,13 +1,15 @@
 import { ASSET_KINDS } from "./catalog";
 import type { MarketState } from "./model";
 
+export type ActivityPeriod = "12h" | "24h" | "daily" | "weekly";
+
 const equal = (a: unknown, b: unknown) =>
   String(a).toLowerCase() === String(b).toLowerCase();
 export function marketAnalytics(
   state: MarketState,
   rightsAddress: string,
   now = Date.now(),
-  period: "daily" | "weekly" = "daily",
+  period: ActivityPeriod = "daily",
 ) {
   const current = state.rights.filter(
     (r) => ["Verified", "Active"].includes(r.status) && r.endAt > now / 1000,
@@ -24,30 +26,52 @@ export function marketAnalytics(
     unmatchedVolume = 0n;
   const netPrimary = new Map<string, bigint>();
   const today = Math.floor(now / 86400000) * 86400000;
+  const hourly = period === "12h" || period === "24h";
   const weekly = period === "weekly";
-  const count = weekly ? 4 : 7;
-  const step = (weekly ? 7 : 1) * 86400000;
-  const currentStart = weekly
-    ? today - ((new Date(today).getUTCDay() + 6) % 7) * 86400000
-    : today;
-  const daily = Array.from({ length: count }, (_, i) => ({
-    day: new Date(currentStart - (count - 1 - i) * step)
-      .toISOString()
-      .slice(0, 10),
-    volume: 0n,
-    revenue: 0n,
-  }));
+  const hours = period === "12h" ? 12 : 24;
+  const count = hourly ? hours + 1 : weekly ? 4 : 7;
+  const step = hourly ? 3600000 : (weekly ? 7 : 1) * 86400000;
+  const currentStart = hourly
+    ? Math.floor(now / step) * step
+    : weekly
+      ? today - ((new Date(today).getUTCDay() + 6) % 7) * 86400000
+      : today;
+  const windowStart = hourly ? now - hours * step : -Infinity;
+  const daily = Array.from({ length: count }, (_, i) => {
+    const boundary = currentStart - (count - 1 - i) * step;
+    const start = Math.max(boundary, windowStart);
+    return {
+      day: new Date(start).toISOString().slice(0, hourly ? 24 : 10),
+      start,
+      end: boundary + step,
+      volume: 0n,
+      revenue: 0n,
+    };
+  });
   const revenueRights = new Set<string>();
+  const revenueAssets = new Set<string>();
+  const revenueComposition = [...ASSET_KINDS, "Unclassified" as const].map(
+    (kind) => ({ kind, amount: 0n }),
+  );
+  const rightsById = new Map(state.rights.map((r) => [r.id, r]));
+  const assetsById = new Map(state.assets.map((a) => [a.id, a]));
   for (const event of state.events) {
     const date = Date.parse(event.timestamp);
-    const bucket = Number.isFinite(date)
-      ? daily.find(
-          (d) => date >= Date.parse(d.day) && date < Date.parse(d.day) + step,
-        )
-      : undefined;
+    const bucket =
+      Number.isFinite(date) && date <= now
+        ? daily.find((d) => date >= d.start && date < d.end)
+        : undefined;
     if (event.name === "RevenueDeposited") {
       const amount = BigInt(String(event.args.amount));
-      if (amount > 0n) revenueRights.add(String(event.args.rightId));
+      if (amount > 0n) {
+        const id = String(event.args.rightId);
+        revenueRights.add(id);
+        const asset = assetsById.get(rightsById.get(id)?.assetId || "");
+        if (asset) revenueAssets.add(asset.id);
+        revenueComposition.find(
+          (c) => c.kind === (asset?.kind || "Unclassified"),
+        )!.amount += amount;
+      }
       if (bucket) bucket.revenue += amount;
     }
     if (event.name !== "ListingPurchased") continue;
@@ -97,12 +121,21 @@ export function marketAnalytics(
   );
   const deposited = BigInt(state.metrics.deposited),
     withdrawn = BigInt(state.metrics.claimed);
+  let cumulativeRevenue = 0n;
   return {
     primaryVolume,
     secondaryVolume,
     basketVolume,
     unmatchedVolume,
-    daily,
+    daily: daily.map((day) => {
+      cumulativeRevenue += day.revenue;
+      return { ...day, cumulativeRevenue };
+    }),
+    revenueAssets: revenueAssets.size,
+    revenueComposition,
+    openListings: state.listings.filter(
+      (l) => !l.cancelled && BigInt(l.remaining) > 0n,
+    ).length,
     registered: state.assets.length,
     verified: state.assets.filter((a) => a.status === "Verified").length,
     active: active.size,

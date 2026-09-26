@@ -1,0 +1,53 @@
+.link {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 14px 15px;
+  margin: 0 -5px;
+  min-height: 46px;
+  border-radius: 2px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.link:hover {
+  background: var(--panel);
+  color: var(--lime);
+}
+.link svg {
+  flex-shrink: 0;
+}
+:global(.city-view) .link {
+  justify-content: center;
+  gap: 0;
+  margin: 0;
+  padding: 14px 8px;
+}
+:global(.city-view) .link svg {
+  width: 20px;
+  height: 20px;
+}
+:global(.city-view) .link span {
+  display: none;
+}
+@media (min-width: 701px) {
+  :global(.city-view.city-sidebar-expanded) .link {
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 14px 12px;
+    font-size: 12px;
+  }
+  :global(.city-view.city-sidebar-expanded) .link span {
+    display: inline;
+  }
+}
+@media (max-width: 700px) {
+  :global(.sidebar) .link {
+    padding: 12px 8px;
+    min-width: 32px;
+    height: 59px;
+    margin: 0;
+  }
+  :global(.sidebar) .link span {
+    display: none;
+  }
+}

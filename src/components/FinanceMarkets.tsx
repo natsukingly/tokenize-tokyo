@@ -12,6 +12,8 @@ import {
 import MapThumbnail from "./MapThumbnail";
 import ReturnScenario from "./ReturnScenario";
 import Launchpad from "./Launchpad";
+import RightsFinance from "./RightsFinance";
+import type { WalletProvider } from "@/lib/transactions";
 import { DEMO_SITES } from "@/lib/demo-catalog";
 import {
   initialFinance,
@@ -44,6 +46,10 @@ export default function FinanceMarkets({
   directory,
   view,
   onViewChange,
+  account,
+  provider,
+  onConnect = () => {},
+  onRefresh = () => {},
 }: {
   market: MarketState;
   sourceId?: string;
@@ -53,6 +59,10 @@ export default function FinanceMarkets({
   directory: ReactNode;
   view: MarketView;
   onViewChange: (view: MarketView) => void;
+  account?: string;
+  provider?: WalletProvider | null;
+  onConnect?: () => void;
+  onRefresh?: () => void | Promise<void>;
 }) {
   const mode: Offer["mode"] = view === "rental" ? "rental" : "fraction";
   const mockMarket = view === "fraction" || view === "rental";
@@ -173,7 +183,7 @@ export default function FinanceMarkets({
           <KeyRound size={18} />
           Rental
         </button>
-        {mockMarket && (
+        {mockMarket && demo && (
           <button className="text-button" onClick={() => setCreate(!create)}>
             <Plus size={14} />
             Create mock market
@@ -188,6 +198,16 @@ export default function FinanceMarkets({
           demo={demo}
           onView={onView}
           onCreate={onCreate}
+        />
+      ) : !demo ? (
+        <RightsFinance
+          market={market}
+          mode={mode}
+          sourceId={sourceId}
+          account={account}
+          provider={provider}
+          onConnect={onConnect}
+          onRefresh={onRefresh}
         />
       ) : (
         <>

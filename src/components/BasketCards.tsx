@@ -4,6 +4,7 @@ import { ArrowRight, MapPin } from "lucide-react";
 import { formatEther } from "viem";
 import type { Basket, Listing, MarketState } from "@/lib/model";
 import styles from "./BasketCards.module.css";
+import CardPaymentOption from "./CardPaymentOption";
 
 const whole = (value: string) => /^\d+$/.test(value) && BigInt(value) > 0n;
 const money = (value: bigint) =>
@@ -203,6 +204,8 @@ export function BasketOfferCard({
         />{" "}
         I reviewed the basket and underlying terms.
       </label>
+      <CardPaymentOption listing={listing} quantity={quantity} account={account}
+        accepted={accepted} demo={demo} busy={busy} onConnect={onConnect}>
       <button
         className="secondary wide"
         disabled={busy || (!!account && (!accepted || !valid || ownListing))}
@@ -214,6 +217,7 @@ export function BasketOfferCard({
         {account ? "Acquire basket shares" : "Connect wallet to buy"}{" "}
         <ArrowRight size={15} />
       </button>
+      </CardPaymentOption>
       <p className={styles.note}>
         {ownListing
           ? "This is your listing. Manage it in My assets."

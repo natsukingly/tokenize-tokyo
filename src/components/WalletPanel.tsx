@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Copy, LogOut, Wallet, X } from "lucide-react";
 import { formatEther, stringToHex } from "viem";
 import { config } from "@/lib/config";
-import { useBrowserWallet } from "@/lib/use-browser-wallet";
+import type { WalletConnection } from "./WalletConnection";
 import {
   assertWallet,
   NETWORK_NAME,
@@ -16,7 +16,6 @@ import {
 import { short } from "@/lib/model";
 import styles from "./WalletPanel.module.css";
 
-type WalletConnection = ReturnType<typeof useBrowserWallet>;
 export default function WalletPanel({
   open,
   onClose,
@@ -94,11 +93,17 @@ export default function WalletPanel({
       clearInterval(timer);
     };
   }, [open, account, provider, wallet.chainId, onGasBalance]);
-  const perform = async (label: string, fn: () => Promise<unknown>) => {
+  const perform = async (
+    label: string,
+    fn: () => Promise<unknown>,
+    opensWallet = false,
+  ) => {
     if (working) return;
     setWorking(label);
     setError("");
     setMessage("");
+    // Native modal dialogs hide/inert SDK portals outside the dialog.
+    if (opensWallet && wallet.access) onClose();
     try {
       await fn();
     } catch (e) {
@@ -167,28 +172,74 @@ export default function WalletPanel({
         </p>
         {!account ? (
           <>
-            <p>Choose a wallet. You approve every transaction.</p>
-            <div className={styles.providers}>
-              {wallet.wallets.map((w) => (
+            <p>
+              {wallet.access
+                ? "Sign in to create your wallet, or connect one you already own."
+                : "Choose a wallet. You approve every transaction."}
+            </p>
+            {wallet.access && (
+              <div className={styles.providers}>
                 <button
-                  key={w.id}
-                  data-tour="wallet-provider"
+                  className="primary"
+                  disabled={blocked || !wallet.access.ready}
+                  onClick={() => {
+                    onClose();
+                    wallet.access!.login();
+                  }}
+                >
+                  Continue with email / Google
+                </button>
+                <button
                   className={styles.provider}
-                  disabled={blocked}
-                  onClick={() => perform("Connecting", () => wallet.connect(w))}
+                  disabled={blocked || !wallet.access.ready}
+                  onClick={() => {
+                    onClose();
+                    wallet.access!.connectExternal();
+                  }}
                 >
                   <Wallet size={18} aria-hidden="true" />
-                  <span>{w.name}</span>
+                  <span>
+                    {process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
+                      ? "MetaMask / WalletConnect"
+                      : "Connect MetaMask"}
+                  </span>
                   <ArrowUpRight size={16} aria-hidden="true" />
                 </button>
-              ))}
-            </div>
-            {!wallet.wallets.length && (
-              <p className={styles.hint}>
-                No browser wallet found. Open this site in a browser with
-                MetaMask or Rabby, or in a wallet’s built-in browser.
-                WalletConnect is not configured.
-              </p>
+                <p className={styles.hint}>
+                  Email and Google login are powered by Privy. You review
+                  transactions before sending.
+                </p>
+                {wallet.access.error && (
+                  <p role="alert">{wallet.access.error}</p>
+                )}
+              </div>
+            )}
+            {(!wallet.access || !wallet.access.ready) && (
+              <>
+                <div className={styles.providers}>
+                  {wallet.wallets.map((w) => (
+                    <button
+                      key={w.id}
+                      data-tour="wallet-provider"
+                      className={styles.provider}
+                      disabled={blocked}
+                      onClick={() =>
+                        perform("Connecting", () => wallet.connect(w))
+                      }
+                    >
+                      <Wallet size={18} aria-hidden="true" />
+                      <span>{w.name}</span>
+                      <ArrowUpRight size={16} aria-hidden="true" />
+                    </button>
+                  ))}
+                </div>
+                {!wallet.wallets.length && (
+                  <p className={styles.hint}>
+                    No browser wallet found. Open this site in a browser with
+                    MetaMask or Rabby, or in a wallet’s built-in browser.
+                  </p>
+                )}
+              </>
             )}
             <a href="/demo" className={styles.link}>
               Explore demo without a wallet <ArrowUpRight size={14} />
@@ -277,6 +328,7 @@ export default function WalletPanel({
                         perform(
                           "Confirm the test gas message in your wallet",
                           requestGas,
+                          true,
                         )
                       }
                     >
@@ -296,7 +348,7 @@ export default function WalletPanel({
                     <button
                       disabled={blocked || gas === null || BigInt(gas) === 0n}
                       data-tour="mint-currency"
-                      onClick={() => perform("Minting MockJPY", onMint)}
+                      onClick={() => perform("Minting MockJPY", onMint, true)}
                     >
                       Mint MockJPY
                     </button>
@@ -321,10 +373,12 @@ export default function WalletPanel({
             <button
               className={styles.disconnect}
               disabled={blocked}
-              onClick={() => {
-                wallet.disconnect();
-                setGas(null);
-              }}
+              onClick={() =>
+                perform("Disconnecting", async () => {
+                  await wallet.disconnect();
+                  setGas(null);
+                })
+              }
             >
               <LogOut size={15} /> Disconnect
             </button>

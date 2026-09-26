@@ -6,6 +6,15 @@
 **公式締切: 2026-09-27（日）09:00 JST。内部目標は08:00提出完了。**
 応募予定はCurvegridの2部門とENS。Curvegridの部門は現在の機能からRWA / Digital Asset Dashboardを想定。第3パートナーは未決定で、追加は必須ではない。
 
+## 2026-09-27 ENSリリース更新
+
+以前の確認表は23:27時点の履歴です。公開メインはSepoliaへ切替済みで、9契約のMultiBaas接続と登録済みrooftopの読取を確認しています。最新のENS提出範囲・実演・コード対応は [ENS_PRIZE_DEMO.md](ENS_PRIZE_DEMO.md) を優先してください。
+
+- 専用公開導線: `https://tokenize-tokyo.vercel.app/ens`
+- 発行委譲とreport-only権限を区別。報告者には `urban.energyReport` のsetter権限だけを付与。
+- 公開証跡: 登録・発行委譲・取消、報告キーのgrant・write・revoke。
+- 残る提出操作: 最終Showcaseに公開デモとGitHubリンクを掲載、動画URLを追加、実ウォレット拡張での発表リハーサル。
+
 ## 1. 確認できたこと
 
 | 対象 | 確認結果 |

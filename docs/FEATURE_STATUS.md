@@ -2,6 +2,8 @@
 
 更新: 2026-09-27。**トークナイズ後の売買・収益分配・Basket運用は、実際のSolidityで動作する。公開サイトのメイン画面は `multibaas` モードで実ウォレット取引。`/demo` は別のシミュレーション。** この区別をピッチでも明示する。
 
+追加の再分割・期限付き貸出は、コントラクトとウォレットUIを実装し、ローカルAnvilでブラウザの実取引を検証済み。公開配置・MultiBaasへの追加2本のリンクは未実施。[実装・検証・配置手順](FINANCE_IMPLEMENTATION.md)。今回の検証はSolidity全67テスト、Vitest全114テストと追加ブラウザフロー。
+
 最新のウォレット更新: TypeScript / production build、78 unit tests、公開サイトの購入→Portfolio→再出品→取消E2Eが通過。[実取引レポート](../deployments/browser-wallet-verification.json)。以前のコントラクト検証では25 Foundry tests、既存画面では15 browser E2Eが通過。MultiBaas側は630 events、426 scenario actionのhash/event一致、3 Basketのcustody・残高を照合済み。[実接続検証レポート](../deployments/testnet-demo-verification.json)。
 
 ## 発見 → 発行 → 運用
@@ -11,7 +13,7 @@
 | 3D都市地図 | フィルター、対象空間ハイライト、X-ray、保有空間表示 | UI実装・E2E確認 | PLATEAU実データ、精密な屋根/階のgeometry |
 | 資産一覧 | 種類・状態・検索・価格順から地図詳細へ移動 | MarketsのAll assetsタブ・モバイル対応 | 大規模データのページ分割 |
 | 多様なアセット | 屋根、空き家、遊休地、駐車場、倉庫、広告、コミュニティ空間 | ブラウザ49件、テストネットにも49件追加 | 実物件との契約は未実施 |
-| 分析Overview | 7日推移、一次/二次/Basket売買高、タイプ別稼働、収益入出金、対応待ち | `MarketOverview.tsx` / `analytics.ts`・ユニット/E2E確認 | 実測稼働率・価格評価・収益予測は未実装 |
+| 分析Overview | 資産件数／収益貢献のドーナツ図、収益の累積折れ線、期間別売買棒グラフ、一次/二次/Basket構成比、稼働・入出金・対応待ち | `MarketOverview.tsx` / `PlatformCharts.tsx` / `analytics.ts`・ユニット/E2E確認。凡例から地図へ移動 | 時価評価・所有者別分布・実測稼働率・収益予測は未実装。グラフ追加は公開ビルドへの反映待ち |
 | チュートリアル | 購入などを実画面で順に案内 | 実装・E2E確認 | WalletConnect/QR対応 |
 | Asset登録 | 空間とmetadataを登録 | コントラクト・UI・テストネット確認 | 登記/所有権の照合 |
 | Asset審査 | 申請、承認、却下、再申請 | VERIFIER_ROLEで制御・Foundry確認 | 現実の審査はシミュレーション |
@@ -27,8 +29,8 @@
 | Basket作成 | 2–8種類の互換収益権を固定比率で束ねる | テストネットで3種類作成 | 自動リバランス・管理報酬なし |
 | Basket発行・償還 | 実際に権利を預けてmint、burnで原資産へ戻す | テストネットで発行・売買・償還確認 | 現金償還ではなく権利の返却 |
 | Basket収益 | underlying収益を回収しBasket持分へ配分 | テストネットclaim・Foundry会計テスト | 実売上の収益ではない |
-| 分割市場 | 権利の経済価値を分割して購入・再販売 | **Marketsのモック** | ERC-1155収益持分とは別機能。実custody/発行なし |
-| 期限付き貸出 | 利用期間の指定・貸出・返却 | **Marketsのモック** | レンタルescrow、予約重複防止、実アクセス制御 |
+| 分割市場 | 取得済み収益権を預託し、小口持分の発行・売買・収益請求・原資産償還 | **FractionVaultとUIを実装、Anvil実取引確認** | 公開配置・MultiBaasリンク。Open収益権限定、償還は元の口数単位 |
+| 期限付き貸出 | 排他的利用権の預託、前払い貸出、失効、早期返却、原資産回収 | **RentalEscrowとUIを実装、Anvil実取引確認** | 公開配置・MultiBaasリンク。将来予約・返金・保証金・現地アクセス連携なし |
 | 担保融資・Lending | 権利を預けて借入、利息、清算 | **未実装** | 評価・担保管理・清算・法的権利の設計 |
 
 ## 基盤・外部接続
@@ -44,7 +46,9 @@
 | Transaction Explorer | `/tx/[hash]`。MultiBaas SDKから取引・receipt・decoded関数/events。Activity/送信直後/ウォレット履歴からリンク |
 | API keys | frontend DApp key / server admin keyを分離。admin endpoint拒否を確認 |
 | Webhook | HMAC、時刻、delivery重複排除、revision polling実装・ローカル確認。**実サービスからの配送は未確認** |
-| Cloud Wallet / TXM | adapter実装済み、Azure/Cloud Wallet未設定・未実行 |
+| Cloud Wallet / TXM | Azure Standard Key Vault・専用権限・2チェーンのoperator設定済み。MultiBaas経由の署名検証成功。実トランザクション送信・TXMは未検証 |
+| Privy / MetaMask | 接続選択UIとadapter実装済み。Privy App ID未設定・実ログイン未検証。WalletConnectは任意設定 |
+| Cloud Wallet setup | Curvegrid Testnet／Sepoliaでprovider登録・鍵作成・署名元アドレス検証まで完了。`deployments/cloud-wallet-verification.json`参照。ガス肩代わりは未実装 |
 | Safe | 未実装 |
 | ENSv2 | ENS Index画面で階層プレビュー・検索・地図連携。名前生成・registry読取・限定roleのunsigned descriptorを実装。**登録・解決・権限委譲・ERC-1155発行連携を実装。公式コントラクト15テスト／ローカルSepolia fork検証済み。公開Sepoliaの登録・限定発行・取消検証済み。Sepolia MultiBaasのAPI設定・9契約link・公開サイト切替済み。初期記録の出典はSEPOLIA_CUTOVER.md参照。実ウォレット拡張による通し署名は別途確認** |
 | コンプライアンス | 譲渡制限/allowlist/Verifier権限は実装。KYC/AML、実所有権確認、規制対応、法的契約は未実装。準拠済みと説明しない |
@@ -70,7 +74,7 @@ UrbanRightTokenはERC-1155。同じ権利ID内では各口が同等、別の権�
 | 優先 | 機能 | 利用場面・新しく必要な仕組み |
 | --- | --- | --- |
 | 1 | 稼働条件付き資金調達 | 期限までに目標額/設備設置条件を満たせば送金、未達なら返金。今の即時売買とは別のescrow contractが必要 |
-| 2 | 利用権の期限付き貸出 | 駐車場・倉庫・広告枠の保有者が、期間だけOperatorへ貸す。転貸許可、重複予約、期限切れ、返金/保証金を定義する |
+| 2 | 期限付き貸出の拡張 | 現在の即時開始・前払い・失効・返却に加え、将来予約、返金/保証金、現地設備とのアクセス連携を設計する |
 | 3 | 指値注文・一括購入 | 希望価格での購入注文や複数権利の一括取得。約定・取消・支払権限を明示する |
 | 4 | 限定的な収益再投資 | 入金済み収益のみを、利用者の上限・対象指定に従って再投資。新規yieldを作らない |
 | 後続 | 担保融資 | 独立した価格評価、LTV、清算、満期、default時の権利移転を設計してから追加 |

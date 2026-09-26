@@ -3,7 +3,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { WalletProvider } from "./transactions";
 import { isAddress, switchNetwork } from "./wallet";
 
-type BrowserWallet = { id: string; name: string; provider: WalletProvider };
+type BrowserWallet = {
+  id: string;
+  name: string;
+  provider: WalletProvider;
+  expectedAccount?: string;
+};
 export function useBrowserWallet(enabled: boolean) {
   const [wallets, setWallets] = useState<BrowserWallet[]>([]);
   const [provider, setProvider] = useState<WalletProvider | null>(null);
@@ -85,6 +90,11 @@ export function useBrowserWallet(enabled: boolean) {
       if (version !== epoch.current) return;
       if (!isAddress(accounts?.[0]))
         throw new Error("No wallet account selected.");
+      if (
+        wallet.expectedAccount &&
+        accounts[0].toLowerCase() !== wallet.expectedAccount.toLowerCase()
+      )
+        throw new Error("Wallet did not return the selected account.");
       const connectedChain = Number(
         BigInt(
           String(await wallet.provider.request({ method: "eth_chainId" })),

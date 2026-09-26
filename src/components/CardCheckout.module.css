@@ -1,0 +1,181 @@
+.payment {
+  min-width: 0;
+  width: 100%;
+}
+.methods {
+  border: 0;
+  padding: 0;
+  margin: 0 0 12px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.methods legend {
+  color: var(--muted);
+  font-size: 11px;
+  margin-bottom: 8px;
+}
+.methods label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+  flex: 1;
+}
+.methods label[data-selected="true"] {
+  border-color: var(--lime);
+  background: color-mix(in srgb, var(--lime) 8%, transparent);
+}
+.methods input {
+  accent-color: var(--lime);
+  width: 14px;
+  height: 14px;
+  margin: 0;
+}
+.tag {
+  color: var(--lime);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 3px 5px;
+}
+.review {
+  display: grid;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  padding: 16px;
+}
+.review p {
+  font-size: 12px;
+  line-height: 1.6;
+}
+.review button {
+  width: 100%;
+  justify-content: center;
+}
+.total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.total strong {
+  font-size: 23px;
+  color: var(--lime);
+}
+.recipient {
+  display: grid;
+  gap: 6px;
+  font-size: 11px;
+}
+.recipient code {
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+  color: var(--text);
+}
+.note {
+  color: var(--muted);
+}
+.page {
+  margin: 0;
+  width: 100%;
+  min-height: 100dvh;
+  padding: 48px 20px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  justify-items: center;
+  gap: 30px;
+}
+.brand {
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  font-size: 15px;
+}
+.receipt {
+  width: min(100%, 620px);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: clamp(22px, 5vw, 40px);
+  display: grid;
+  gap: 22px;
+}
+.receipt h1 {
+  font-size: clamp(24px, 5vw, 32px);
+  line-height: 1.25;
+}
+.receipt p {
+  line-height: 1.7;
+}
+.steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0;
+}
+.steps li {
+  display: flex;
+  gap: 14px;
+  padding: 15px 0;
+  border-bottom: 1px solid var(--line);
+  align-items: center;
+  color: var(--muted);
+}
+.steps li[data-done="true"] {
+  color: var(--text);
+}
+.stepNumber {
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  flex: none;
+  font-size: 12px;
+}
+.steps li[data-done="true"] .stepNumber {
+  color: var(--bg);
+  background: var(--lime);
+  border-color: var(--lime);
+}
+.summary {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px 20px;
+  margin: 0;
+  font-size: 12px;
+}
+.summary dt {
+  color: var(--muted);
+}
+.summary dd {
+  margin: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+.actions a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.status {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+}

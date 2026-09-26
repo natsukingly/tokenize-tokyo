@@ -21,7 +21,6 @@ import {
   ChevronDown,
   X,
   RefreshCw,
-  Building2,
   Leaf,
   Menu,
   ExternalLink,
@@ -63,7 +62,10 @@ import {
   type LensKind,
 } from "@/lib/dormant";
 import { loadMarket, readContract, sendViaMultiBaas } from "@/lib/multibaas";
-import { useBrowserWallet } from "@/lib/use-browser-wallet";
+import {
+  WalletConnectionProvider,
+  useWalletConnection,
+} from "./WalletConnection";
 import {
   isTxHash,
   transactionPhase,
@@ -75,6 +77,7 @@ import {
 import WalletPanel from "./WalletPanel";
 import AccountGate from "./AccountGate";
 import DataStatus from "./DataStatus";
+import LoadingOverlay from "./LoadingOverlay";
 import { BasketPoolCard, BasketOfferCard } from "./BasketCards";
 import AssetIcon from "./AssetIcon";
 import AssetDirectory, {
@@ -96,6 +99,8 @@ import ActivityFeed from "./ActivityFeed";
 import NamespaceDashboard from "./NamespaceDashboard";
 import MapFunding from "./MapFunding";
 import SpaceEnsPreview from "./SpaceEnsPreview";
+import CardPaymentOption from "./CardPaymentOption";
+import CityPreviewLink from "./CityPreviewLink";
 import {
   ASSET_KINDS,
   SPACE_TYPES,
@@ -120,8 +125,15 @@ export default function Dashboard({
 }: {
   demo?: boolean;
 }) {
+  return (
+    <WalletConnectionProvider enabled={!demo}>
+      <DashboardContent demo={demo} />
+    </WalletConnectionProvider>
+  );
+}
+function DashboardContent({ demo }: { demo: boolean }) {
   const DEMO = demo;
-  const wallet = useBrowserWallet(!DEMO);
+  const wallet = useWalletConnection();
   const account = wallet.account;
   const [walletOpen, setWalletOpen] = useState(false);
   const [walletTourContainer, setWalletTourContainer] =
@@ -218,6 +230,7 @@ export default function Dashboard({
   const [loadedAccount, setLoadedAccount] = useState<string | null>(null);
   const [marketLoaded, setMarketLoaded] = useState(false);
   const [loadError, setLoadError] = useState("");
+  const [foregroundRefresh, setForegroundRefresh] = useState(false);
   useEffect(() => {
     if (
       ["namespaces", "ens"].includes(
@@ -334,7 +347,8 @@ export default function Dashboard({
   activeRef.current = active;
   const loading = useRef(false);
   const refreshPending = useRef(false);
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (showFeedback = false) => {
+    if (showFeedback) setForegroundRefresh(true);
     if (loading.current) {
       refreshPending.current = true;
       return;
@@ -359,10 +373,12 @@ export default function Dashboard({
       );
     } finally {
       loading.current = false;
-      setRefreshing(false);
       if (refreshPending.current) {
         refreshPending.current = false;
         setTimeout(() => void refresh(), 0);
+      } else {
+        setRefreshing(false);
+        setForegroundRefresh(false);
       }
     }
   }, []);
@@ -841,7 +857,8 @@ export default function Dashboard({
         <button
           className="icon-button"
           aria-label="Refresh market"
-          onClick={() => void refresh()}
+          disabled={refreshing}
+          onClick={() => void refresh(true)}
         >
           <RefreshCw size={15} className={refreshing ? "spin" : ""} />
         </button>
@@ -900,6 +917,21 @@ export default function Dashboard({
         (cityDetailsOpen ? " city-details-open" : "")
       }
     >
+      <LoadingOverlay
+        active={(!marketLoaded && !loadError) || foregroundRefresh || !!busy}
+        title={
+          busy || (marketLoaded ? "Updating market data…" : "Loading Tokyo…")
+        }
+        detail={
+          busy
+            ? transaction
+              ? transaction.phase === "confirmed"
+                ? "Updating your assets from the latest onchain activity."
+                : transactionPhase[transaction.phase]
+              : "Preparing your action…"
+            : "Fetching assets, listings and onchain activity."
+        }
+      />
       <aside className="sidebar" id="app-sidebar">
         <a className="brand" href="/" aria-label="TOKENIZE TOKYO">
           <BrandPlate
@@ -987,6 +1019,7 @@ export default function Dashboard({
               ))}
             </div>
           ))}
+          <CityPreviewLink />
           <button
             className="guide-entry"
             title="Quick tour"
@@ -1050,7 +1083,15 @@ export default function Dashboard({
           <div className="top-actions">
             <span className={"mode " + (DEMO ? "demo" : "")}>
               <span />
-              {DEMO ? "SIMULATED DEMO" : config.chainId === 11155111 ? "SEPOLIA TESTNET" : "CURVEGRID TESTNET"}
+              {DEMO
+                ? "SIMULATED DEMO"
+                : config.chainId === 11155111
+                  ? "SEPOLIA TESTNET"
+                  : config.chainId === 31337
+                    ? "LOCAL ANVIL"
+                    : config.chainId === 2017072401
+                      ? "CURVEGRID TESTNET"
+                      : `TESTNET ${config.chainId}`}
             </span>
             {marketLoaded && refreshing && (
               <span className="data-refresh" role="status">
@@ -1159,12 +1200,15 @@ export default function Dashboard({
           {!marketLoaded &&
             activeNavigation !== "Explore" &&
             activeNavigation !== "Portfolio" && (
-              <DataStatus error={loadError} onRetry={() => void refresh()} />
+              <DataStatus
+                error={loadError}
+                onRetry={() => void refresh(true)}
+              />
             )}
           {marketLoaded && loadError && (
             <div className="sample-activity" role="status">
               <p>Update unavailable. Showing the last loaded data.</p>
-              <button className="secondary" onClick={() => void refresh()}>
+              <button className="secondary" onClick={() => void refresh(true)}>
                 Retry update
               </button>
             </div>
@@ -1204,40 +1248,6 @@ export default function Dashboard({
                 </button>
               )}
             </div>
-          )}
-          {marketLoaded && activeNavigation === "Dashboard" && !guideActive && (
-            <section className="metrics">
-              <Metric
-                label="ASSETS REGISTERED"
-                value={String(state.assets.length)}
-                note="Places with new potential"
-                icon={<Building2 size={17} />}
-              />
-              <Metric
-                label="ACTIVE LISTINGS"
-                value={String(
-                  state.listings.filter(
-                    (l) => !l.cancelled && BigInt(l.remaining) > 0n,
-                  ).length,
-                )}
-                note="Primary & secondary rights"
-                icon={<Layers3 size={17} />}
-              />
-              <Metric
-                label="TRADED VOLUME"
-                value={money(state.metrics.volume)}
-                suffix="mJPY"
-                note="Settled marketplace payments"
-                icon={<ArrowUpRight size={17} />}
-              />
-              <Metric
-                label="REVENUE DEPOSITED"
-                value={money(state.metrics.deposited)}
-                suffix="mJPY"
-                note="Actual deposits in live mode"
-                icon={<Sun size={17} />}
-              />
-            </section>
           )}
           {marketLoaded && tab === "Explore" && !cityFocus && !guideActive && (
             <MarketOverview
@@ -1623,45 +1633,60 @@ export default function Dashboard({
                                     <span>mJPY / unit</span>
                                   </strong>
                                 </div>
-                                <button
-                                  className="primary"
-                                  disabled={
-                                    !!busy ||
-                                    (!!active && !termsAccepted) ||
-                                    same(l.seller, active)
-                                  }
-                                  onClick={() => {
-                                    if (!active) return connect();
-                                    return run("Purchase rights", async () => {
-                                      if (
-                                        !/^\d+$/.test(quantity) ||
-                                        BigInt(quantity) <= 0n ||
-                                        BigInt(quantity) > BigInt(l.remaining)
-                                      )
-                                        throw new Error(
-                                          "Enter a whole quantity within the available supply.",
-                                        );
-                                      await approve(
-                                        "settlement",
-                                        "market",
-                                        (
-                                          BigInt(quantity) * BigInt(l.unitPrice)
-                                        ).toString(),
-                                      );
-                                      await send("market", "purchase", [
-                                        l.id,
-                                        quantity,
-                                      ]);
-                                    });
-                                  }}
+                                <CardPaymentOption
+                                  listing={l}
+                                  quantity={quantity}
+                                  account={active}
+                                  accepted={termsAccepted}
+                                  demo={DEMO}
+                                  busy={!!busy}
+                                  onConnect={connect}
                                 >
-                                  {!active
-                                    ? "Connect wallet to buy"
-                                    : same(l.seller, active)
-                                      ? "Your listing"
-                                      : "Acquire right"}
-                                  <ArrowUpRight size={15} />
-                                </button>
+                                  <button
+                                    className="primary"
+                                    disabled={
+                                      !!busy ||
+                                      (!!active && !termsAccepted) ||
+                                      same(l.seller, active)
+                                    }
+                                    onClick={() => {
+                                      if (!active) return connect();
+                                      return run(
+                                        "Purchase rights",
+                                        async () => {
+                                          if (
+                                            !/^\d+$/.test(quantity) ||
+                                            BigInt(quantity) <= 0n ||
+                                            BigInt(quantity) >
+                                              BigInt(l.remaining)
+                                          )
+                                            throw new Error(
+                                              "Enter a whole quantity within the available supply.",
+                                            );
+                                          await approve(
+                                            "settlement",
+                                            "market",
+                                            (
+                                              BigInt(quantity) *
+                                              BigInt(l.unitPrice)
+                                            ).toString(),
+                                          );
+                                          await send("market", "purchase", [
+                                            l.id,
+                                            quantity,
+                                          ]);
+                                        },
+                                      );
+                                    }}
+                                  >
+                                    {!active
+                                      ? "Connect wallet to buy"
+                                      : same(l.seller, active)
+                                        ? "Your listing"
+                                        : "Acquire right"}
+                                    <ArrowUpRight size={15} />
+                                  </button>
+                                </CardPaymentOption>
                               </div>
                             ))}
                           </>
@@ -1824,7 +1849,9 @@ export default function Dashboard({
                               setTab("Markets");
                             }}
                           >
-                            Fractionalize / lend · mock
+                            {DEMO
+                              ? "Fractionalize / lend · mock"
+                              : "Split / rent rights"}
                           </button>
                         )}
                         {x.token === "basket" && (
@@ -2138,6 +2165,10 @@ export default function Dashboard({
               onViewChange={setMarketView}
               sourceId={financeSource}
               demo={DEMO}
+              account={account || undefined}
+              provider={wallet.provider}
+              onConnect={() => setWalletOpen(true)}
+              onRefresh={refresh}
               onCreate={() => openTokenize(true)}
               onView={(id) => {
                 setKind("All assets");
@@ -2233,7 +2264,7 @@ export default function Dashboard({
             <span>
               {DEMO
                 ? "Demo simulation · no on-chain transactions"
-                : state.events.some(event => event.source === "rpc-bootstrap")
+                : state.events.some((event) => event.source === "rpc-bootstrap")
                   ? "Data: MultiBaas + verified Sepolia setup logs"
                   : "Data: MultiBaas Event Queries"}{" "}
               {lastSync && "· Updated " + lastSync}
@@ -2439,38 +2470,5 @@ export default function Dashboard({
         )}
       </TokenizeDialog>
     </div>
-  );
-}
-function Metric({
-  label,
-  value,
-  note,
-  suffix,
-  icon,
-}: {
-  label: string;
-  value: string;
-  note: string;
-  suffix?: string;
-  icon: React.ReactNode;
-}) {
-  return (
-    <article className="metric">
-      <div>
-        <span>{label}</span>
-        {icon}
-      </div>
-      <strong title={`${value}${suffix ? ` ${suffix}` : ""}`}>
-        <span className="metric-full">{value}</span>
-        <span className="metric-compact">
-          {Number(value.replaceAll(",", "")).toLocaleString("en", {
-            notation: "compact",
-            maximumFractionDigits: 1,
-          })}
-        </span>
-        <small>{suffix}</small>
-      </strong>
-      <p>{note}</p>
-    </article>
   );
 }

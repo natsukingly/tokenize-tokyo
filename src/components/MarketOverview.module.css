@@ -42,6 +42,213 @@
 .card h3 {
   font-size: 15px;
 }
+.impact:global(.metrics) {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin: 0 0 18px;
+}
+.impact article {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 22px 24px;
+  background: var(--panel);
+}
+.impact .impactPrimary {
+  border-top: 2px solid var(--lime);
+}
+.impact article > span {
+  color: var(--muted);
+  font-size: 12px;
+}
+.impact strong {
+  display: block;
+  margin-top: 14px;
+  font-size: clamp(22px, 2.2vw, 32px);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.impactPrimary strong {
+  color: var(--lime);
+}
+.impact small {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 400;
+}
+.impact p {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.6;
+  margin-top: 10px;
+}
+.compositionGrid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+.chartToggle {
+  display: flex;
+  flex-shrink: 0;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+}
+.chartToggle button {
+  padding: 7px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.chartToggle button[aria-pressed="true"] {
+  background: var(--lime);
+  color: #152014;
+}
+.donutLayout {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.9fr) minmax(130px, 1fr);
+  align-items: center;
+  gap: 18px;
+  margin: 18px 0;
+}
+.donut {
+  position: relative;
+  width: 100%;
+  max-width: 230px;
+  margin: auto;
+}
+.donut svg {
+  width: 100%;
+  display: block;
+}
+.donutCenter {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 7px;
+  pointer-events: none;
+  text-align: center;
+  padding: 25%;
+}
+.donutCenter strong {
+  font-size: clamp(19px, 2vw, 28px);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.donutCenter span {
+  font-size: 10px;
+  line-height: 1.4;
+  color: var(--muted);
+}
+.chartLegend {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+.chartLegend button {
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  text-align: left;
+  min-height: 34px;
+  padding: 5px 7px;
+  border-radius: 5px;
+}
+.chartLegend button:hover,
+.chartLegend button[aria-pressed="true"] {
+  background: var(--line);
+}
+.chartLegend i,
+.tradeRows i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+.chartLegend span {
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.chartLegend small {
+  display: block;
+  color: var(--muted);
+  font-size: 9px;
+  margin-top: 3px;
+}
+.chartLegend b {
+  font-size: 10px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.chartLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  color: var(--lime);
+  margin: 0 0 14px;
+}
+.chartPeriod {
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--muted);
+}
+.chartEmpty {
+  min-height: 170px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 12px;
+}
+.stackedBar {
+  display: flex;
+  height: 36px;
+  border-radius: 5px;
+  gap: 3px;
+  overflow: hidden;
+  margin: 28px 0 22px;
+}
+.stackedBar span {
+  min-width: 0;
+  flex-basis: 0;
+}
+.tradeRows {
+  display: grid;
+  margin-bottom: 20px;
+}
+.tradeRows > div {
+  display: grid;
+  grid-template-columns: 7px 1fr auto 43px;
+  align-items: center;
+  gap: 9px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+.tradeRows span {
+  font-size: 11px;
+}
+.tradeRows strong {
+  font-size: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.tradeRows small,
+.tradeRows b {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 400;
+}
+.tradeRows b {
+  text-align: right;
+}
 .cardHead {
   display: flex;
   align-items: center;
@@ -92,16 +299,6 @@
   display: block;
   color: var(--muted);
 }
-.breakdownDetails {
-  border-top: 1px solid var(--line);
-  padding-top: 12px;
-  margin-top: 16px;
-}
-.breakdownDetails summary {
-  cursor: pointer;
-  color: var(--muted);
-  font-size: 11px;
-}
 .example {
   color: var(--muted);
   font-size: 12px;
@@ -112,35 +309,6 @@
 .empty {
   font-size: 12px;
   line-height: 1.8;
-}
-.breakdown {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  padding-top: 16px;
-}
-.breakdown div {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
-  padding-bottom: 10px;
-  font-size: 10px;
-}
-.breakdown b {
-  font-size: 14px;
-  font-weight: 500;
-}
-.breakdown small {
-  font-size: 9px;
-  color: var(--muted);
-}
-.breakdown i {
-  height: 2px;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  background: var(--lime);
 }
 .ratio {
   font-size: 23px;
@@ -242,7 +410,8 @@
 }
 @media (max-width: 1050px) {
   .grid,
-  .bottom {
+  .bottom,
+  .compositionGrid {
     grid-template-columns: 1fr;
   }
   .heading {
@@ -251,6 +420,28 @@
   }
 }
 @media (max-width: 600px) {
+  .impact:global(.metrics) {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .impact article {
+    padding: 16px 18px;
+  }
+  .impact strong {
+    margin-top: 7px;
+  }
+  .donutLayout {
+    grid-template-columns: 1fr;
+  }
+  .chartLegend button {
+    min-height: 40px;
+  }
+  .tradeRows > div {
+    grid-template-columns: 7px 1fr auto;
+  }
+  .tradeRows b {
+    grid-column: 3;
+  }
   .card {
     padding: 18px;
   }
@@ -262,9 +453,6 @@
   }
   .moneyFlow > svg {
     display: none;
-  }
-  .breakdown {
-    gap: 8px;
   }
   .categoryList button {
     grid-template-columns: 75px 1fr 72px;

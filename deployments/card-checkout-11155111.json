@@ -1,0 +1,12 @@
+{
+  "chainId": 11155111,
+  "market": "0x14ac507bf41118613a257e7482aefe002ba87c3d",
+  "operator": "0xE90FB4cABa8bE81391389A2dA4E2192c69151a17",
+  "deploymentHash": "0x6b3422c788aa1332c343e2071bb70fbb3f16cd89c1f1f51fde3c430ce5505a67",
+  "executor": "0x2a33b0466330b39e09b89d2cba96a621506a6b4d",
+  "startingBlock": 11787552,
+  "linked": true,
+  "gasFundingHash": "0x1551425c41405d5b6af0ff6ab99b4e17a7999781bd9a27e0b09da33b65c4fb65",
+  "cashFundingHash": "0xeebd91e8294cc5cd42f293d27d47c5eefe90257c3ea302e7ade3be0d537db9e5",
+  "cashFundingReplaces": "0x41160ab7ce8007fe48b17ac6f2771fc6cf9a91f0b7a768fd2a5a5240fe310b27"
+}

@@ -12,5 +12,9 @@
 !/next-env.d.ts
 !/next.config.ts
 !/vercel.json
+!/deployments
+/deployments/*
+!/deployments/ens-v2-sepolia-delegation-proof.json
+!/deployments/ens-v2-sepolia-report-proof.json
 /src/**/*.test.ts
 /public/maplibre
