@@ -45,11 +45,13 @@ export async function queryRows(
 ): Promise<Record<string, unknown>[]> {
   const api = clients().queries;
   const rows: Record<string, unknown>[] = [];
-  for (let offset = 0; offset < 100000; offset += 500) {
-    const { data } = await api.executeArbitraryEventQuery(query, offset, 500);
+  // MultiBaas rejects limit values above 50 with a bare "invalid request".
+  const PAGE = 50;
+  for (let offset = 0; offset < 100000; offset += PAGE) {
+    const { data } = await api.executeArbitraryEventQuery(query, offset, PAGE);
     const page = data.result.rows as Record<string, unknown>[];
     rows.push(...page);
-    if (page.length < 500) return rows;
+    if (page.length < PAGE) return rows;
   }
   throw new Error(
     "Event result limit reached; narrow query range before rendering incomplete market data.",

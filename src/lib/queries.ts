@@ -176,15 +176,16 @@ export function eventQuery(
           ? [
               {
                 type: FieldType.Input,
-                name: aggregation.field,
+                // MultiBaas resolves event inputs by position, not by name.
+                inputIndex: spec.fields.indexOf(aggregation.field),
                 alias: "value",
                 aggregator: aggregation.op,
               },
             ]
           : [
-              ...spec.fields.map((name) => ({
+              ...spec.fields.map((name, inputIndex) => ({
                 type: FieldType.Input,
-                name,
+                inputIndex,
                 alias: name,
               })),
               { type: FieldType.BlockNumber, alias: "block" },

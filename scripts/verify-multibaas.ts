@@ -8,7 +8,12 @@ import { config, labels, type ContractKey } from "../src/lib/config";
 import { clients, readContract, queryRows } from "../src/lib/multibaas";
 import { eventQuery } from "../src/lib/queries";
 async function main() {
+  // Frontend checks use the DApp User key (config.key). Address lookups and
+  // indexing status are Administrators-only, so they use MULTIBAAS_API_KEY.
+  const adminKey = process.env.MULTIBAAS_API_KEY;
+  if (!adminKey) throw new Error("Set MULTIBAAS_API_KEY for admin checks");
   const api = clients();
+  const admin = clients(config.url, adminKey);
   const status = (await api.chains.getChainStatus()).data.result;
   if (status.chainID !== config.chainId)
     throw new Error("Wrong MultiBaas chain ID");
@@ -16,7 +21,12 @@ async function main() {
     basePath: new URL("/api/v0", config.url).toString(),
     accessToken: config.key,
   });
-  const addresses = new AddressesApi(cfg);
+  const addresses = new AddressesApi(
+    new Configuration({
+      basePath: new URL("/api/v0", config.url).toString(),
+      accessToken: adminKey,
+    }),
+  );
   for (const name of Object.keys(labels) as ContractKey[]) {
     const addr = config.addresses[name];
     if (!/^0x[\da-f]{40}$/i.test(addr))
@@ -25,7 +35,7 @@ async function main() {
     if (!data.contracts?.some((c) => c.label === labels[name]))
       throw new Error(name + " is not linked");
     const sync = (
-      await api.contracts.getEventIndexingStatus(addr, labels[name])
+      await admin.contracts.getEventIndexingStatus(addr, labels[name])
     ).data.result;
     if (
       !sync.latestBlockHash ||

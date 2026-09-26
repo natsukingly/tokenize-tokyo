@@ -35,15 +35,15 @@ it("paginates indexed rows instead of silently losing events after page one", as
   api
     .mockResolvedValueOnce({
       data: {
-        result: { rows: Array.from({ length: 500 }, (_, id) => ({ id })) },
+        result: { rows: Array.from({ length: 50 }, (_, id) => ({ id })) },
       },
     } as never)
     .mockResolvedValueOnce({
-      data: { result: { rows: [{ id: 500 }] } },
+      data: { result: { rows: [{ id: 50 }] } },
     } as never);
   const q = eventQuery("AssetRegistered", address);
-  expect(await queryRows(q)).toHaveLength(501);
-  expect(api).toHaveBeenNthCalledWith(2, q, 500, 500);
+  expect(await queryRows(q)).toHaveLength(51);
+  expect(api).toHaveBeenNthCalledWith(2, q, 50, 50);
 });
 it("uses the SDK to read integer state without floating point conversion", async () => {
   const api = vi
