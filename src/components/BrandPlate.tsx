@@ -1,6 +1,6 @@
 /** Logo lab picks, rendered inline so app fonts apply. variant: "plate" (10-A1), "stack" (01-A1), "grid" (09-x3). */
-export type BrandVariant = "plate" | "stack" | "grid" | "jp" | "bar" | "mono" | "terminal";
-export const BRAND_VARIANTS: BrandVariant[] = ["stack", "plate", "grid", "jp", "bar", "mono", "terminal"];
+export type BrandVariant = "plate" | "stack" | "stackw" | "grid" | "jp" | "bar" | "mono" | "terminal";
+export const BRAND_VARIANTS: BrandVariant[] = ["stack", "stackw", "plate", "grid", "jp", "bar", "mono", "terminal"];
 const Y = "#f0df37", MUTED = "#8b9098", INK = "#f1f2f3";
 function Steps({ x, y, s, color = Y }: { x: number; y: number; s: number; color?: string }) {
   return (
@@ -11,31 +11,32 @@ function Steps({ x, y, s, color = Y }: { x: number; y: number; s: number; color?
     </g>
   );
 }
-function PinRoof({ x, y, s, color = Y }: { x: number; y: number; s: number; color?: string }) {
+function PinRoof({ x, y, s, color = Y, grid = color }: { x: number; y: number; s: number; color?: string; grid?: string }) {
   return (
     <g transform={`translate(${x} ${y}) scale(${s / 64})`} fill="none" stroke={color} strokeWidth="5" strokeLinejoin="round">
       <path d="M32 6 10 24v22h13l9 12 9-12h13V24Z" />
-      <g fill={color} stroke="none"><rect x="21" y="27" width="6" height="6" /><rect x="29" y="27" width="6" height="6" /><rect x="37" y="27" width="6" height="6" /><rect x="21" y="35" width="6" height="6" /><rect x="29" y="35" width="6" height="6" /><rect x="37" y="35" width="6" height="6" /></g>
+      <g fill={grid} stroke="none"><rect x="21" y="27" width="6" height="6" /><rect x="29" y="27" width="6" height="6" /><rect x="37" y="27" width="6" height="6" /><rect x="21" y="35" width="6" height="6" /><rect x="29" y="35" width="6" height="6" /><rect x="37" y="35" width="6" height="6" /></g>
     </g>
   );
 }
 export function BrandMark({ size = 32, className = "", variant = "stack" }: { size?: number; className?: string; variant?: BrandVariant }) {
   return (
     <svg className={className} width={size} height={size} viewBox="0 0 64 64" aria-hidden="true" style={{ color: Y }}>
-      {variant === "stack" ? <PinRoof x={0} y={0} s={64} /> : <Steps x={0} y={0} s={64} />}
+      {variant === "stack" ? <PinRoof x={0} y={0} s={64} /> : variant === "stackw" ? <PinRoof x={0} y={0} s={64} color={INK} grid={Y} /> : <Steps x={0} y={0} s={64} />}
     </svg>
   );
 }
 const upright = { fontStyle: "normal" as const };
 export default function BrandPlate({ className = "", width = 190, variant = "stack" }: { className?: string; width?: number; variant?: BrandVariant }) {
   const label = "TOKENIZE TOKYO 東京トークン化計画";
-  if (variant === "stack") {
+  if (variant === "stack" || variant === "stackw") {
     const height = Math.round((width * 64) / 190);
+    const ink = variant === "stackw" ? INK : Y;
     return (
       <svg className={className} width={width} height={height} viewBox="0 0 190 64" role="img" aria-label={label}>
-        <PinRoof x={0} y={4} s={56} />
-        <text x="64" y="27" fontFamily="'Bebas Neue', 'Anton', Impact, sans-serif" fontSize="27" fill={Y} style={{ ...upright, letterSpacing: "1.4px" }}>TOKENIZE</text>
-        <text x="64" y="50" fontFamily="'Bebas Neue', 'Anton', Impact, sans-serif" fontSize="27" fill={Y} style={{ ...upright, letterSpacing: "1.4px" }}>TOKYO</text>
+        <PinRoof x={0} y={4} s={56} color={ink} grid={Y} />
+        <text x="64" y="27" fontFamily="'Bebas Neue', 'Anton', Impact, sans-serif" fontSize="27" fill={ink} style={{ ...upright, letterSpacing: "1.4px" }}>TOKENIZE</text>
+        <text x="64" y="50" fontFamily="'Bebas Neue', 'Anton', Impact, sans-serif" fontSize="27" fill={ink} style={{ ...upright, letterSpacing: "1.4px" }}>TOKYO</text>
         <text x="64.5" y="61" fontFamily="'DM Sans', 'Noto Sans JP', sans-serif" fontWeight="500" fontSize="6.4" fill={MUTED} style={{ ...upright, letterSpacing: "2.2px" }}>東京トークン化計画</text>
       </svg>
     );
