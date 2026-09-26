@@ -21,7 +21,7 @@ abstract contract ProtocolBase is Test {
     uint256 solar;
     uint256 solarB;
 
-    function setUp() public {
+    function setUp() public virtual {
         registry = new UrbanAssetRegistry(address(this));
         cash = new MockJPY();
         rights = new UrbanRightToken(registry, address(cash));
@@ -265,6 +265,35 @@ contract ProtocolTest is ProtocolBase {
         ids[1] = solar;
         vm.expectRevert();
         baskets.createBasket(ids, units, "ipfs://x");
+    }
+
+    function testBasketCombinesRevenueFromDifferentAssetClasses() public {
+        // Code 3 covers metadata-defined parking, advertising and other spaces.
+        uint256 parkingRevenue = issue(3, 1, 0);
+        uint256[] memory ids = new uint256[](2);
+        uint256[] memory units = new uint256[](2);
+        ids[0] = solar;
+        ids[1] = parkingRevenue;
+        units[0] = 1;
+        units[1] = 1;
+        vm.startPrank(owner);
+        uint256 id = baskets.createBasket(ids, units, "ipfs://mixed-urban-income");
+        baskets.depositUnderlying(id, 10);
+        vm.stopPrank();
+        assertEq(rights.balanceOf(address(baskets), solar), 10);
+        assertEq(rights.balanceOf(address(baskets), parkingRevenue), 10);
+        rights.activateRight(solar);
+        rights.activateRight(parkingRevenue);
+        vm.startPrank(owner);
+        revenue.depositRevenue(solar, 100 ether);
+        revenue.depositRevenue(parkingRevenue, 200 ether);
+        // The vault holds 10% of each 100-unit right, so receives 10 + 20.
+        assertEq(baskets.claimRevenue(id), 30 ether);
+        baskets.redeem(id, 10);
+        vm.stopPrank();
+        assertEq(rights.balanceOf(address(baskets), solar), 0);
+        assertEq(rights.balanceOf(address(baskets), parkingRevenue), 0);
+        assertEq(baskets.totalSupply(id), 0);
     }
 
     function testBasketCanTradeInSameMarketplace() public {

@@ -1,0 +1,28 @@
+{
+  "chainId": 11155111,
+  "startingBlock": 11786720,
+  "admin": "0x71bE0c03F807Ad83F290aDddb842f14652c80554",
+  "registry": "0x0e627aec81902fc6f0873a6bef8dda02eac78235",
+  "settlement": "0x86b71e71137648dc2c76958d73d75af3f968f67f",
+  "rights": "0x1126eb4a20c16e4ed1f28ed8c03a68b0be15975c",
+  "revenue": "0xd214afc228c0cf2f964c8c842bb0799524c1eb23",
+  "basket": "0x64717a76655bb831dd0f2bf806884fdad5fc1834",
+  "market": "0x14ac507bf41118613a257e7482aefe002ba87c3d",
+  "authority": "0x31547a29e5302c87cd59a3e812afbe777745de6b",
+  "city": "0x6A5389bea58291f508C1711816FF7C3d65dc1D4F",
+  "district": "0x3Bb7389A4cB5C8aFfca1e486aE69653b9b510B2c",
+  "building": "0xf861Ae5e620Ec87a41037AEC73610f7f06490Ba2",
+  "resolver": "0x0a5e20fDf2152d048dafEaCad7D6A2A48c78da82",
+  "ens": {
+    "sourceCommit": "71a3b7339dbc55ab47667abdfe8303bac4f4c24e",
+    "parent": "tokenizetokyo-demo-2026.eth",
+    "name": "rooftop.building-1.chiyoda.tokenizetokyo-demo-2026.eth",
+    "assetId": "1",
+    "scope": 0,
+    "anchor": "0x657ea849311d3d5823348dded7c2aaafb3ede09e",
+    "resolver": "0x0a5e20fDf2152d048dafEaCad7D6A2A48c78da82",
+    "registrationTx": "0xa4e8e8fe110aa51bbe10f9f4e2c43af58af20f51bd769e5c73604f90dc4db858",
+    "bindingTx": "0xb6e13414008b877a8e3feb6332146869a7bacd257c170431f009b299a1535078",
+    "locallyForked": false
+  }
+}

@@ -3,6 +3,7 @@ pragma solidity ^0.8.28;
 import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import {ERC1155Supply} from "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
 import {UrbanAssetRegistry} from "./UrbanAssetRegistry.sol";
+import {IUrbanNamespaceAuthority} from "./ens/IENSv2.sol";
 
 interface IRevenueCheckpoint {
     function checkpoint(uint256 id, address account) external;
@@ -56,6 +57,9 @@ contract UrbanRightToken is ERC1155Supply {
     UrbanAssetRegistry public immutable registry;
     address public immutable paymentToken;
     address public revenueVault;
+    IUrbanNamespaceAuthority public namespaceAuthority;
+    event NamespaceAuthorityConfigured(address indexed authority);
+    event DelegatedRightCreated(uint256 indexed rightId, bytes32 indexed bindingId, address indexed operator, address issuer);
     uint256 public nextRightId = 1;
     mapping(uint256 => Right) private rights;
     mapping(uint256 => mapping(address => bool)) public allowed;
@@ -93,6 +97,14 @@ contract UrbanRightToken is ERC1155Supply {
         revenueVault = vault;
     }
 
+    function setNamespaceAuthority(IUrbanNamespaceAuthority authority) external {
+        require(registry.hasRole(bytes32(0), msg.sender) && address(namespaceAuthority) == address(0)
+            && address(authority).code.length > 0 && authority.rightsToken() == address(this)
+            && authority.assetRegistry() == address(registry), "Invalid namespace authority");
+        namespaceAuthority = authority;
+        emit NamespaceAuthorityConfigured(address(authority));
+    }
+
     function createRight(
         uint256 assetId,
         uint8 kind,
@@ -116,17 +128,26 @@ contract UrbanRightToken is ERC1155Supply {
                 kind == 1 ? 0 : 4,
                 keccak256("GENERAL"),
                 kind != 1
-            )
+            ), msg.sender
         );
     }
 
     function createScopedRight(RightRequest calldata request) external returns (uint256) {
-        return _create(request);
+        return _create(request, msg.sender);
     }
 
-    function _create(RightRequest memory q) private returns (uint256 id) {
+    function createScopedRightForIssuer(RightRequest calldata q) external returns (uint256 id) {
+        require(address(namespaceAuthority) != address(0), "ENS authority not configured");
+        bytes32 binding = namespaceAuthority.consume(msg.sender, q.assetId, q.scope, q.purpose, q.kind,
+            q.policy, q.exclusive, q.start, q.end, q.supply);
+        address issuer = registry.issuerOf(q.assetId);
+        id = _create(q, issuer);
+        emit DelegatedRightCreated(id, binding, msg.sender, issuer);
+    }
+
+    function _create(RightRequest memory q, address issuer) private returns (uint256 id) {
         require(
-            registry.isVerified(q.assetId) && registry.issuerOf(q.assetId) == msg.sender, "Verified issuer required"
+            registry.isVerified(q.assetId) && registry.issuerOf(q.assetId) == issuer, "Verified issuer required"
         );
         require(
             q.kind <= 3 && q.policy <= 2 && q.supply > 0 && q.supply <= 1e12 && q.end > q.start
@@ -143,14 +164,14 @@ contract UrbanRightToken is ERC1155Supply {
         require(revenueVault != address(0), "Revenue vault required");
         id = nextRightId++;
         rights[id] = Right(
-            q.assetId, msg.sender, q.kind, q.policy, Status.PENDING_VERIFICATION, q.start, q.end, q.termsHash, q.terms
+            q.assetId, issuer, q.kind, q.policy, Status.PENDING_VERIFICATION, q.start, q.end, q.termsHash, q.terms
         );
         spatialScopes[id] = SpatialScope(q.scope, q.purpose, q.exclusive);
         assetRights[q.assetId].push(id);
-        allowed[id][msg.sender] = true;
-        emit RightCreated(id, q.assetId, msg.sender, q.kind, q.supply, q.terms, q.termsHash, q.start, q.end, q.policy);
+        allowed[id][issuer] = true;
+        emit RightCreated(id, q.assetId, issuer, q.kind, q.supply, q.terms, q.termsHash, q.start, q.end, q.policy);
         emit RightScopeDefined(id, q.assetId, q.scope, q.purpose, q.exclusive);
-        _mint(msg.sender, id, q.supply, "");
+        _mint(issuer, id, q.supply, "");
     }
 
     /// @notice Canonical scopes: roof=0, interior=1, wall=2, land=3, whole asset=4.

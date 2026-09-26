@@ -1,0 +1,50 @@
+{
+  "chainId": 11155111,
+  "block": "11786709",
+  "sourceCommit": "71a3b7339dbc55ab47667abdfe8303bac4f4c24e",
+  "checkedAt": "2026-09-26T14:09:40.371Z",
+  "checks": [
+    {
+      "name": "ETHRegistry",
+      "address": "0x657ea849311d3d5823348dded7c2aaafb3ede09e",
+      "runtimeHash": "0x5a6d133f74a90f6f3e78309679321d531dd01edc914526904275bc024530fa85",
+      "matchesPinnedArtifact": true
+    },
+    {
+      "name": "VerifiableFactory",
+      "address": "0x9e726eb570beb6bceb495ab8cda7df517d4e841c",
+      "runtimeHash": "0x7ccfd46da461cb7145497a383f2a6e6582be057b8bef3de694530b699632ecda",
+      "matchesPinnedArtifact": true
+    },
+    {
+      "name": "UserRegistryImpl",
+      "address": "0xa80338aaa8d23831cea25e858d1774534abb0263",
+      "runtimeHash": "0xf8436ec1a5ce6a92b5bf616a7d768f611f3670d6ebe6e797470688848a45bb8c",
+      "matchesPinnedArtifact": true
+    },
+    {
+      "name": "PermissionedResolverImpl",
+      "address": "0x14f09fd05d4585759e54844dc9b00147131cf243",
+      "runtimeHash": "0x00de223fd76d537e07b24abe5537e3c852e934dbe4db22c02f94a143e4ceeea3",
+      "matchesPinnedArtifact": true
+    },
+    {
+      "name": "UniversalResolverV2",
+      "address": "0x5d25c1d6acbb71b7a28aa7899618a3412a8303e3",
+      "runtimeHash": "0x77851ce255e0932b1b6f8f88395db21f2e443cbd14c75c3ca4387ab3ce46a9c5",
+      "matchesPinnedArtifact": true
+    },
+    {
+      "name": "ETHRegistrar",
+      "address": "0xabe76f6c8dfced81aa5a2bb8034202a7136b94ca",
+      "runtimeHash": "0xe1911f6aae8f9ff9cfa8b1fde67fb5ae1256290168a45ebb8b066af19be87b04",
+      "matchesPinnedArtifact": true
+    },
+    {
+      "name": "MockUSDC",
+      "address": "0x16f95d91dba7da3aca778ec053df0ff6c6a8aa8e",
+      "runtimeHash": "0xa430e5a1e733deef5671e696d68dcf0ea62b125330bc52d8846dd3d57c4602e0",
+      "matchesPinnedArtifact": true
+    }
+  ]
+}

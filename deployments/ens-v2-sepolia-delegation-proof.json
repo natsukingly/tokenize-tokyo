@@ -1,0 +1,29 @@
+{
+  "network": "public Sepolia",
+  "chainId": 11155111,
+  "checkedAt": "2026-09-26T14:32:16.799Z",
+  "parent": "tokenizetokyo-demo-2026.eth",
+  "name": "rooftop.building-1.chiyoda.tokenizetokyo-demo-2026.eth",
+  "rights": "0x1126eb4a20c16e4ed1f28ed8c03a68b0be15975c",
+  "authority": "0x31547a29e5302c87cd59a3e812afbe777745de6b",
+  "issuer": "0x71bE0c03F807Ad83F290aDddb842f14652c80554",
+  "operator": "0x9caf0D85d95b49B7465d10323b1Dd5eBAE502541",
+  "rightId": "1",
+  "issuerBalance": "10",
+  "rightStatus": "Pending verification",
+  "permissionsAfterTest": "revoked",
+  "negativeChecks": [
+    "interior-denied",
+    "other-asset-denied",
+    "revoked-ens-denied"
+  ],
+  "transactions": {
+    "fund-operator": "0xd772593395e97a2d793a2daedd174c194fd4aa04d5aacab4ce045ee16139b222",
+    "grant-ens": "0xf400efa650804f689f4beee0628af0e421311c431d0cd0c01288cbac5ae7e108",
+    "grant-issuance": "0x38e61acc86c1d943e8c736949eff676b4ca2fd7babd8f64d562799eecf6a007d",
+    "fund-operator-gas-buffer": "0x43c44ae51504ce9ed4e1e16f6a96df1f2f551c5bfc726b13e386e7fb7816544e",
+    "issue-rooftop": "0x10da73ed264c75e700f147fc687b0a4298a04cd818c1e72c18eca09df4cd0696",
+    "revoke-ens": "0xa4ca4b5be431ebb9fe19f819d142288058cafbe88fd54fda586afb1a5dbf0989",
+    "revoke-issuance": "0xe25191c46c470b8e5ee24a01e0f96f39a460e499dc77195a9715170f29ab8a51"
+  }
+}
