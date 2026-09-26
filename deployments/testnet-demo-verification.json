@@ -1,0 +1,68 @@
+{
+  "checkedAt": "2026-09-26T08:47:41.493Z",
+  "chainId": 2017072401,
+  "scriptedTestAssets": true,
+  "browserMode": "demo",
+  "confirmedScenarioTransactions": 448,
+  "indexedScenarioActionsChecked": 426,
+  "assets": 50,
+  "rights": 44,
+  "baskets": 3,
+  "listings": 72,
+  "listingsWithRemainingUnits": 37,
+  "indexedEvents": 630,
+  "sales": 69,
+  "volumeMockJPY": "2269800",
+  "depositedMockJPY": "117000",
+  "withdrawnFromRevenueVaultMockJPY": "25800",
+  "primaryRightsVolumeMockJPY": "1762000",
+  "secondaryRightsVolumeMockJPY": "492800",
+  "basketVolumeMockJPY": "15000",
+  "verifiedAssets": 44,
+  "activeAssets": 18,
+  "reviewsPending": 6,
+  "categories": [
+    {
+      "kind": "Rooftop",
+      "total": 9,
+      "active": 7
+    },
+    {
+      "kind": "Vacant Home",
+      "total": 7,
+      "active": 2
+    },
+    {
+      "kind": "Idle Land",
+      "total": 7,
+      "active": 3
+    },
+    {
+      "kind": "Parking",
+      "total": 7,
+      "active": 2
+    },
+    {
+      "kind": "Storage",
+      "total": 7,
+      "active": 1
+    },
+    {
+      "kind": "Advertising",
+      "total": 7,
+      "active": 2
+    },
+    {
+      "kind": "Other",
+      "total": 6,
+      "active": 1
+    }
+  ],
+  "basketCustodyVerified": true,
+  "limitations": [
+    "Fictional properties and simulated verification",
+    "Valueless test tokens; not organic adoption or returns",
+    "External webhook and browser-wallet rehearsal not verified by this script",
+    "ENSv2 not deployed"
+  ]
+}

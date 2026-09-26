@@ -65,13 +65,35 @@ This is a bounded, canonical-scope engine, not an arbitrary polygon intersection
 
 ## Guided experience and broader asset types
 
-**Optional Cyberpunk theme:** use the palette button in the top bar, or open `http://127.0.0.1:3000/?theme=cyberpunk`. A custom brush wordmark and a map-first Explore layout put Tokyo in the foreground; **Overview** restores the dashboard layout, and **Original** restores the green design. The preference uses its own localStorage key and does not change holdings, transactions or app mode. See [design variants and logo attribution](docs/DESIGN_VARIANTS.md).
+**Main theme — Cyberpunk:** open `http://127.0.0.1:3000/` (or `?theme=cyberpunk`). Tokenize opens a modal over the current screen, keeping the map and draft in place. A custom brush wordmark and a map-first Explore layout put Tokyo in the foreground; **Overview** restores the dashboard layout, and **Original** restores the green design. The preference uses its own localStorage key and does not change holdings, transactions or app mode. See [design variants and logo attribution](docs/DESIGN_VARIANTS.md).
 
 Use **使い方ガイド** in the sidebar for an optional Japanese walkthrough. Choose buying a right or listing a space; the guide waits for the relevant app action and can be closed with Escape or restarted. It never signs or submits a transaction for you.
 
 **Tokenize** has three focused steps: **Space → Right → Publish**. Only one selected space is shown. Location details, evidence, terms and transfer settings expand on demand. Publish shows the next lifecycle action and the required demo role. Use **Working on** to resume a registered asset; choose **＋ New space** to create one.
 
-The market has seven demo listings across six categories: rooftop solar (two projects), vacant-home workshop, idle-land pop-up, parking, storage and wall advertising. Non-solar examples are single, exclusive **usage rights** with purpose-specific terms and dates. Parking, storage and advertising use the existing contract's `Other` type with a validated metadata subtype. Missing examples are appended to existing browser data without clearing holdings or custom assets. Explore's **More spaces** filter exposes the additional categories.
+The browser catalog has **49 fictional spaces across seven categories**: rooftop solar, vacant-home workshops, idle-land pop-ups, parking, storage, wall advertising and community spaces. Non-solar examples are single, exclusive **usage rights** with purpose-specific terms and dates. Parking, storage and advertising use the existing contract's `Other` type with a validated metadata subtype. New examples are appended without clearing existing holdings or custom assets. Explore's **More spaces** filter exposes the additional categories.
+
+**Overview is an analysis view, not an asset table.** It shows a seven-day trade/deposit chart, separates primary rights, secondary rights and Basket turnover, compares activation by asset type, traces deposited versus withdrawn revenue, and links pending-review/activation signals to actions. Clicking an asset type filters the map. Figures come from the current mode's event stream; fictional metadata is never presented as measured social impact.
+
+### Scripted activity on Curvegrid Testnet
+
+On 2026-09-26, `demo:seed:testnet` added 49 fictional assets using **448 confirmed transactions** through MultiBaas unsigned composition and four local test signers. Including the pre-existing asset, Event Queries returned **50 assets, 44 rights, 72 listings, 69 sales, 3 baskets and 630 indexed events**. Volume was **2,269,800 MockJPY**, deposits **117,000 MockJPY**, and withdrawals from RevenueVault **25,800 MockJPY**. These are scripted test quantities, not adoption, real capital or realized investment returns.
+
+- [Transaction hashes and actors](deployments/testnet-demo-receipts.json) — public metadata only; private signer keys remain in ignored `.data/` with restricted permissions.
+- [Verification report](deployments/testnet-demo-verification.json) — 426 scenario actions matched by transaction hash and event name, SDK custody/balance checks for every basket, event totals reconciled against server-side Event Query aggregates.
+- `npm run demo:verify:testnet` — read-only verification. The Free-plan indexer took time to catch up; rerun after syncing rather than treating partial rows as complete market state.
+- `npm run demo:seed:testnet` — sends a bounded scenario on chain `2017072401` only. Maximum 650 transactions and 0.7 test ETH including actor funding; current run used about 0.333. It journals signed hashes before submission and resumes without repeating confirmed actions. Never delete its journal to rerun a completed scenario.
+
+The browser at port 3000 remains in `demo` mode. These on-chain scenarios are not silently imported into browser localStorage. A browser-wallet rehearsal is separate from scripted signing.
+
+### How to inspect TOKENIZE TOKYO transactions in MultiBaas
+
+1. Open the MultiBaas deployment for **Curvegrid Testnet**, then **Blockchain → TX Explorer**.
+2. Copy a `hash` from `deployments/testnet-demo-receipts.json`, for example an action ending in `/issue`, `/secondary-purchase`, `/revenue-1`, `basket-0/mint` or `basket-0/redeem`.
+3. Search the hash and inspect **Overview**, **Function Details**, and **Event Details**. The linked ABI decodes the function and emitted events.
+4. For Basket custody, use the linked rights contract's `balanceOf(BasketVault, rightId)` and compare it with the basket share supply. The verification script performs these reads through MultiBaas.
+
+The current Activity link opens the deployment, not a validated per-hash deep link. Curvegrid Testnet RPC requires a provisioned endpoint/API key; do not publish that URL or invent Etherscan transaction URLs for this chain. The planned Sepolia deployment will have separate addresses and Sepolia explorer links. See the official [Transaction Explorer guide](https://docs.curvegrid.com/multibaas/tx-explorer/) and [Curvegrid Testnet description](https://docs.curvegrid.com/multibaas/networks/curvegrid-testnet/).
 
 ## Secondary financial markets — interactive mock
 
@@ -85,47 +107,131 @@ This sandbox has its own **mock credits** and localStorage. It does not use Mock
 
 ## Architecture
 
+The city is the discovery interface. **Urban Rights contracts enforce ownership of tokens, transfer rules and payments; MultiBaas supplies reads, indexed history and transaction composition.** Owning a token or ENS name is not proof of ownership of a building.
+
+### Product and infrastructure
+
+```mermaid
+flowchart TB
+    User["Owner / Investor / Demo verifier"] --> UI
+    Map["3D Tokyo: MapLibre + OpenStreetMap\nSimulated asset scopes; PLATEAU planned"] --> UI
+    UI["Next.js application\nExplore / Assets / Tokenize\nPortfolio / Compose / Activity"]
+    UI -->|"DApp User key: reads, Event Queries, unsigned composition"| MB
+    subgraph Backend["Curvegrid MultiBaas — connected on Curvegrid Testnet"]
+        MB["TypeScript SDK / Contracts API"]
+        Index["Event Indexing + Event Queries\nLifecycle, listings, sales and revenue totals"]
+        Management["Contract definitions / ABI / linking\nDecoded Transaction Explorer"]
+    end
+    UI -->|"Composed transaction"| Wallet["Browser wallet\nSigns and submits"]
+    Wallet -->|"Signed transaction"| Chain
+    MB -->|"Contract reads / simulation"| Chain
+    subgraph Chain["EVM: Curvegrid Testnet • chain ID 2017072401"]
+        Registry["UrbanAssetRegistry\nAsset registration + verifier role"]
+        Rights["UrbanRightToken • ERC-1155\nSpace, time, purpose, transfer policy"]
+        Market["UrbanMarketplace\nAtomic primary / secondary sales"]
+        Revenue["RevenueVault\nReal test-token deposits + claims"]
+        Basket["BasketVault • ERC-1155\nUnderlying custody + mint / redeem"]
+        Cash["MockJPY • test ERC-20\nNo monetary value"]
+        Registry -->|"Verified asset linkage"| Rights
+        Rights --- Market
+        Rights --- Revenue
+        Rights -->|"Underlying rights"| Basket
+        Basket --- Market
+        Cash --- Market
+        Cash --- Revenue
+    end
+    Chain -->|"Contract events"| Index
+    Index -->|"Query results → projection.ts → market state"| UI
+    Admin["Deployment CLI\nAdmin key: server / local environment only"] --> Management
+    Management --- Chain
+    Index -.->|"Signed webhook; external delivery pending"| Hook["Next.js webhook endpoint\nHMAC + timestamp + delivery deduplication"]
+    Hook -.->|"Activity revision polling → rerun Event Queries"| UI
+    ENS["ENSv2 on Sepolia\nRead adapter implemented locally\nRegistration + issuance delegation pending"] -.->|"Future same-chain authority adapter"| Rights
+    Operator["Cloud Wallet + TXM adapter\nImplemented, not configured / live-tested"] -.-> MB
+    Lab["Markets: fractional / rental sandbox\nSeparate mock credits, no chain transactions"] --- UI
 ```
-                         +------------------------------------------+
-  Browser                |  Next.js 16 app (React 19)               |
-                         |  Dashboard.tsx  TokyoMap.tsx (MapLibre)  |
-                         |  projection.ts: events -> MarketState    |
-                         +------+-------------------+---------------+
-                                |                   |
-        reads, event queries,   |                   | poll /api/activity (2 s)
-        unsigned tx composition |                   | full refresh fallback (15 s)
-        (DApp User key only)    v                   v
-                   +-----------------------+   +--------------------------------+
-                   |  Curvegrid MultiBaas  |   | Next.js API (Node runtime)     |
-                   |  ContractsApi         |   | POST /api/webhooks/multibaas   |
-                   |  EventQueriesApi      |   |  HMAC-SHA256 + 5 min window    |
-                   |  ChainsApi            |-->|  dedup by delivery id          |
-                   |  Event indexing       |   | GET /api/activity (revision)   |
-                   |  Webhooks (signed)    |   +--------------------------------+
-                   +----+------------+-----+
-     unsigned tx        |            ^  indexes events
-     returned to UI     v            |
-              +----------------+     |        +------------------------------+
-              | Browser wallet |-----+------->| EVM chain                    |
-              | signs + sends  |  eth_send... | UrbanAssetRegistry           |
-              +----------------+              | UrbanRightToken (ERC-1155)   |
-                                              | UrbanMarketplace             |
-  Server / CLI only (admin key):              | RevenueVault                 |
-   scripts/link-multibaas.ts (forge-multibaas)| BasketVault (ERC-1155)       |
-   scripts/verify-multibaas.ts                | MockJPY (test ERC-20)        |
-   scripts/operator.ts -> CloudWalletOperator +------------------------------+
-     (signAndSubmit=true, nonceManagement, TXM status)
+
+Solid paths describe implemented architecture; dotted paths are pending live connection or implementation as labelled. **The current default browser mode is `demo`**: it substitutes localStorage events for MultiBaas and does not broadcast transactions. The separate testnet seed script uses MultiBaas composition with local test signers; it does not prove a browser-wallet or Cloud Wallet rehearsal.
+
+### What happens after tokenization?
+
+```mermaid
+flowchart LR
+    A["Register a space"] --> V["Demo verifier approves asset"]
+    V --> R["Issue a scoped right\nSpace × time × purpose"]
+    R --> RV["Verifier approves right\nReject overlapping exclusive usage"]
+    RV --> L["List on primary market"]
+    L --> B["Investor purchases\nPayment + token transfer in one transaction"]
+    B --> S["Resell some or all units\nSecondary market"]
+    B --> Act["Verifier activates project\nSeparate from purchase"]
+    Act --> D["Operator deposits MockJPY\nRevenue rights only"]
+    D --> C["Holder claims accrued revenue\nTransfer preserves past entitlement"]
+    B --> K["Compatible revenue rights\nDeposit into BasketVault"]
+    K --> Shares["Mint Basket shares"]
+    Shares --> Trade["Trade Basket shares"]
+    Shares --> Redeem["Burn shares → receive underlying rights"]
+    Shares --> Income["Claim underlying revenue through Basket"]
+    B -.-> F["Fractional economic interests / rental access\nInteractive mock only"]
+    F -.-> Future["Collateral / lending / funds\nNot implemented"]
 ```
 
-Demo mode replaces MultiBaas and the chain with `src/lib/demo.ts`, which enforces the same rules in the browser (localStorage), emits the **same event shapes**, and feeds them through the **same** `project()` function used for MultiBaas event rows.
+Revenue starts with a token deposit, not with a timer or advertised yield. Usage rights and revenue rights have different meaning: holding revenue units does not grant roof access. Buying all primary units can mark a project **Funded**; **Activated** requires a separate action and does not certify real construction.
 
-### ENSv2: spatial namespaces and delegated authority (planned)
+### Signing, indexing and refreshing
 
-The pitch's target architecture is **PLATEAU → ENSv2 → Urban Rights Protocol → Curvegrid**: physical geometry → space identity and namespace authority → scoped contractual rights → issuance, trading and indexed history. Today the basemap is MapLibre/OpenStreetMap; PLATEAU and ENSv2 are not integrated, and the MultiBaas path is verified live on Curvegrid Testnet.
+```mermaid
+sequenceDiagram
+    actor Investor
+    participant UI as Next.js UI
+    participant MB as MultiBaas SDK/API
+    participant Wallet as Browser wallet
+    participant EVM as UrbanMarketplace
+    participant Hook as Webhook API
+    Investor->>UI: Purchase a verified right
+    UI->>MB: Compose purchase (signAndSubmit=false)
+    MB-->>UI: Unsigned transaction
+    UI->>UI: Validate chain, sender, target and zero native value
+    UI->>Wallet: Request signature and submission
+    Wallet->>EVM: Signed purchase
+    EVM->>EVM: Transfer MockJPY and right atomically
+    EVM-->>MB: ListingPurchased + Transfer events
+    MB->>MB: Index events
+    opt Configured webhook — live delivery still pending
+        MB->>Hook: event.emitted + HMAC + timestamp
+        Hook->>Hook: Verify signature, reject replay, deduplicate
+        UI->>Hook: Poll activity revision (2 seconds)
+        Hook-->>UI: Changed revision
+    end
+    UI->>MB: Event Queries (also refreshed after action / every 15 seconds)
+    MB-->>UI: Indexed lifecycle and aggregate results
+    UI-->>Investor: Updated map, portfolio and activity
+```
 
-The proposed ENS hierarchy follows **district → building → rooftop / floor → right**. An owner would delegate a rooftop namespace to an operator while keeping other spaces separate. This needs an explicit `UrbanNamespaceAuthority` adapter: current `UrbanRightToken._create` allows only the verified asset's issuer. ENS record editing must not silently become issuance or verifier authority, and owning a name does not prove ownership of a building.
+The receiver is implemented for a single persistent Node server. A changed webhook revision triggers another MultiBaas query; the webhook payload itself is not treated as authoritative market state.
 
-See the [ENSv2 design and required tests](docs/ENSV2_DESIGN.md), [architecture slide](docs/pitch/index.html) and [four-minute pitch runbook](docs/PITCH_DEMO.md). The deck labels this as a proposed integration, not a completed ENS demonstration.
+The [feature status matrix](docs/FEATURE_STATUS.md) separates tested contracts, browser simulation, live service checks and mocks. The [remaining tasks](docs/REMAINING_TASKS.md) identify what is still needed for the full submitted demo.
+
+### ENSv2: spatial namespaces and delegated authority (prototype)
+
+Target hierarchy:
+
+```mermaid
+flowchart LR
+    Parent["Team-controlled ENS parent\nName not obtained yet"] --> District["District subregistry"]
+    District --> Building["building-1024"]
+    Building --> Roof["rooftop"]
+    Building --> Interior["interior"]
+    Building --> Wall["wall"]
+    Roof --> Right["right ID / terms reference"]
+    Owner["Asset issuer"] -.->|"Scoped EAC delegation + separate issuance grant (planned)"| Roof
+    Roof -.-> Operator["Solar operator\nNo authority over interior or wall"]
+```
+
+`src/lib/ens/` now builds namespace paths, reads name state and canonical parent/subregistry pointers at one Sepolia block, checks expiry, reads an operator's explicit EAC roles, and prepares a narrow unsigned grant/revoke call descriptor. Unit fixtures pass; **no live ENS registration, delegation or Universal Resolver verification has been performed**. `npm run ens:inspect` uses explicitly configured Sepolia RPC and registry values, with no fabricated fallback names or addresses. This diagnostic uses direct read-only RPC; product transaction integration remains MultiBaas-first.
+
+Authoritative ENS issuance needs a **Sepolia deployment of both Urban Rights and MultiBaas**; Curvegrid Testnet cannot directly enforce a Sepolia namespace. The existing testnet stays available. `UrbanNamespaceAuthority` and the delegated issuance contract entry point remain to be implemented. A resolver edit or EAC namespace grant must not confer issuance or verifier authority on its own.
+
+See the [ENSv2 specification and milestones](docs/ENSV2_DESIGN.md), [ENS pitch deck](docs/pitch/ens.html) and [four-minute pitch runbook](docs/PITCH_DEMO.md).
 
 ## Smart contracts
 
@@ -289,7 +395,9 @@ Based on the live run on 2026-09-26: a MultiBaas Free-plan deployment on Curvegr
 - **Page size is capped at 50.** `POST /queries` with `limit` above 50 returns the same bare `400 "invalid request"`. We had been paging 500 rows at a time; `queryRows()` in `src/lib/multibaas.ts` now pages by 50. Both errors return the same body, so the response alone does not say which part of the request is wrong.
 - **The DApp User key cannot read address or indexing status.** `AddressesApi.getAddress` and `getEventIndexingStatus` return 403 for DApp User. `scripts/verify-multibaas.ts` now uses the Administrators key (`MULTIBAAS_API_KEY`) for those two checks and the DApp key for chain status, reads, composition and queries.
 - **Unsigned composition fails for an unfunded sender.** `callContractFunction` with `signAndSubmit: false` returned `400 "gas required exceeds allowance (0)"` when `from` had zero balance, because MultiBaas estimates gas against the sender's balance. The verify script now takes a funded `PROBE_ADDRESS`. A new user with an empty wallet would hit the same error before seeing a transaction to sign.
-- **`bytes32` event inputs come back as byte arrays.** A value arrives as a JSON array of byte values, for example `"[54, 126, 15, ...]"`, not as a hex string. **Not yet verified:** whether `src/lib/projection.ts` handles this form for our `bytes32` fields (`geoReference`, `termsHash`, `purpose`).
+- **Event Query values need wire-format normalization.** `bytes32` values arrived as JSON byte arrays; dynamic Basket arrays also arrived as JSON strings. `projection.ts` now normalizes both, with tests and live Basket projection verification.
+- **Overloaded functions have API-specific names.** For this linked ABI, `totalSupply` selected the no-argument overload; `totalSupply(uint256)` and its selector were rejected. `totalSupply0` successfully read the per-ID supply. The testnet verification script documents that observed method name.
+- **A successful transaction is not immediate index completeness.** During the batch, Event Queries returned partial history. We now match every meaningful scripted action by hash/event and reconcile aggregates before recording verification success.
 - **No log index in Event Query results.** We can order by block but not by position within a block. When two lifecycle events for one asset share a block, `loadMarket()` resolves the asset status with an SDK `getAsset` read. Right status is projected order-independently (Closed beats Active beats Verified).
 - **Browser access needed a CORS entry.** `http://127.0.0.1:3000` had to be added in Admin > CORS before the browser could call the API.
 
@@ -319,7 +427,10 @@ The app shows: **"Test assets only. Verification is simulated. Map data does not
 ## Project documents
 
 - [Implementation report](docs/IMPLEMENTATION_REPORT.md): what was built, what was executed locally, what remains unverified.
-- [ENSv2 spatial namespace design](docs/ENSV2_DESIGN.md): proposed, not implemented, no ENS prize claimed.
+- [Feature implementation matrix](docs/FEATURE_STATUS.md): local, on-chain, mock and pending status.
+- [Remaining tasks](docs/REMAINING_TASKS.md): submission gates and Sepolia/ENS milestones.
+- [ENSv2 specification](docs/ENSV2_DESIGN.md): local read adapter implemented; live delegation and issuance pending, no ENS prize claimed.
+- [ENS pitch material](docs/pitch/ENS_IMPLEMENTATION.md): evidence-based slide content and target demo.
 - [Showcase copy](docs/showcase.md), [Q&A cheat sheet](docs/qa-cheatsheet.md), [five-slide finalist pitch](docs/pitch/index.html), [four-minute narration and exact demo actions](docs/PITCH_DEMO.md). The deck includes an optional rehearsal clock (T), notes (N) and a local-demo shortcut (D). Statistics are dated and sourced in the runbook.
 
 ## References
