@@ -71,7 +71,7 @@
   align-items: center;
   flex: none;
 }
-.city-view .city-brand img {
+.city-view .city-brand :is(img, svg) {
   width: 190px;
   height: 68px;
   object-fit: contain;
@@ -375,7 +375,7 @@
     gap: 12px;
     padding: 0 18px;
   }
-  .city-view .city-brand img {
+  .city-view .city-brand :is(img, svg) {
     width: 160px;
   }
 }
@@ -444,7 +444,7 @@
     padding: 0 12px;
     gap: 8px;
   }
-  .city-view .city-brand img {
+  .city-view .city-brand :is(img, svg) {
     width: 120px;
     height: 54px;
   }
