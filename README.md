@@ -60,20 +60,20 @@ This is a bounded, canonical-scope engine, not an arbitrary polygon intersection
 - **Tokenize**: register an asset, request verification, verifier approves, issuer defines a scoped right, verifier approves, issuer lists it.
 - **Portfolio**: holdings, claimable revenue, resale listings, basket redemption. Each holding shows its units and claimable mJPY next to the actions available on it (**Claim revenue**, enabled only when something is claimable; **List for resale**; **Redeem** for basket shares).
 - **Compose**: bundle 2 to 8 compatible revenue rights into a Tokyo Solar Basket (ERC-1155 shares backed by custody of the underlying rights).
-- **Activity**: urban activity ledger built from MultiBaas event queries; links to the MultiBaas Transaction Explorer.
+- **Activity**: urban activity ledger built from MultiBaas event queries; 20 events per page, newest first, with Previous / Next and Latest controls. Older pages keep their position while new events arrive. This paginates the loaded event history in the UI, not the underlying SDK queries. Links to the MultiBaas Transaction Explorer.
 - Lifecycle stage per asset (`src/lib/lifecycle.ts`): Dormant, Available, Funding, Funded, Active. "Funded" means the issuer sold its full supply; it is not a certification of project economics.
 
 ## Guided experience and broader asset types
 
-**Main theme — Cyberpunk:** open `http://127.0.0.1:3000/` (or `?theme=cyberpunk`). Tokenize opens a modal over the current screen, keeping the map and draft in place. A custom brush wordmark and a map-first Explore layout put Tokyo in the foreground; **Overview** restores the dashboard layout, and **Original** restores the green design. The preference uses its own localStorage key and does not change holdings, transactions or app mode. See [design variants and logo attribution](docs/DESIGN_VARIANTS.md).
+**Main theme — Cyberpunk:** open `http://127.0.0.1:3000/` (or `?theme=cyberpunk`). Tokenize opens a modal over the current screen, keeping the map and draft in place. A custom brush wordmark and a map-first Explore layout put Tokyo in the foreground; The sidebar **Dashboard** opens market analysis. Map controls are grouped into **Filters** and **Map tools**; large promotional page headings have been removed. The sidebar shows the brush logo when expanded and a compact mark when collapsed; **Tokenize** is available in the header. The header has no theme switch. The old green design remains available through `?theme=original` for development comparison; normal visits always use Cyberpunk. See [design variants and logo attribution](docs/DESIGN_VARIANTS.md).
 
-Use **使い方ガイド** in the sidebar for an optional Japanese walkthrough. Choose buying a right or listing a space; the guide waits for the relevant app action and can be closed with Escape or restarted. It never signs or submits a transaction for you.
+Use **Quick tour** in the sidebar for an optional English walkthrough. Small floating cards highlight the next control and point to it with an arrow; the map stays visible. Choose buying a right or listing a space. The guide waits for the relevant app action and can be closed or restarted; Escape dismisses the guide outside the tokenization modal and closes the modal when inside it. It never signs or submits a transaction for you.
 
 **Tokenize** has three focused steps: **Space → Right → Publish**. Only one selected space is shown. Location details, evidence, terms and transfer settings expand on demand. Publish shows the next lifecycle action and the required demo role. Use **Working on** to resume a registered asset; choose **＋ New space** to create one.
 
 The browser catalog has **49 fictional spaces across seven categories**: rooftop solar, vacant-home workshops, idle-land pop-ups, parking, storage, wall advertising and community spaces. Non-solar examples are single, exclusive **usage rights** with purpose-specific terms and dates. Parking, storage and advertising use the existing contract's `Other` type with a validated metadata subtype. New examples are appended without clearing existing holdings or custom assets. Explore's **More spaces** filter exposes the additional categories.
 
-**Overview is an analysis view, not an asset table.** It shows a seven-day trade/deposit chart, separates primary rights, secondary rights and Basket turnover, compares activation by asset type, traces deposited versus withdrawn revenue, and links pending-review/activation signals to actions. Clicking an asset type filters the map. Figures come from the current mode's event stream; fictional metadata is never presented as measured social impact.
+**Dashboard is an analysis view, not an asset table.** It shows a seven-day trade/deposit chart, separates primary rights, secondary rights and Basket turnover, compares activation by asset type, traces deposited versus withdrawn revenue, and links pending-review/activation signals to actions. Clicking an asset type filters the map. Figures come from the current mode's event stream; fictional metadata is never presented as measured social impact.
 
 ### Scripted activity on Curvegrid Testnet
 
@@ -97,7 +97,7 @@ The current Activity link opens the deployment, not a validated per-hash deep li
 
 ## Secondary financial markets — interactive mock
 
-**Markets** is a separate, clearly marked sandbox:
+**Markets** is a separate, clearly marked sandbox. Each offer includes a small 3D map crop centered on its demo location, with a category badge. Previews load lazily and release their WebGL renderer after capture; a category icon remains available if external map tiles fail. Shared attribution is shown below the list. Market explanations are expandable:
 
 - **Fractional market:** acquire shares of a mock right pool's economic interest, reserve shares for resale, and explicitly simulate a buyer settling the resale. Inventory checks prevent duplicate simulated sales.
 - **Rental market:** choose a duration, preview the price, confirm a mock access pass, and return access. The original token stays with its owner. Early return does not simulate a refund.
@@ -431,7 +431,7 @@ The app shows: **"Test assets only. Verification is simulated. Map data does not
 - [Remaining tasks](docs/REMAINING_TASKS.md): submission gates and Sepolia/ENS milestones.
 - [ENSv2 specification](docs/ENSV2_DESIGN.md): local read adapter implemented; live delegation and issuance pending, no ENS prize claimed.
 - [ENS pitch material](docs/pitch/ENS_IMPLEMENTATION.md): evidence-based slide content and target demo.
-- [Showcase copy](docs/showcase.md), [Q&A cheat sheet](docs/qa-cheatsheet.md), [five-slide finalist pitch](docs/pitch/index.html), [four-minute narration and exact demo actions](docs/PITCH_DEMO.md). The deck includes an optional rehearsal clock (T), notes (N) and a local-demo shortcut (D). Statistics are dated and sourced in the runbook.
+- [Showcase copy](docs/showcase.md), [Q&A cheat sheet](docs/qa-cheatsheet.md), adversarial Q&A ([EN](docs/qa-adversarial.en.md) / [JA](docs/qa-adversarial.ja.md)), [five-slide finalist pitch](docs/pitch/index.html), [four-minute narration and exact demo actions](docs/PITCH_DEMO.md). The deck includes an optional rehearsal clock (T), notes (N) and a local-demo shortcut (D). Statistics are dated and sourced in the runbook.
 
 ## References
 

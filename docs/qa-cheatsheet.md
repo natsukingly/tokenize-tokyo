@@ -1,6 +1,6 @@
 # Judge Q&A Cheatsheet
 
-Start with a 15–20 second answer. Use the detailed sections below only when a judge asks for evidence. The current browser is simulated, MultiBaas awaits connection, and ENSv2 / PLATEAU are planned.
+Start with a 15–20 second answer. Use the detailed sections below only when a judge asks for evidence. The browser demo mode is simulated; the same contracts run live on Curvegrid Testnet and are indexed by MultiBaas (multibaas mode); ENSv2 / PLATEAU are planned.
 
 ## Six answers for the three-minute Q&A
 
@@ -87,3 +87,6 @@ Co-ownership already exists: a Revenue Share right is 100 fungible ERC-1155 unit
 
 > JA: 共同所有は既に実装（収益権は 100 単位の ERC-1155）。次は担保貸付（評価オラクルと金商法レビューが前提）、検証パートナー、KYC、運用自動化。
 
+---
+
+Harder questions (40, tagged fatal / prepared / demo): [English](qa-adversarial.en.md) · [日本語](qa-adversarial.ja.md)
