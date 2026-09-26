@@ -1050,7 +1050,7 @@ export default function Dashboard({
           <div className="top-actions">
             <span className={"mode " + (DEMO ? "demo" : "")}>
               <span />
-              {DEMO ? "SIMULATED DEMO" : "MULTIBAAS TESTNET"}
+              {DEMO ? "SIMULATED DEMO" : config.chainId === 11155111 ? "SEPOLIA TESTNET" : "CURVEGRID TESTNET"}
             </span>
             {marketLoaded && refreshing && (
               <span className="data-refresh" role="status">
@@ -2233,7 +2233,9 @@ export default function Dashboard({
             <span>
               {DEMO
                 ? "Demo simulation · no on-chain transactions"
-                : "Data: MultiBaas Event Queries"}{" "}
+                : state.events.some(event => event.source === "rpc-bootstrap")
+                  ? "Data: MultiBaas + verified Sepolia setup logs"
+                  : "Data: MultiBaas Event Queries"}{" "}
               {lastSync && "· Updated " + lastSync}
             </span>
             {DEMO && (

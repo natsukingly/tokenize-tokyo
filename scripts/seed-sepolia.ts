@@ -156,8 +156,8 @@ async function finish(
     }
     receipt = await rpc.waitForTransactionReceipt({
       hash: step.hash,
-      timeout: 60_000,
-      pollingInterval: 750,
+      timeout: 180_000,
+      pollingInterval: 1500,
     });
   }
   assert(receipt.status === "success", `Transaction reverted: ${step.hash}`);
@@ -213,7 +213,8 @@ async function transact(
     Object.keys(journal.steps).length < MAX_TRANSACTIONS,
     "Scenario transaction cap reached",
   );
-  const gasPrice = await rpc.getGasPrice();
+  // Sepolia base fees can move before inclusion. Keep a small bounded margin.
+  const gasPrice = (await rpc.getGasPrice()) * 12n / 10n + 100_000_000n;
   assert(
     gasPrice <= MAX_GAS_PRICE && gas > 0n && gas <= 5_000_000n,
     "Unexpected gas estimate",
