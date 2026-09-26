@@ -1021,11 +1021,9 @@
           </div>
           <div class="rmap-block">
             <div class="tag">FINANCIAL LAYER</div>
-            <ul>
-              <li>Protocol: revenue · resale · baskets</li>
-              <li>Mock: fractional shares · rental access</li>
-              <li>Future: collateral loans</li>
-            </ul>
+            <div class="rmap-tags">
+              <span>Co-ownership (live: fungible revenue units)</span><span>Secondary markets</span><span>Baskets</span><span>Collateralized lending (next)</span><span>Revenue index (next)</span>
+            </div>
           </div>
         </div>
       </div>
@@ -1056,7 +1054,7 @@
     "Time 0:40–2:55. Discover: Rooftop + Available, Opportunity Lens for fictional opportunity sites, then X-ray for registered-right scopes. Define: issue and verify one exclusive rooftop usage right on prepared Nihonbashi Solar Roof. Reject: overlapping RESTAURANT usage. Activate: Investor B buys the 100-unit revenue listing, Funded appears; Demo verifier activates revenue right #1 separately; return to the map to see panels. All browser actions are simulated; contracts were separately tested on Anvil. Do not claim ENS resolution or MultiBaas events in demo mode. The runbook specifies preparation, exact controls and dates. Return here at 2:55 and advance.",
     "ENS is not a label on a building; it is the hierarchy and control model for spaces. Each name is its own subregistry — district, then building, then space, then right — created with the ENSv2 Verifiable Factory and attached with setSubregistry, mirroring the city's own structure. Enhanced Access Control lets an owner delegate only the rooftop namespace to the solar operator, and UrbanRightToken checks that permission before a scoped right can be issued; every other floor stays untouched. Revocation or expiry ends future issuance immediately without disturbing rights already issued, and names are indexed by labelhash through MultiBaas. Namespace control never proves physical ownership; verification stays a separate layer. Status: ENSv2 is live on Sepolia.",
     "Say the status of each layer out loud; judges reward honesty over a four-logo diagram. 3D Tokyo runs today on MapLibre/OpenStreetMap, with PLATEAU as a planned data source. ENSv2 is live on Sepolia. The Urban Rights Protocol and Curvegrid MultiBaas integration are implemented; the MultiBaas integration is verified live on Curvegrid Testnet.",
-    "Nothing here is Tokyo-specific except the data. Swap the map tiles and the verifier network and the same contracts run for Osaka, Taipei or Lisbon."
+    "Nothing here is Tokyo-specific except the data. Swap the map tiles and the verifier network and the same contracts run for Osaka, Taipei or Lisbon. Co-ownership already exists as fungible revenue units; collateralized lending is the next layer and needs a valuation oracle and Japanese securities-law review."
 ];
   var current = Math.max(0, Math.min(slides.length - 1, Number(location.hash.slice(1)) - 1 || 0));
   var total = slides.length;

@@ -1,6 +1,19 @@
 # Judge Q&A Cheatsheet
 
-Answers are grounded in the code. File references are for your own backup if a judge asks "show me".
+Start with a 15–20 second answer. Use the detailed sections below only when a judge asks for evidence. The current browser is simulated, MultiBaas awaits connection, and ENSv2 / PLATEAU are planned.
+
+## Six answers for the three-minute Q&A
+
+| Question | Short answer | Evidence / limit |
+| --- | --- | --- |
+| Does PLATEAU prove ownership? | No. Spatial data describes a place; verification of authority is separate. Our current map is OpenStreetMap. | Simulated verifier role. No real title checks. |
+| Why blockchain instead of a database? | A common settlement layer enforces issuance, atomic trades and deposited-revenue accounting across holders and vaults. | Solidity contracts; not a guarantee against external duplicate contracts. |
+| How is this different from property NFTs? | The token describes what a particular space may provide, for a defined purpose and period. | Roof access differs from building title and from a revenue share. |
+| Can two operators rent the same roof? | Within the protocol, a verified exclusive use blocks competing uses for overlapping dates. | Canonical scopes and geo hashes; verifier review still matters. |
+| Why ENS? | The proposed hierarchy identifies a right's space and enables scoped namespace delegation. | Not implemented. An explicit adapter must connect it to issuance. |
+| Why Curvegrid? | The SDK, indexing, queries and signed webhooks are designed to build the citywide market from its lifecycle events. | Code and local tests exist; real connection is pending. |
+
+## Detailed answers
 
 ### 1. Why blockchain?
 
@@ -10,9 +23,9 @@ Rights here are split across many parties (owner, verifier, operator, many inves
 
 ### 2. Why not a database or a normal marketplace?
 
-A marketplace can list a rooftop; it cannot guarantee that a second platform is not selling the same roof for the same dates, or that a secondary buyer receives no revenue earned before purchase. We enforce both in contracts (conflict check at issuance and again at verification; revenue checkpoint on every transfer in `UrbanRightToken._update`). The history is also portable: any dashboard can rebuild the market from events, which is exactly how ours works via MultiBaas.
+A database can represent these rules. Our reason for a shared protocol is that marketplaces and vaults can use the same settlement rules and public history. Contracts reject conflicting rights within this registry and preserve past revenue for the seller (conflict checks at issuance and verification; revenue checkpoints in `UrbanRightToken._update`). They cannot prevent somebody making a separate off-platform agreement or using a different registry. MultiBaas mode is implemented to rebuild the market from events but awaits live verification.
 
-> JA: 二重販売防止と過去収益の非継承をコントラクトで保証し、履歴はイベントで誰でも再構築できる。
+> JA: 共通の決済ルールと履歴を複数市場・Vaultで使うため。同一Protocol内の競合を防ぎ、外部の契約まで阻止するとは主張しない。
 
 ### 3. Who verifies ownership?
 
@@ -34,7 +47,7 @@ We do not claim a legal classification. A transferable revenue-share token that 
 
 ### 6. Why Curvegrid MultiBaas?
 
-It is our entire backend in live mode: contract reads, 24 address-filtered Event Queries for discovery and history, server-side `add` aggregation for volume and revenue totals, and unsigned transaction composition (`signAndSubmit: false`) that the user signs in their own wallet. Signed webhooks trigger dashboard refresh, and a separate admin key runs a Cloud Wallet operator for verifier and revenue actions. RBAC maps to our roles: DApp User key in the browser, admin key only on the server, and `multibaas:verify` checks the browser key cannot list API keys.
+It is the implemented backend for `multibaas` mode, verified live on Curvegrid Testnet on 2026-09-26: contract reads, 24 address-filtered Event Queries for discovery and history, server-side `add` aggregation for volume and revenue totals, and unsigned transaction composition (`signAndSubmit: false`) that the user signs in their own wallet. Signed webhooks trigger dashboard refresh, and a server-only operator adapter supports Cloud Wallet verifier/revenue actions when configured. Cloud Wallet and TXM have not been exercised. RBAC maps to our roles: DApp User key in the browser, admin key only on the server, and `multibaas:verify` checks the browser key cannot list API keys.
 
 > JA: 読み取り・イベント検索・集計・未署名Tx生成・Webhook をすべて MultiBaas で賄い、独自インデクサ不要。
 
@@ -52,15 +65,15 @@ Three layers. Only one asset can be verified per canonical geo hash (`verifiedAs
 
 ### 9. Cold start?
 
-Supply comes first: owners can register and list without any buyers, and lifecycle labels (Dormant, Available, Funding, Funded, Active) show where each asset stands. Opportunity Lens visualizes about 150 demo sites to show the scale of dormant supply that local governments already count. Baskets let a small investor get exposure to several roofs at once, and operators (solar installers) are natural first issuers because they already have revenue to deposit.
+Demand first. An investor or operator can signal interest in a dormant site from Opportunity Lens before any owner is on the platform. That demand is routed to the owner: in-app if they are registered, otherwise through local agencies and referrals. An owner who hears "twelve people want to fund your rooftop" has a reason to register and verify, and the right is issued into visible demand. Today the app shows about 150 demo sites and the lifecycle labels (Dormant, Available, Funding, Funded, Active); the interest-signal step is the next feature.
 
-> JA: 供給側から始め、Opportunity Lens で潜在供給を可視化し、Basket で小口投資家を呼ぶ。
+> JA: 需要が先。Lens で関心表明 → 所有者へ届ける（アプリ内・代理店・紹介）→ 検証 → 需要が見えた状態で発行。関心表明機能は次の実装。
 
 ### 10. What is simulated and what is real?
 
-Real: six Solidity contracts and their tests, 50 transactions with assertions on local Anvil (`demo:seed`), the MultiBaas SDK adapter, scripts and webhook receiver with unit tests. Simulated: all assets and sites (fictional positions on a real OpenStreetMap basemap), ownership verification, Mock JPY, and the browser demo mode, which runs the same rules and event shapes in localStorage. `TODO natsuki: state whether the live MultiBaas run was completed.` The map uses OpenFreeMap tiles, not a 3D city model dataset.
+Real: six Solidity contracts and their tests, 50 transactions with assertions on local Anvil (`demo:seed`), the MultiBaas SDK adapter, scripts and webhook receiver with unit tests, and the same six contracts deployed on Curvegrid Testnet (chain 2017072401), linked to a MultiBaas deployment and indexed live: the Activity ledger in `multibaas` mode shows real events through Event Queries. Simulated: all assets and sites (fictional positions on a real OpenStreetMap basemap), ownership verification, Mock JPY, and the browser demo mode, which runs the same rules and event shapes in localStorage. The map uses OpenFreeMap tiles, not a 3D city model dataset.
 
-> JA: コントラクトとテストは本物、資産・検証・通貨・ブラウザデモは模擬。
+> JA: コントラクト・テスト・Curvegrid Testnet 上の稼働と MultiBaas 索引は本物。資産・検証・通貨・ブラウザのデモモードは模擬。
 
 ### 11. How does revenue distribution work?
 
@@ -70,6 +83,7 @@ The operator deposits Mock JPY into `RevenueVault` only while the revenue right 
 
 ### 12. What is next?
 
-First, a live MultiBaas testnet deployment with a recorded signed-webhook refresh and Transaction Explorer links. Then a real verifier partner and KYC-gated `Allowlist` transfers, the Cloud Wallet operator for scheduled revenue deposits, a shared database for webhooks so the app can scale beyond one Node server, and finer geometry than five canonical scopes. Legal structuring with counsel comes before any real money.
+Co-ownership already exists: a Revenue Share right is 100 fungible ERC-1155 units, so many holders share one rooftop's cash flow, and BasketVault pools several roofs. The next financial layer is collateralized lending, using revenue history to value a right and borrow against it; that needs a valuation oracle and a securities-law review before anything real. On the plumbing side: a real verifier partner with KYC-gated `Allowlist` transfers, the Cloud Wallet operator for scheduled revenue deposits, a shared store for webhooks beyond one Node server, and finer geometry than five canonical scopes.
 
-> JA: 本番 MultiBaas 接続、検証パートナーと KYC、運用自動化、法務設計の順に進める。
+> JA: 共同所有は既に実装（収益権は 100 単位の ERC-1155）。次は担保貸付（評価オラクルと金商法レビューが前提）、検証パートナー、KYC、運用自動化。
+

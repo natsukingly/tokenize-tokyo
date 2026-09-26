@@ -810,8 +810,8 @@
           <p>RevenueVault pro-rata index, per-holder checkpoints, buyers do not inherit unclaimed revenue.</p>
         </div>
         <div class="tile">
-          <h3>Composable</h3>
-          <p>BasketVault: fixed-ratio custody of 2 to 8 revenue rights, fully backed shares, redeem returns underlying.</p>
+          <h3>Co-owned and composable</h3>
+          <p>Revenue Share rights are fungible ERC-1155 units: 100 holders can share one rooftop's cash flow. BasketVault pools 2 to 8 rights into fully backed shares. Next: rights as collateral for lending.</p>
         </div>
       </div>
       <p class="infra-status">Curvegrid RWA track: ownership, transactions, permissions and cash flows as code.</p>
@@ -884,11 +884,9 @@
           </div>
           <div class="rmap-block">
             <div class="tag">FINANCIAL LAYER</div>
-            <ul>
-              <li>Protocol: revenue · resale · baskets</li>
-              <li>Mock: fractional shares · rental access</li>
-              <li>Future: collateral loans</li>
-            </ul>
+            <div class="rmap-tags">
+              <span>Co-ownership (live: fungible revenue units)</span><span>Secondary markets</span><span>Baskets</span><span>Collateralized lending (next)</span><span>Revenue index (next)</span>
+            </div>
           </div>
         </div>
       </div>
@@ -919,7 +917,7 @@
     "Time 0:40–2:55. Discover: Rooftop + Available, Opportunity Lens for fictional opportunity sites, then X-ray for registered-right scopes. Define: issue and verify one exclusive rooftop usage right on prepared Nihonbashi Solar Roof. Reject: overlapping RESTAURANT usage. Activate: Investor B buys the 100-unit revenue listing, Funded appears; Demo verifier activates revenue right #1 separately; return to the map to see panels. All browser actions are simulated; contracts were separately tested on Anvil. Do not claim ENS resolution or MultiBaas events in demo mode. The runbook specifies preparation, exact controls and dates. Return here at 2:55 and advance.",
     "This is the answer to \"what becomes possible after tokenization?\" No double-selling: the spatial × temporal conflict engine rejects overlapping exclusive rights on-chain using half-open intervals. Atomic settlement: MockJPY in, ERC-1155 right out, one purchase call, with partial fills. Cash flow follows the token: RevenueVault keeps a pro-rata index with per-holder checkpoints, so buyers never inherit unclaimed revenue. Composable: BasketVault holds 2 to 8 revenue rights in fixed ratio, fully backed, and redeem always returns the underlying.",
     "Dashboard track framing: understand assets, know the required action, make a better decision. MultiBaas is what turns the protocol into a live ledger view. Event Queries read across 6 contracts for market state, the activity ledger and metrics (sum of ListingPurchased, RevenueDeposited, RevenueClaimed). Contract calls go through the SDK with signAndSubmit=false, so the browser wallet signs and MultiBaas never holds keys. Webhooks are HMAC-signed with a 5-minute replay window and drive the live activity feed. The DApp User key lives in the browser; the admin key stays only in deploy/link scripts. The mb-status line is intentionally editable by hand once a live deployment is connected.",
-    "Nothing here is Tokyo-specific except the data. Swap the map tiles and the verifier network and the same contracts run for Osaka, Taipei or Lisbon."
+    "Nothing here is Tokyo-specific except the data. Swap the map tiles and the verifier network and the same contracts run for Osaka, Taipei or Lisbon. Co-ownership already exists as fungible revenue units; collateralized lending is the next layer and needs a valuation oracle and Japanese securities-law review."
 ];
   var current = Math.max(0, Math.min(slides.length - 1, Number(location.hash.slice(1)) - 1 || 0));
   var total = slides.length;
