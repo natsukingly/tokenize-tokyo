@@ -126,6 +126,37 @@ The hosted market and ENSv2 integration now run on **Sepolia** through a dedicat
 
 Conflict checks apply within the same asset and overlapping canonical scopes, including whole-asset scope. Time intervals are half-open, so adjacent bookings can coexist. These checks do not detect arbitrary physical geometry overlaps or off-platform agreements. Verification is role-gated, but the demo's initial administrator also receives the verifier role.
 
+### Token-standard extensibility (planned)
+
+**English — Current implementation vs. future extension**
+
+The current prototype issues usage and revenue rights through the existing **ERC-1155 `UrbanRightToken`** contract. The Tokenize flow mints a new right; it does not deploy a new contract per asset or let issuers choose arbitrary token standards. MockJPY's ERC-20 payment support does not imply ERC-20 asset-issuance support.
+
+The project can be extended to other EVM token standards through additional contract and application development. **T-REX / ERC-3643 is a future candidate for permissioned revenue or investment interests**, alongside ERC-1155 usage rights. ERC-3643 is ERC-20 compatible and provides interfaces for identity-based eligibility, transfer restrictions and issuer controls. It is **not implemented, deployed or integrated into TOKENIZE TOKYO today**. [ERC-3643 specification](https://eips.ethereum.org/EIPS/eip-3643)
+
+The proposed approach separates the **space and its ENS identity** from the **token representing a particular right**. A future token reference would record the chain, contract address, standard and, where applicable, token ID. This would allow one space to reference rights issued under different standards. The standard-selection and adapter layer is a roadmap item, not an existing plug-in interface.
+
+Implementation would require:
+
+- A deployment and issuance flow for the additional standard, including the T-REX identity registries, trusted claim issuers and compliance configuration. Access to the official T-REX Factory/Gateway must be confirmed; it is not assumed to be permissionless. [Official deployment access](https://docs.erc3643.org/erc-3643/smart-contracts-library/tokens-factory/official-factories-and-gateways)
+- Standard-specific token references, approvals, balances, decimals, event indexing and ENS issuance-authority integration.
+- Compatible marketplace settlement, revenue accounting and Basket/custody contracts, including transfer-eligibility checks for vaults and investors. Existing contracts depend on `UrbanRightToken` and cannot accept T-REX assets merely by changing an ABI.
+- Issuer/investor onboarding and end-to-end tests for issuance, permitted and rejected transfers, distributions and redemption. Choosing ERC-3643 alone does not establish legal compliance or verify real-world ownership; the [production trust requirements](docs/TRUST_MODEL.md) still apply.
+
+**MultiBaas remains the integration layer:** it supports linking contract addresses to ABIs, calling methods and indexing events across EVM contract types. That infrastructure capability is separate from this application's current ERC-1155-specific workflows. [MultiBaas contract management](https://docs.curvegrid.com/multibaas/manage-contracts/)
+
+**日本語 — 現在の実装と将来の拡張**
+
+現在の利用権・収益権は、既存の **ERC-1155 `UrbanRightToken`** から発行します。Tokenizeは権利の新規発行であり、資産ごとの新しいコントラクトのデプロイや、発行規格の自由選択には対応していません。決済用MockJPYがERC-20であることと、ERC-20の資産トークンを発行できることは別です。
+
+将来は、コントラクトとアプリの追加実装により、他のEVMトークン規格へ拡張する方針です。**利用権にERC-1155、投資家の参加条件を管理する収益持分・出資持分にT-REX／ERC-3643を使う構成**を候補としています。ERC-3643はERC-20互換で、本人確認情報に基づく保有資格の確認、譲渡制限、発行者による管理の仕組みを備えます。**TOKENIZE TOKYOでのT-REX対応は未実装・未デプロイ・未接続です。**
+
+拡張時は、**空間とENSの識別・管理**と、**その空間に設定する権利トークンの規格**を分けます。チェーン、コントラクトアドレス、規格、必要に応じてToken IDを記録し、同じ空間に複数規格の権利を紐づける構想です。この共通参照・規格選択・接続層は、現在完成している機能ではなく今後の開発項目です。
+
+追加で必要なのは、T-REX関連コントラクトの配置と本人確認・譲渡ルールの設定、規格別の発行画面・承認・残高・小数桁・イベント索引・ENS発行権限の対応、売買・収益分配・Basket／保管先の対応、発行から償還までの検証です。既存の市場やVaultは`UrbanRightToken`に依存しているため、ABIの差し替えだけでは対応できません。公式Factory／Gatewayを使う場合は利用許可の確認も必要です。
+
+MultiBaasはERC-1155専用ではなく、別規格のコントラクトもABIとアドレスを登録して接続・操作・イベント索引の対象にできます。ただし、それだけで本アプリの取引機能が別規格に対応するわけではありません。T-REX採用後も、法人審査、実物資産の権限確認、実際のKYC／AMLや法的な発行条件の整備は別途必要です。規格の採用のみをもって法令準拠済みとは説明しません。
+
 ### Frontend and data model
 
 | Area                                     | Relevant code                                                                                                                                |

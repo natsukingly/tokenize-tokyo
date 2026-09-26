@@ -18,6 +18,7 @@
 | Asset登録 | 空間とmetadataを登録 | コントラクト・UI・テストネット確認 | 登記/所有権の照合 |
 | Asset審査 | 申請、承認、却下、再申請 | VERIFIER_ROLEで制御・Foundry確認 | 現実の審査はシミュレーション |
 | 権利発行 | 用途・期間・scope・供給量・譲渡条件を定義 | ERC-1155発行をテストネット確認 | 法的契約としての有効性・証憑保管 |
+| 複数トークン規格への拡張 | 利用権のERC-1155と、参加条件を管理する収益・出資持分のT-REX／ERC-3643などを使い分ける構想 | **将来方針のみ。T-REXの実装・デプロイ・接続、規格選択UIは未対応** | 発行・本人確認・ENS連携・売買・分配・Basket・索引の規格別対応。[英日説明](../README.md#token-standard-extensibility-planned) |
 | 権利審査 | Assetとは別に承認後のみ出品可能 | コントラクト・テストネット確認 | 本人確認・審査運用 |
 | 空間/期間の競合 | 同じscope・重複期間の排他的用途を拒否 | コントラクト・Foundry・ブラウザE2E確認 | プロトコル外の二重契約は検知しない |
 | 一次販売 | 発行者から投資家へ持分を販売 | MockJPY支払と権利移転を同一txで実行・テストネット確認 | MetaMask/Rabby拡張そのものの手動リハーサル |
@@ -56,6 +57,8 @@
 ## 「何のトークンか」
 
 UrbanRightTokenはERC-1155。同じ権利ID内では各口が同等、別の権利IDとは内容が異なる。Usage Rightは通常1口、Revenue Shareは100口など。建物の所有権そのものではない。BasketもERC-1155、決済のMockJPYはERC-20で金銭的価値はない。
+
+他のEVM規格への拡張は今後の開発方針。空間・ENSと権利トークンの参照を分離し、T-REX／ERC-3643等を追加する構想だが、現在の取引・Vault・ENS発行権限は既存のUrbanRightTokenに依存する。MultiBaasで別ABIを登録できることと、アプリでその規格を発行・運用できることは区別する。[READMEの拡張方針（English／日本語）](../README.md#token-standard-extensibility-planned)。
 
 ## Basketは誰が使うか
 
