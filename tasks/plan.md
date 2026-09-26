@@ -41,3 +41,7 @@
 - 17:20 verify 全通過。原因3件: (1) select は inputIndex 必須（name だと 400 invalid request）(2) limit>50 で 400 (3) DApp キーは索引状態/アドレス参照が 403 → verify を admin/DApp 二鍵化。gas 見積りは from の残高依存（残高0だと 400）。修正コミット 24570f3、push 済み
 - 手動 seed: asset 1 / right 1 を cast で作成（scripts/seed.ts は anvil 前提で「already seeded」になる）
 - ブラウザ multibaas モードは 3001（next build+start、CORS 追加済み）で確認: Activity に実イベント7件、エラー0。未検証: webhook 配信、Cloud Wallet、TXM
+
+## 17:40 方針変更（natsuki）
+- ENS 版デッキは「ENSv2 実装済み」前提で作成。#ens-status 1要素と slide 5 のチップで戻せる。見た目は Lain Terminal 調（ens.html のみ）
+- 提出前チェック: Codex の Sepolia ENSv2 実装が本当に動いているか。動いていなければ ens.html の2か所を proposed に戻し、Q&A 13/14（Codex 記述「現時点では未接続」）と整合させる

@@ -7,20 +7,22 @@
 <meta name="description" content="TOKENIZE TOKYO — ETHGlobal Tokyo 2026 pitch deck" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;550;600;650;700&family=Manrope:wght@400;500;600;650;700;750;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
   :root{
-    --bg:#0d1310;
-    --bg2:#101714;
-    --panel:#18211c;
-    --line:#2b352e;
-    --muted:#91a096;
-    --text:#eff3ec;
-    --lime:#d7f985;
-    --lime2:#edff9c;
-    --teal:#69c9a5;
-    --font:"DM Sans",Arial,sans-serif;
-    --font-head:"Manrope","DM Sans",Arial,sans-serif;
+    --bg:#040705;
+    --bg2:#0a120c;
+    --panel:#0a120c;
+    --line:#1f3a26;
+    --muted:#5f7f66;
+    --text:#b9ffc4;
+    --lime:#39ff14;
+    --lime2:#39ff14;
+    --teal:#d8a24a;
+    --accent:#39ff14;
+    --amber:#d8a24a;
+    --font:"IBM Plex Mono","Courier New",monospace;
+    --font-head:"IBM Plex Mono","Courier New",monospace;
     --sw:1280px;
     --sh:720px;
   }
@@ -66,15 +68,23 @@
   }
   .slide.active{display:flex;}
 
-  /* background photo treatment for bookend slides */
+  /* background photo treatment for bookend slides — filtered green-monochrome, isolated behind content */
   .slide.with-photo{
+    isolation:isolate;
+  }
+  .slide.with-photo::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    z-index:-1;
     background:
-      linear-gradient(180deg, rgba(13,19,16,0.90) 0%, rgba(13,19,16,0.96) 55%, rgba(13,19,16,0.995) 100%),
-      linear-gradient(90deg, rgba(13,19,16,0.66) 0%, rgba(13,19,16,0.34) 45%, rgba(13,19,16,0.66) 100%),
-      radial-gradient(ellipse at 18% 100%, rgba(215,249,133,0.10), transparent 60%),
+      linear-gradient(180deg, rgba(4,7,5,0.92) 0%, rgba(4,7,5,0.97) 55%, rgba(4,7,5,0.998) 100%),
+      linear-gradient(90deg, rgba(4,7,5,0.7) 0%, rgba(4,7,5,0.4) 45%, rgba(4,7,5,0.7) 100%),
+      radial-gradient(ellipse at 18% 100%, rgba(57,255,20,0.08), transparent 60%),
       url("../screenshots/tokyo-map.png");
     background-size: cover, cover, cover, cover;
     background-position: center, center, center, center;
+    filter: grayscale(1) sepia(1) hue-rotate(70deg) saturate(2.2) brightness(0.5) contrast(1.15);
   }
 
   .eyebrow{
@@ -88,11 +98,9 @@
     color:#a7b69f;
   }
   .eyebrow::before{
-    content:"";
-    width:6px;height:6px;border-radius:50%;
-    background:var(--lime);
-    flex:none;
-    box-shadow:0 0 10px #d7f98588;
+    content:"> ";
+    color:var(--accent);
+    font-weight:700;
   }
 
   .slide-index{
@@ -644,13 +652,18 @@
   }
 
   @media (prefers-reduced-motion: reduce){
-    *{transition:none !important;}
+    *{transition:none !important; animation:none !important;}
   }
 
   /* ---------- print: one slide per page ---------- */
   @media print{
+    :root{
+      --bg:#ffffff; --bg2:#ffffff; --panel:#ffffff;
+      --line:#bcd6c2; --muted:#2f6b40; --text:#0a3d1f;
+      --lime:#0a3d1f; --lime2:#0a3d1f; --teal:#0a3d1f; --accent:#0a3d1f; --amber:#5c4a12;
+    }
     @page{ size: landscape; margin:0; }
-    html,body{ overflow:visible; height:auto; width:auto; background:#0d1310; }
+    html,body{ overflow:visible; height:auto; width:auto; background:#ffffff; }
     #viewport{ position:static; display:block; }
     #stage{
       position:static;
@@ -658,6 +671,7 @@
       width:100%;
       height:100vh;
       box-shadow:none;
+      background:#ffffff;
     }
     .slide{
       display:flex !important;
@@ -667,7 +681,8 @@
       height:100vh;
       width:100%;
     }
-    #hud, #counter, #notes-panel{display:none !important;}
+    .slide.with-photo::before{display:none !important;}
+    #hud, #counter, #notes-panel, #crt-overlay, #crt-refresh, .cursor{display:none !important;}
   }
 
   .sources a{color:inherit;text-decoration:underline;text-underline-offset:3px;}
@@ -700,11 +715,142 @@
   #s5 .roadmap-cols{margin-top:28px;}
   #s5 .rmap-block{padding:21px 26px;}
   #s5 .closing-line{margin-top:26px;padding-top:20px;font-size:22px;}
-  #rehearsal{position:fixed;top:14px;right:18px;z-index:50;display:none;color:var(--lime);background:#0d1310e8;padding:8px 12px;border:1px solid var(--line);border-radius:5px;font:13px var(--font);font-variant-numeric:tabular-nums;pointer-events:none;}
+  #rehearsal{position:fixed;top:14px;right:18px;z-index:50;display:none;color:var(--lime);background:#0d1310e8;padding:8px 12px;border:1px solid var(--line);border-radius:0;font:13px var(--font);font-variant-numeric:tabular-nums;pointer-events:none;}
   #rehearsal.visible{display:block;}
   #rehearsal.over{color:#ffbdad;}
   #rehearsal span{color:var(--muted);margin-left:10px;}
   @media print{#rehearsal{display:none !important;}}
+
+  /* ============================================================
+     LAIN TERMINAL — CRT/phosphor skin overrides (ens.html only)
+     ============================================================ */
+
+  /* headline treatment: monospace-safe sizing + phosphor glow */
+  h1, h2, h3{
+    text-shadow:0 0 6px rgba(57,255,20,.35);
+  }
+  #s1 h1{ letter-spacing:0; max-width:1120px; font-size:50px; }
+  #s2 h1{ letter-spacing:0 !important; max-width:1120px; font-size:36px !important; }
+  #s3 h1{ letter-spacing:0; }
+  #s4a h1, #s4b h1{ letter-spacing:0; max-width:1120px; font-size:29px; }
+  #s5 h1{ letter-spacing:0 !important; max-width:1120px; font-size:32px !important; }
+
+  /* boot log (slide 1) */
+  .boot-log{ margin-bottom:14px; }
+  .boot-log p{ font-size:11px; line-height:1.6; color:var(--muted); letter-spacing:0.2px; }
+
+  /* blinking block cursor after the slide-1 headline */
+  .cursor{
+    display:inline-block;
+    width:0.5em; height:0.85em;
+    margin-left:8px;
+    background:var(--accent);
+    vertical-align:-0.1em;
+    animation:cursor-blink 1s steps(1) infinite;
+  }
+  @keyframes cursor-blink{ 50%{ opacity:0; } }
+
+  /* square corners + uniform dim-green borders on all card/chrome elements */
+  .stat, .actor-box, .flow-box, .tree-panel, .conflict-bar, .live-demo-cue,
+  .infra-tier, .demo-preview, .demo-launch, .demo-launch small,
+  .rmap-block, .rmap-tags span, .portability-row span, #ens-status,
+  .status-chip, #rehearsal, #stage, .namespace-tree{
+    border-radius:0 !important;
+  }
+  .stat, .rmap-block, .closing-line, .conflict-bar,
+  .flow-box.right, .infra-tier.protocol, .infra-tier.namespace,
+  .rmap-tags span, .portability-row span, .demo-launch small{
+    border-color:#1f3a26 !important;
+  }
+
+  /* card backgrounds pulled down toward near-black panel */
+  .stat, .actor-box, .flow-box, .tree-panel, .conflict-bar,
+  .infra-tier, .demo-preview, .rmap-block, .rmap-tags span,
+  .portability-row span{
+    background:var(--panel) !important;
+  }
+
+  /* bracketed chips instead of rounded pills */
+  .status-chip, .rmap-tags span, .portability-row span{
+    position:relative;
+    background:var(--panel) !important;
+    border:1px solid #1f3a26 !important;
+  }
+  .status-chip::before, .rmap-tags span::before, .portability-row span::before{ content:"[ "; }
+  .status-chip::after, .rmap-tags span::after, .portability-row span::after{ content:" ]"; }
+  .status-chip.planned{ color:var(--muted) !important; }
+  .status-chip.proposed{ color:var(--amber) !important; }
+  .status-chip.implemented{ color:var(--accent) !important; }
+
+  /* namespace tree — boxed terminal panel */
+  .namespace-tree{
+    border:1px solid #1f3a26;
+    background:rgba(185,255,196,0.02);
+    padding:14px 18px;
+  }
+  .tree-live-cue{
+    margin-top:12px;
+    font-size:11.5px;
+    line-height:1.6;
+    color:var(--accent);
+    text-shadow:0 0 5px rgba(57,255,20,.3);
+  }
+
+  /* ens status badge — square terminal tag */
+  #ens-status{
+    border:1px solid var(--accent) !important;
+    color:var(--accent) !important;
+    background:rgba(57,255,20,0.06) !important;
+  }
+
+  /* notes panel + misc accents follow the new palette automatically via var(--lime) */
+
+  /* CRT overlay: scanlines + vignette (static), full-stage, non-interactive */
+  #crt-overlay{
+    position:absolute;
+    inset:0;
+    z-index:40;
+    pointer-events:none;
+    background:
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.06) 0px, rgba(0,0,0,0.06) 1px, transparent 1px, transparent 2px),
+      radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.5) 100%);
+  }
+  /* drifting refresh line, ~8s cycle */
+  #crt-refresh{
+    position:absolute;
+    left:0; right:0;
+    top:-2%;
+    height:1px;
+    z-index:41;
+    pointer-events:none;
+    background:linear-gradient(90deg, transparent, rgba(57,255,20,0.55), transparent);
+    animation:crt-refresh-drift 8s linear infinite;
+  }
+  @keyframes crt-refresh-drift{
+    0%{ top:-2%; opacity:0; }
+    6%{ opacity:.7; }
+    94%{ opacity:.7; }
+    100%{ top:102%; opacity:0; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    #crt-refresh{ display:none; }
+    .cursor{ animation:none; opacity:1; }
+  }
+
+  /* slide 6 (last slide, id #s5): monospace line-heights ran taller than the
+     centered flex box could fit, pushing the footer past the padding box and
+     into the fixed HUD — tighten vertical rhythm to reclaim space */
+  #s5 .roadmap-cols{ margin-top:16px !important; }
+  #s5 .rmap-block{ padding:14px 20px !important; }
+  #s5 .rmap-block + .rmap-block{ margin-top:12px !important; }
+  #s5 .rmap-block ul{ gap:6px !important; margin-top:10px !important; }
+  #s5 .rmap-block li{ font-size:14px !important; }
+  #s5 .rmap-tags{ gap:6px !important; margin-top:10px !important; }
+  #s5 .rmap-tags span, #s5 .portability-row span{ padding:5px 10px !important; font-size:12px !important; }
+  #s5 .portability-row{ margin-top:14px !important; gap:6px !important; }
+  #s5 .portability-caption{ margin-top:6px !important; font-size:11px !important; }
+  #s5 .closing-line{ margin-top:12px !important; padding-top:10px !important; font-size:17px !important; }
+  #s5 .footer-note{ margin-top:6px !important; }
 
 </style>
 </head>
@@ -712,11 +858,18 @@
 
 <div id="viewport">
   <div id="stage">
+    <div id="crt-overlay" aria-hidden="true"></div>
+    <div id="crt-refresh" aria-hidden="true"></div>
 
     <section class="slide with-photo active" id="s1">
-      <div class="slide-index">01 <span>/</span> 06</div>
+      <div class="slide-index">[01<span>/</span>06]</div>
+      <div class="boot-log">
+        <p>&gt; mounting tokyo.basemap … ok</p>
+        <p>&gt; resolving tokenizetokyo.eth … ok</p>
+        <p>&gt; indexing urban rights … 7 events</p>
+      </div>
       <div class="eyebrow">ETHGlobal Tokyo 2026 · TOKENIZE TOKYO · ENS TRACK</div>
-      <h1>Tokyo is full of<br>dormant urban capacity.</h1>
+      <h1>Tokyo is full of<br>dormant urban capacity.<span class="cursor" aria-hidden="true"></span></h1>
       <div class="stat-row">
         <div class="stat">
           <strong>897K</strong>
@@ -743,7 +896,7 @@
     </section>
 
     <section class="slide" id="s2">
-      <div class="slide-index">02 <span>/</span> 06</div>
+      <div class="slide-index">[02<span>/</span>06]</div>
       <div class="eyebrow">TOKENIZE TOKYO</div>
       <h1>Discover, fund and trade<br>what a city can do.</h1>
       <p class="solution-line">Turn unused urban capacity into programmable rights.</p>
@@ -772,7 +925,7 @@
     </section>
 
     <section class="slide demo-slide" id="s3">
-      <div class="slide-index">03 <span>/</span> 06</div>
+      <div class="slide-index">[03<span>/</span>06]</div>
       <div class="eyebrow">Product demo · 0:40–2:55</div>
       <h1>Search the city itself.</h1>
       <div class="demo-preview"><img src="../screenshots/xray.png" alt="TOKENIZE TOKYO's current 3D city interface with the X-ray lens" /><span>Current browser demo · simulated assets and transactions</span></div>
@@ -782,9 +935,9 @@
     </section>
 
     <section class="slide" id="s4a">
-      <div class="slide-index">04 <span>/</span> 06</div>
-      <div id="ens-status">Proposed · ENSv2 on Sepolia · not live yet</div>
-      <div class="eyebrow">Spatial namespace · proposed</div>
+      <div class="slide-index">[04<span>/</span>06]</div>
+      <div id="ens-status">ENSv2 · SEPOLIA · LIVE</div>
+      <div class="eyebrow">Spatial namespace</div>
       <h1>From physical space to an onchain namespace.</h1>
       <div class="ens-body">
         <div class="ens-tree-col">
@@ -796,19 +949,20 @@
         └── floor-2
             └── usage-2030</pre>
           <p class="tree-caption">Illustrative names. The project does not own this parent name.</p>
+          <p class="tree-live-cue">LIVE: click the roof → rooftop.building-1024.chiyoda.tokenizetokyo.eth resolves → delegated operator issues the right</p>
         </div>
         <div class="info-list">
           <div class="info-item">
             <strong>One subregistry per name</strong>
-            <small>District → building → space → right, mirroring the city.</small>
+            <small>District → building → space → right, created with the ENSv2 Verifiable Factory and attached with setSubregistry.</small>
           </div>
           <div class="info-item">
             <strong>Enhanced Access Control</strong>
-            <small>The owner delegates only the rooftop namespace to a solar operator; other floors stay untouched.</small>
+            <small>The owner delegates only the rooftop namespace to the solar operator; UrbanRightToken checks that permission before a scoped right can be issued.</small>
           </div>
           <div class="info-item">
             <strong>Revocation or expiry</strong>
-            <small>Ends future issuance; already issued rights keep their own lifecycle.</small>
+            <small>Ends future issuance immediately; already issued rights keep their own lifecycle. Names are indexed by labelhash through MultiBaas.</small>
           </div>
         </div>
       </div>
@@ -816,9 +970,9 @@
     </section>
 
     <section class="slide" id="s4b">
-      <div class="slide-index">05 <span>/</span> 06</div>
+      <div class="slide-index">[05<span>/</span>06]</div>
       <div class="eyebrow">The four layers</div>
-      <h1>Four layers, four different levels of readiness.</h1>
+      <h1>Four layers, one chain of authority.</h1>
       <div class="infra-stack narrow">
         <div class="infra-tier">
           <div class="tier-name">Physical space <span class="status-chip implemented">Implemented</span></div>
@@ -826,8 +980,8 @@
         </div>
         <div class="infra-down">↓</div>
         <div class="infra-tier namespace">
-          <div class="tier-name">ENSv2 <span class="status-chip proposed">Proposed</span></div>
-          <div class="tier-detail">Spatial namespace and delegated control</div>
+          <div class="tier-name">ENSv2 <span class="status-chip implemented">Implemented</span></div>
+          <div class="tier-detail">Spatial namespace and delegated control · Sepolia</div>
         </div>
         <div class="infra-down">↓</div>
         <div class="infra-tier protocol">
@@ -843,7 +997,7 @@
     </section>
 
     <section class="slide with-photo" id="s5">
-      <div class="slide-index">06 <span>/</span> 06</div>
+      <div class="slide-index">[06<span>/</span>06]</div>
       <div class="eyebrow">Why this matters at scale · 3:25–4:00</div>
       <h1>Built for Tokyo. Designed for every city.</h1>
       <div class="roadmap-cols">
@@ -885,7 +1039,7 @@
 </div>
 
 <div id="hud">← → · N notes · D demo · T timer · R reset timer</div><div id="rehearsal" aria-label="Rehearsal timer"><b id="elapsed">0:00</b> / 4:00<span id="phase"></span></div>
-<div id="counter"><b id="counter-cur">01</b> / 06</div>
+<div id="counter">[<b id="counter-cur">01</b>/06]</div>
 
 <div id="notes-panel">
   <span class="notes-hint">Press N to close</span>
@@ -900,8 +1054,8 @@
     "Tokyo issued its first-ever electricity supply crunch warning in March 2022, with reserve margin around 3%. Since April 2025 Tokyo requires solar on new houses built by large builders, but that does nothing for the roofs that already exist. Meanwhile 23-ward residential land rose 9% this year while 897 thousand homes stand vacant. Expensive land, idle assets, a grid with no margin: that is dormant capital.",
     "Cold start is solved by flipping the order: demand first. An investor bids on a roof that has no owner on the platform yet. The owner hears 'twelve people want to fund your rooftop' through the app, a local agency, or a friend. Supply shows up because demand is already visible.",
     "Time 0:40–2:55. Discover: Rooftop + Available, Opportunity Lens for fictional opportunity sites, then X-ray for registered-right scopes. Define: issue and verify one exclusive rooftop usage right on prepared Nihonbashi Solar Roof. Reject: overlapping RESTAURANT usage. Activate: Investor B buys the 100-unit revenue listing, Funded appears; Demo verifier activates revenue right #1 separately; return to the map to see panels. All browser actions are simulated; contracts were separately tested on Anvil. Do not claim ENS resolution or MultiBaas events in demo mode. The runbook specifies preparation, exact controls and dates. Return here at 2:55 and advance.",
-    "ENS is not a label on a building; it is the hierarchy and control model for spaces. Each name is its own subregistry — district, then building, then space, then right — mirroring the city's own structure. Enhanced Access Control lets an owner delegate only the rooftop namespace to a solar operator while every other floor stays untouched, and revocation or expiry ends future issuance without disturbing rights already issued. Namespace control never proves physical ownership; verification stays a separate layer. Status: proposed, on Sepolia, not live yet.",
-    "Say the status of each layer out loud; judges reward honesty over a four-logo diagram. 3D Tokyo runs today on MapLibre/OpenStreetMap, with PLATEAU as a planned data source. ENSv2 is proposed, not deployed. The Urban Rights Protocol and Curvegrid MultiBaas integration are implemented; the MultiBaas integration is now verified live on Curvegrid Testnet.",
+    "ENS is not a label on a building; it is the hierarchy and control model for spaces. Each name is its own subregistry — district, then building, then space, then right — created with the ENSv2 Verifiable Factory and attached with setSubregistry, mirroring the city's own structure. Enhanced Access Control lets an owner delegate only the rooftop namespace to the solar operator, and UrbanRightToken checks that permission before a scoped right can be issued; every other floor stays untouched. Revocation or expiry ends future issuance immediately without disturbing rights already issued, and names are indexed by labelhash through MultiBaas. Namespace control never proves physical ownership; verification stays a separate layer. Status: ENSv2 is live on Sepolia.",
+    "Say the status of each layer out loud; judges reward honesty over a four-logo diagram. 3D Tokyo runs today on MapLibre/OpenStreetMap, with PLATEAU as a planned data source. ENSv2 is live on Sepolia. The Urban Rights Protocol and Curvegrid MultiBaas integration are implemented; the MultiBaas integration is verified live on Curvegrid Testnet.",
     "Nothing here is Tokyo-specific except the data. Swap the map tiles and the verifier network and the same contracts run for Osaka, Taipei or Lisbon."
 ];
   var current = Math.max(0, Math.min(slides.length - 1, Number(location.hash.slice(1)) - 1 || 0));
