@@ -1,0 +1,11 @@
+{
+  "capturedAt": "2026-09-26T19:32:24.004Z",
+  "base": "https://tokenize-tokyo.vercel.app",
+  "viewport": {
+    "width": 1600,
+    "height": 900
+  },
+  "network": "Sepolia testnet",
+  "mode": "Public app; read-only; no wallet connected; no transactions sent",
+  "errors": []
+}

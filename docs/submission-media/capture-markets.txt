@@ -1,0 +1,1631 @@
+TOKENIZE TOKY
+東京トークン化計画 · URBAN RIGHTS
+URBAN ASSET PROTOCOL
+01
+PLATFORM
+Explore
+Dashboard
+Markets
+ENS Index
+Activity
+MY WORKSPACE
+My assets
+Compose
+NEW
+City preview
+Quick tour
+
+More possibility.
+In every square meter.
+
+◒
+Infrastructure by
+Curvegrid MultiBaas
+Open infrastructure
+TOKYO
+/
+MARKETS
+SEPOLIA TESTNET
+Connect wallet
+Tokenize
+Markets
+All assets
+Funding
+Fractional
+Rental
+Lending
+Coming soon
+Find a space
+Asset type
+All types
+Rooftop
+Vacant Home
+Idle Land
+Parking
+Storage
+Advertising
+Other
+Asset state
+All states
+Available
+Funding
+Funded
+Active
+Secondary Market
+Dormant
+Draft
+Pending verification
+Rejected
+Sort by
+Name A–Z
+Price: low to high
+Price: high to low
+
+180 of 180 registered spaces
+
+Market data · MultiBaas
+SPACE	RIGHTS	STATE	OFFER PRICE	
+VIEW DETAILS
+
+
+Akihabara Community Kitchen 063 · Sepolia Test
+AKIHABARA · CHIYODA
+Other · 109 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Akihabara Community Kitchen 147 · Sepolia Test
+AKIHABARA · CHIYODA
+Other · 61 m² · Demo
+	Revenue Share	Active
+Asset verified
+	Not listed	View on map
+
+
+Akihabara Community Solar Roof 015 · Sepolia Test
+AKIHABARA · CHIYODA
+Rooftop · 360 m² · Demo
+	Not issued yet	Dormant
+Asset verified
+	Not listed	View on map
+
+
+Akihabara Community Solar Roof 099 · Sepolia Test
+AKIHABARA · CHIYODA
+Rooftop · 384 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Akihabara Makers House 051 · Sepolia Test
+AKIHABARA · CHIYODA
+Vacant Home · 120 m² · Demo
+	Not issued yet	Pending verification	Not listed	View on map
+
+
+Akihabara Makers House 135 · Sepolia Test
+AKIHABARA · CHIYODA
+Vacant Home · 144 m² · Demo
+	Usage Right	Available
+Asset verified
+	
+From 80,000
+mJPY / right unit
+	View on map
+
+
+Akihabara Neighborhood Storage 075 · Sepolia Test
+AKIHABARA · CHIYODA
+Storage · 41 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Akihabara Neighborhood Storage 159 · Sepolia Test
+AKIHABARA · CHIYODA
+Storage · 65 m² · Demo
+	Revenue Share	Active
+Asset verified
+	Not listed	View on map
+
+
+Akihabara Parking Bay · Sepolia Test
+AKIHABARA · CHIYODA
+Parking · 12 m² · Demo
+	Revenue Share	Active
+Asset verified
+	
+From 600
+mJPY / right unit
+	View on map
+
+
+Akihabara Pop-up Garden 003 · Sepolia Test
+AKIHABARA · CHIYODA
+Idle Land · 166 m² · Demo
+	Not issued yet	Dormant
+Asset verified
+	Not listed	View on map
+
+
+Akihabara Pop-up Garden 087 · Sepolia Test
+AKIHABARA · CHIYODA
+Idle Land · 190 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Akihabara Pop-up Garden 171 · Sepolia Test
+AKIHABARA · CHIYODA
+Idle Land · 214 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Akihabara Shared Parking Bay 039 · Sepolia Test
+AKIHABARA · CHIYODA
+Parking · 28 m² · Demo
+	Not issued yet	Pending verification	Not listed	View on map
+
+
+Akihabara Shared Parking Bay 123 · Sepolia Test
+AKIHABARA · CHIYODA
+Parking · 52 m² · Demo
+	Usage Right	Available
+Asset verified
+	
+From 18,000
+mJPY / right unit
+	View on map
+
+
+Akihabara Wall Canvas 027 · Sepolia Test
+AKIHABARA · CHIYODA
+Advertising · 82 m² · Demo
+	Not issued yet	Pending verification	Not listed	View on map
+
+
+Akihabara Wall Canvas 111 · Sepolia Test
+AKIHABARA · CHIYODA
+Advertising · 34 m² · Demo
+	Usage Right	Available
+Asset verified
+	
+From 45,000
+mJPY / right unit
+	View on map
+
+
+Asakusabashi Community Kitchen 077 · Sepolia Test
+ASAKUSABASHI · TAITO
+Other · 77 m² · Demo
+	Not issued yet	Dormant
+Asset verified
+	Not listed	View on map
+
+
+Asakusabashi Community Kitchen 161 · Sepolia Test
+ASAKUSABASHI · TAITO
+Other · 101 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Asakusabashi Community Solar Roof 029 · Sepolia Test
+ASAKUSABASHI · TAITO
+Rooftop · 328 m² · Demo
+	Revenue Share	Funding
+Asset verified
+	
+From 1,800
+mJPY / right unit
+	View on map
+
+
+Asakusabashi Community Solar Roof 113 · Sepolia Test
+ASAKUSABASHI · TAITO
+Rooftop · 352 m² · Demo
+	Not issued yet	Dormant
+Asset verified
+	Not listed	View on map
+
+
+Asakusabashi Makers House 065 · Sepolia Test
+ASAKUSABASHI · TAITO
+Vacant Home · 88 m² · Demo
+	Revenue Share	Available
+Asset verified
+	
+From 2,400
+mJPY / right unit
+	View on map
+
+
+Asakusabashi Makers House 149 · Sepolia Test
+ASAKUSABASHI · TAITO
+Vacant Home · 112 m² · Demo
+	Not issued yet	Pending verification	Not listed	View on map
+
+
+Asakusabashi Neighborhood Storage 005 · Sepolia Test
+ASAKUSABASHI · TAITO
+Storage · 57 m² · Demo
+	Revenue Share	Funding
+Asset verified
+	
+From 2,400
+mJPY / right unit
+	View on map
+
+
+Asakusabashi Neighborhood Storage 089 · Sepolia Test
+ASAKUSABASHI · TAITO
+Storage · 81 m² · Demo
+	Not issued yet	Dormant
+Asset verified
+	Not listed	View on map
+
+
+Asakusabashi Neighborhood Storage 173 · Sepolia Test
+ASAKUSABASHI · TAITO
+Storage · 33 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Asakusabashi Pop-up Garden 017 · Sepolia Test
+ASAKUSABASHI · TAITO
+Idle Land · 206 m² · Demo
+	Revenue Share	Funding
+Asset verified
+	
+From 900
+mJPY / right unit
+	View on map
+
+
+Asakusabashi Pop-up Garden 101 · Sepolia Test
+ASAKUSABASHI · TAITO
+Idle Land · 158 m² · Demo
+	Not issued yet	Dormant
+Asset verified
+	Not listed	View on map
+
+
+Asakusabashi Shared Parking Bay 053 · Sepolia Test
+ASAKUSABASHI · TAITO
+Parking · 68 m² · Demo
+	Revenue Share	Available
+Asset verified
+	
+From 1,200
+mJPY / right unit
+	View on map
+
+
+Asakusabashi Shared Parking Bay 137 · Sepolia Test
+ASAKUSABASHI · TAITO
+Parking · 20 m² · Demo
+	Not issued yet	Pending verification	Not listed	View on map
+
+
+Asakusabashi Wall Canvas 041 · Sepolia Test
+ASAKUSABASHI · TAITO
+Advertising · 50 m² · Demo
+	Revenue Share	Available
+Asset verified
+	
+From 600
+mJPY / right unit
+	View on map
+
+
+Asakusabashi Wall Canvas 125 · Sepolia Test
+ASAKUSABASHI · TAITO
+Advertising · 74 m² · Demo
+	Not issued yet	Pending verification	Not listed	View on map
+
+
+Chiyoda ENS Solar Roof · Test
+CHIYODA
+Rooftop · 240 m² · Demo
+	Revenue Share	Active
+Asset verified
+	
+From 2,400
+mJPY / right unit
+	View on map
+
+
+Ginza Community Kitchen 007 · Sepolia Test
+GINZA · CHUO
+Other · 93 m² · Demo
+	Usage Right	Available
+Asset verified
+	
+From 10,000
+mJPY / right unit
+	View on map
+
+
+Ginza Community Kitchen 091 · Sepolia Test
+GINZA · CHUO
+Other · 45 m² · Demo
+	Revenue Share	Funding
+Asset verified
+	
+From 600
+mJPY / right unit
+	View on map
+
+
+Ginza Community Kitchen 175 · Sepolia Test
+GINZA · CHUO
+Other · 69 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Ginza Community Solar Roof 043 · Sepolia Test
+GINZA · CHUO
+Rooftop · 368 m² · Demo
+	Usage Right	Available
+Asset verified
+	
+From 2,400
+mJPY / right unit
+	View on map
+
+
+Ginza Community Solar Roof 127 · Sepolia Test
+GINZA · CHUO
+Rooftop · 320 m² · Demo
+	Revenue Share	Funding
+Asset verified
+	
+From 900
+mJPY / right unit
+	View on map
+
+
+Ginza Makers House 079 · Sepolia Test
+GINZA · CHUO
+Vacant Home · 128 m² · Demo
+	Revenue Share	Active
+Asset verified
+	Not listed	View on map
+
+
+Ginza Makers House 163 · Sepolia Test
+GINZA · CHUO
+Vacant Home · 80 m² · Demo
+	Revenue Share	Available
+Asset verified
+	
+From 1,200
+mJPY / right unit
+	View on map
+
+
+Ginza Neighborhood Storage 019 · Sepolia Test
+GINZA · CHUO
+Storage · 25 m² · Demo
+	Usage Right	Available
+Asset verified
+	
+From 24,000
+mJPY / right unit
+	View on map
+
+
+Ginza Neighborhood Storage 103 · Sepolia Test
+GINZA · CHUO
+Storage · 49 m² · Demo
+	Revenue Share	Funding
+Asset verified
+	
+From 1,200
+mJPY / right unit
+	View on map
+
+
+Ginza Pop-up Garden 031 · Sepolia Test
+GINZA · CHUO
+Idle Land · 174 m² · Demo
+	Usage Right	Available
+Asset verified
+	
+From 35,000
+mJPY / right unit
+	View on map
+
+
+Ginza Pop-up Garden 115 · Sepolia Test
+GINZA · CHUO
+Idle Land · 198 m² · Demo
+	Revenue Share	Funding
+Asset verified
+	
+From 2,400
+mJPY / right unit
+	View on map
+
+
+Ginza Shared Parking Bay 067 · Sepolia Test
+GINZA · CHUO
+Parking · 36 m² · Demo
+	Revenue Share	Active
+Asset verified
+	Not listed	View on map
+
+
+Ginza Shared Parking Bay 151 · Sepolia Test
+GINZA · CHUO
+Parking · 60 m² · Demo
+	Revenue Share	Available
+Asset verified
+	
+From 600
+mJPY / right unit
+	View on map
+
+
+Ginza Wall Canvas 055 · Sepolia Test
+GINZA · CHUO
+Advertising · 18 m² · Demo
+	Revenue Share	Active
+Asset verified
+	Not listed	View on map
+
+
+Ginza Wall Canvas 139 · Sepolia Test
+GINZA · CHUO
+Advertising · 42 m² · Demo
+	Revenue Share	Available
+Asset verified
+	
+From 1,800
+mJPY / right unit
+	View on map
+
+
+Hongo Community Kitchen 021 · Sepolia Test
+HONGO · BUNKYO
+Other · 61 m² · Demo
+	Not issued yet	Pending verification	Not listed	View on map
+
+
+Hongo Community Kitchen 105 · Sepolia Test
+HONGO · BUNKYO
+Other · 85 m² · Demo
+	Usage Right	Available
+Asset verified
+	
+From 10,000
+mJPY / right unit
+	View on map
+
+
+Hongo Community Solar Roof 057 · Sepolia Test
+HONGO · BUNKYO
+Rooftop · 336 m² · Demo
+	Not issued yet	Pending verification	Not listed	View on map
+
+
+Hongo Community Solar Roof 141 · Sepolia Test
+HONGO · BUNKYO
+Rooftop · 360 m² · Demo
+	Usage Right	Available
+Asset verified
+	
+From 2,400
+mJPY / right unit
+	View on map
+
+
+Hongo Makers House 009 · Sepolia Test
+HONGO · BUNKYO
+Vacant Home · 144 m² · Demo
+	Not issued yet	Dormant
+Asset verified
+	Not listed	View on map
+
+
+Hongo Makers House 093 · Sepolia Test
+HONGO · BUNKYO
+Vacant Home · 96 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Hongo Neighborhood Storage 033 · Sepolia Test
+HONGO · BUNKYO
+Storage · 65 m² · Demo
+	Not issued yet	Pending verification	Not listed	View on map
+
+
+Hongo Neighborhood Storage 117 · Sepolia Test
+HONGO · BUNKYO
+Storage · 89 m² · Demo
+	Usage Right	Available
+Asset verified
+	
+From 24,000
+mJPY / right unit
+	View on map
+
+
+Hongo Pop-up Garden 045 · Sepolia Test
+HONGO · BUNKYO
+Idle Land · 214 m² · Demo
+	Not issued yet	Pending verification	Not listed	View on map
+
+
+Hongo Pop-up Garden 129 · Sepolia Test
+HONGO · BUNKYO
+Idle Land · 166 m² · Demo
+	Usage Right	Available
+Asset verified
+	
+From 35,000
+mJPY / right unit
+	View on map
+
+
+Hongo Shared Parking Bay 081 · Sepolia Test
+HONGO · BUNKYO
+Parking · 76 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Hongo Shared Parking Bay 165 · Sepolia Test
+HONGO · BUNKYO
+Parking · 28 m² · Demo
+	Revenue Share	Active
+Asset verified
+	Not listed	View on map
+
+
+Hongo Wall Canvas 069 · Sepolia Test
+HONGO · BUNKYO
+Advertising · 58 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Hongo Wall Canvas 153 · Sepolia Test
+HONGO · BUNKYO
+Advertising · 82 m² · Demo
+	Revenue Share	Active
+Asset verified
+	Not listed	View on map
+
+
+Kanda Community Kitchen 049 · Sepolia Test
+KANDA · CHIYODA
+Other · 69 m² · Demo
+	Revenue Share	Active
+Asset verified
+	Not listed	View on map
+
+
+Kanda Community Kitchen 133 · Sepolia Test
+KANDA · CHIYODA
+Other · 93 m² · Demo
+	Revenue Share	Available
+Asset verified
+	
+From 1,200
+mJPY / right unit
+	View on map
+
+
+Kanda Community Solar Roof 001 · Sepolia Test
+KANDA · CHIYODA
+Rooftop · 320 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Kanda Community Solar Roof 085 · Sepolia Test
+KANDA · CHIYODA
+Rooftop · 344 m² · Demo
+	Revenue Share	Active
+Asset verified
+	Not listed	View on map
+
+
+Kanda Community Solar Roof 169 · Sepolia Test
+KANDA · CHIYODA
+Rooftop · 368 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Kanda Makers House 037 · Sepolia Test
+KANDA · CHIYODA
+Vacant Home · 80 m² · Demo
+	Usage Right	Available
+Asset verified
+	
+From 80,000
+mJPY / right unit
+	View on map
+
+
+Kanda Makers House 121 · Sepolia Test
+KANDA · CHIYODA
+Vacant Home · 104 m² · Demo
+	Revenue Share	Funding
+Asset verified
+	
+From 600
+mJPY / right unit
+	View on map
+
+
+Kanda Neighborhood Storage 061 · Sepolia Test
+KANDA · CHIYODA
+Storage · 73 m² · Demo
+	Revenue Share	Active
+Asset verified
+	Not listed	View on map
+
+
+Kanda Neighborhood Storage 145 · Sepolia Test
+KANDA · CHIYODA
+Storage · 25 m² · Demo
+	Revenue Share	Available
+Asset verified
+	
+From 2,400
+mJPY / right unit
+	View on map
+
+
+Kanda Pop-up Garden 073 · Sepolia Test
+KANDA · CHIYODA
+Idle Land · 150 m² · Demo
+	Revenue Share	Active
+Asset verified
+	Not listed	View on map
+
+
+Kanda Pop-up Garden 157 · Sepolia Test
+KANDA · CHIYODA
+Idle Land · 174 m² · Demo
+	Revenue Share	Available
+Asset verified
+	
+From 900
+mJPY / right unit
+	View on map
+
+
+Kanda Shared Parking Bay 025 · Sepolia Test
+KANDA · CHIYODA
+Parking · 60 m² · Demo
+	Usage Right	Available
+Asset verified
+	
+From 18,000
+mJPY / right unit
+	View on map
+
+
+Kanda Shared Parking Bay 109 · Sepolia Test
+KANDA · CHIYODA
+Parking · 12 m² · Demo
+	Revenue Share	Funding
+Asset verified
+	
+From 1,800
+mJPY / right unit
+	View on map
+
+
+Kanda Wall Canvas 013 · Sepolia Test
+KANDA · CHIYODA
+Advertising · 42 m² · Demo
+	Usage Right	Available
+Asset verified
+	
+From 45,000
+mJPY / right unit
+	View on map
+
+
+Kanda Wall Canvas 097 · Sepolia Test
+KANDA · CHIYODA
+Advertising · 66 m² · Demo
+	Revenue Share	Funding
+Asset verified
+	
+From 900
+mJPY / right unit
+	View on map
+
+
+Kuramae Community Kitchen 028 · Sepolia Test
+KURAMAE · TAITO
+Other · 45 m² · Demo
+	Not issued yet	Dormant
+Asset verified
+	Not listed	View on map
+
+
+Kuramae Community Kitchen 112 · Sepolia Test
+KURAMAE · TAITO
+Other · 69 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Kuramae Community Solar Roof 064 · Sepolia Test
+KURAMAE · TAITO
+Rooftop · 320 m² · Demo
+	Not issued yet	Dormant
+Asset verified
+	Not listed	View on map
+
+
+Kuramae Community Solar Roof 148 · Sepolia Test
+KURAMAE · TAITO
+Rooftop · 344 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Kuramae Makers House · Sepolia Test
+KURAMAE · TAITO
+Vacant Home · 96 m² · Demo
+	Usage Right	Available
+Asset verified
+	
+From 12,000
+mJPY / right unit
+	View on map
+
+
+Kuramae Makers House 016 · Sepolia Test
+KURAMAE · TAITO
+Vacant Home · 128 m² · Demo
+	Revenue Share	Available
+Asset verified
+	
+From 600
+mJPY / right unit
+	View on map
+
+
+Kuramae Makers House 100 · Sepolia Test
+KURAMAE · TAITO
+Vacant Home · 80 m² · Demo
+	Not issued yet	Pending verification	Not listed	View on map
+
+
+Kuramae Neighborhood Storage 040 · Sepolia Test
+KURAMAE · TAITO
+Storage · 49 m² · Demo
+	Not issued yet	Dormant
+Asset verified
+	Not listed	View on map
+
+
+Kuramae Neighborhood Storage 124 · Sepolia Test
+KURAMAE · TAITO
+Storage · 73 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Kuramae Pop-up Garden 052 · Sepolia Test
+KURAMAE · TAITO
+Idle Land · 198 m² · Demo
+	Not issued yet	Dormant
+Asset verified
+	Not listed	View on map
+
+
+Kuramae Pop-up Garden 136 · Sepolia Test
+KURAMAE · TAITO
+Idle Land · 150 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Kuramae Shared Parking Bay 004 · Sepolia Test
+KURAMAE · TAITO
+Parking · 36 m² · Demo
+	Revenue Share	Available
+Asset verified
+	
+From 1,800
+mJPY / right unit
+	View on map
+
+
+Kuramae Shared Parking Bay 088 · Sepolia Test
+KURAMAE · TAITO
+Parking · 60 m² · Demo
+	Not issued yet	Pending verification	Not listed	View on map
+
+
+Kuramae Shared Parking Bay 172 · Sepolia Test
+KURAMAE · TAITO
+Parking · 12 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Kuramae Wall Canvas 076 · Sepolia Test
+KURAMAE · TAITO
+Advertising · 42 m² · Demo
+	Not issued yet	Pending verification	Not listed	View on map
+
+
+Kuramae Wall Canvas 160 · Sepolia Test
+KURAMAE · TAITO
+Advertising · 66 m² · Demo
+	Usage Right	Available
+Asset verified
+	
+From 45,000
+mJPY / right unit
+	View on map
+
+
+Nihonbashi Community Kitchen 014 · Sepolia Test
+NIHONBASHI · CHUO
+Other · 77 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Nihonbashi Community Kitchen 098 · Sepolia Test
+NIHONBASHI · CHUO
+Other · 101 m² · Demo
+	Revenue Share	Active
+Asset verified
+	Not listed	View on map
+
+
+Nihonbashi Community Solar Roof 050 · Sepolia Test
+NIHONBASHI · CHUO
+Rooftop · 352 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Nihonbashi Community Solar Roof 134 · Sepolia Test
+NIHONBASHI · CHUO
+Rooftop · 376 m² · Demo
+	Revenue Share	Active
+Asset verified
+	Not listed	View on map
+
+
+Nihonbashi Makers House 002 · Sepolia Test
+NIHONBASHI · CHUO
+Vacant Home · 88 m² · Demo
+	Not issued yet	Pending verification	Not listed	View on map
+
+
+Nihonbashi Makers House 086 · Sepolia Test
+NIHONBASHI · CHUO
+Vacant Home · 112 m² · Demo
+	Usage Right	Available
+Asset verified
+	
+From 80,000
+mJPY / right unit
+	View on map
+
+
+Nihonbashi Makers House 170 · Sepolia Test
+NIHONBASHI · CHUO
+Vacant Home · 136 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Nihonbashi Neighborhood Storage 026 · Sepolia Test
+NIHONBASHI · CHUO
+Storage · 81 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Nihonbashi Neighborhood Storage 110 · Sepolia Test
+NIHONBASHI · CHUO
+Storage · 33 m² · Demo
+	Revenue Share	Active
+Asset verified
+	Not listed	View on map
+
+
+Nihonbashi Pop-up Garden 038 · Sepolia Test
+NIHONBASHI · CHUO
+Idle Land · 158 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Nihonbashi Pop-up Garden 122 · Sepolia Test
+NIHONBASHI · CHUO
+Idle Land · 182 m² · Demo
+	Revenue Share	Active
+Asset verified
+	Not listed	View on map
+
+
+Nihonbashi Shared Parking Bay 074 · Sepolia Test
+NIHONBASHI · CHUO
+Parking · 20 m² · Demo
+	Usage Right	Available
+Asset verified
+	
+From 18,000
+mJPY / right unit
+	View on map
+
+
+Nihonbashi Shared Parking Bay 158 · Sepolia Test
+NIHONBASHI · CHUO
+Parking · 44 m² · Demo
+	Revenue Share	Funding
+Asset verified
+	
+From 1,200
+mJPY / right unit
+	View on map
+
+
+Nihonbashi Wall Canvas 062 · Sepolia Test
+NIHONBASHI · CHUO
+Advertising · 74 m² · Demo
+	Usage Right	Available
+Asset verified
+	
+From 45,000
+mJPY / right unit
+	View on map
+
+
+Nihonbashi Wall Canvas 146 · Sepolia Test
+NIHONBASHI · CHUO
+Advertising · 26 m² · Demo
+	Revenue Share	Funding
+Asset verified
+	
+From 600
+mJPY / right unit
+	View on map
+
+
+Ningyocho Community Kitchen 042 · Sepolia Test
+NINGYOCHO · CHUO
+Other · 85 m² · Demo
+	Revenue Share	Funding
+Asset verified
+	
+From 900
+mJPY / right unit
+	View on map
+
+
+Ningyocho Community Kitchen 126 · Sepolia Test
+NINGYOCHO · CHUO
+Other · 109 m² · Demo
+	Not issued yet	Dormant
+Asset verified
+	Not listed	View on map
+
+
+Ningyocho Community Solar Roof 078 · Sepolia Test
+NINGYOCHO · CHUO
+Rooftop · 360 m² · Demo
+	Revenue Share	Funding
+Asset verified
+	
+From 1,200
+mJPY / right unit
+	View on map
+
+
+Ningyocho Community Solar Roof 162 · Sepolia Test
+NINGYOCHO · CHUO
+Rooftop · 384 m² · Demo
+	Not issued yet	Dormant
+Asset verified
+	Not listed	View on map
+
+
+Ningyocho Makers House 030 · Sepolia Test
+NINGYOCHO · CHUO
+Vacant Home · 96 m² · Demo
+	Revenue Share	Active
+Asset verified
+	Not listed	View on map
+
+
+Ningyocho Makers House 114 · Sepolia Test
+NINGYOCHO · CHUO
+Vacant Home · 120 m² · Demo
+	Revenue Share	Available
+Asset verified
+	
+From 1,800
+mJPY / right unit
+	View on map
+
+
+Ningyocho Neighborhood Storage 054 · Sepolia Test
+NINGYOCHO · CHUO
+Storage · 89 m² · Demo
+	Revenue Share	Funding
+Asset verified
+	
+From 1,800
+mJPY / right unit
+	View on map
+
+
+Ningyocho Neighborhood Storage 138 · Sepolia Test
+NINGYOCHO · CHUO
+Storage · 41 m² · Demo
+	Not issued yet	Dormant
+Asset verified
+	Not listed	View on map
+
+
+Ningyocho Pop-up Garden 066 · Sepolia Test
+NINGYOCHO · CHUO
+Idle Land · 166 m² · Demo
+	Revenue Share	Funding
+Asset verified
+	
+From 600
+mJPY / right unit
+	View on map
+
+
+Ningyocho Pop-up Garden 150 · Sepolia Test
+NINGYOCHO · CHUO
+Idle Land · 190 m² · Demo
+	Not issued yet	Dormant
+Asset verified
+	Not listed	View on map
+
+
+Ningyocho Shared Parking Bay 018 · Sepolia Test
+NINGYOCHO · CHUO
+Parking · 76 m² · Demo
+	Revenue Share	Active
+Asset verified
+	Not listed	View on map
+
+
+Ningyocho Shared Parking Bay 102 · Sepolia Test
+NINGYOCHO · CHUO
+Parking · 28 m² · Demo
+	Revenue Share	Available
+Asset verified
+	
+From 900
+mJPY / right unit
+	View on map
+
+
+Ningyocho Wall Canvas · Sepolia Test
+NINGYOCHO · CHUO
+Advertising · 18 m² · Demo
+	Revenue Share	Active
+Asset verified
+	
+From 600
+mJPY / right unit
+	View on map
+
+
+Ningyocho Wall Canvas 006 · Sepolia Test
+NINGYOCHO · CHUO
+Advertising · 58 m² · Demo
+	Revenue Share	Active
+Asset verified
+	Not listed	View on map
+
+
+Ningyocho Wall Canvas 090 · Sepolia Test
+NINGYOCHO · CHUO
+Advertising · 82 m² · Demo
+	Revenue Share	Available
+Asset verified
+	
+From 2,400
+mJPY / right unit
+	View on map
+
+
+Ningyocho Wall Canvas 174 · Sepolia Test
+NINGYOCHO · CHUO
+Advertising · 34 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Shimbashi Community Kitchen 070 · Sepolia Test
+SHIMBASHI · MINATO
+Other · 93 m² · Demo
+	Not issued yet	Pending verification	Not listed	View on map
+
+
+Shimbashi Community Kitchen 154 · Sepolia Test
+SHIMBASHI · MINATO
+Other · 45 m² · Demo
+	Usage Right	Available
+Asset verified
+	
+From 10,000
+mJPY / right unit
+	View on map
+
+
+Shimbashi Community Solar Roof 022 · Sepolia Test
+SHIMBASHI · MINATO
+Rooftop · 344 m² · Demo
+	Revenue Share	Available
+Asset verified
+	
+From 900
+mJPY / right unit
+	View on map
+
+
+Shimbashi Community Solar Roof 106 · Sepolia Test
+SHIMBASHI · MINATO
+Rooftop · 368 m² · Demo
+	Not issued yet	Pending verification	Not listed	View on map
+
+
+Shimbashi Makers House 058 · Sepolia Test
+SHIMBASHI · MINATO
+Vacant Home · 104 m² · Demo
+	Not issued yet	Dormant
+Asset verified
+	Not listed	View on map
+
+
+Shimbashi Makers House 142 · Sepolia Test
+SHIMBASHI · MINATO
+Vacant Home · 128 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Shimbashi Neighborhood Storage 082 · Sepolia Test
+SHIMBASHI · MINATO
+Storage · 25 m² · Demo
+	Not issued yet	Pending verification	Not listed	View on map
+
+
+Shimbashi Neighborhood Storage 166 · Sepolia Test
+SHIMBASHI · MINATO
+Storage · 49 m² · Demo
+	Usage Right	Available
+Asset verified
+	
+From 24,000
+mJPY / right unit
+	View on map
+
+
+Shimbashi Pop-up Garden 010 · Sepolia Test
+SHIMBASHI · MINATO
+Idle Land · 150 m² · Demo
+	Revenue Share	Available
+Asset verified
+	
+From 2,400
+mJPY / right unit
+	View on map
+
+
+Shimbashi Pop-up Garden 094 · Sepolia Test
+SHIMBASHI · MINATO
+Idle Land · 174 m² · Demo
+	Not issued yet	Pending verification	Not listed	View on map
+
+
+Shimbashi Shared Parking Bay 046 · Sepolia Test
+SHIMBASHI · MINATO
+Parking · 12 m² · Demo
+	Not issued yet	Dormant
+Asset verified
+	Not listed	View on map
+
+
+Shimbashi Shared Parking Bay 130 · Sepolia Test
+SHIMBASHI · MINATO
+Parking · 36 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Shimbashi Wall Canvas 034 · Sepolia Test
+SHIMBASHI · MINATO
+Advertising · 66 m² · Demo
+	Not issued yet	Dormant
+Asset verified
+	Not listed	View on map
+
+
+Shimbashi Wall Canvas 118 · Sepolia Test
+SHIMBASHI · MINATO
+Advertising · 18 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Toranomon Community Kitchen 035 · Sepolia Test
+TORANOMON · MINATO
+Other · 101 m² · Demo
+	Revenue Share	Available
+Asset verified
+	
+From 2,400
+mJPY / right unit
+	View on map
+
+
+Toranomon Community Kitchen 119 · Sepolia Test
+TORANOMON · MINATO
+Other · 53 m² · Demo
+	Not issued yet	Pending verification	Not listed	View on map
+
+
+Toranomon Community Solar Roof 071 · Sepolia Test
+TORANOMON · MINATO
+Rooftop · 376 m² · Demo
+	Revenue Share	Available
+Asset verified
+	
+From 600
+mJPY / right unit
+	View on map
+
+
+Toranomon Community Solar Roof 155 · Sepolia Test
+TORANOMON · MINATO
+Rooftop · 328 m² · Demo
+	Not issued yet	Pending verification	Not listed	View on map
+
+
+Toranomon Makers House 023 · Sepolia Test
+TORANOMON · MINATO
+Vacant Home · 112 m² · Demo
+	Revenue Share	Funding
+Asset verified
+	
+From 1,200
+mJPY / right unit
+	View on map
+
+
+Toranomon Makers House 107 · Sepolia Test
+TORANOMON · MINATO
+Vacant Home · 136 m² · Demo
+	Not issued yet	Dormant
+Asset verified
+	Not listed	View on map
+
+
+Toranomon Neighborhood Storage 047 · Sepolia Test
+TORANOMON · MINATO
+Storage · 33 m² · Demo
+	Revenue Share	Available
+Asset verified
+	
+From 900
+mJPY / right unit
+	View on map
+
+
+Toranomon Neighborhood Storage 131 · Sepolia Test
+TORANOMON · MINATO
+Storage · 57 m² · Demo
+	Not issued yet	Pending verification	Not listed	View on map
+
+
+Toranomon Pop-up Garden 059 · Sepolia Test
+TORANOMON · MINATO
+Idle Land · 182 m² · Demo
+	Revenue Share	Available
+Asset verified
+	
+From 1,800
+mJPY / right unit
+	View on map
+
+
+Toranomon Pop-up Garden 143 · Sepolia Test
+TORANOMON · MINATO
+Idle Land · 206 m² · Demo
+	Not issued yet	Pending verification	Not listed	View on map
+
+
+Toranomon Shared Parking Bay 011 · Sepolia Test
+TORANOMON · MINATO
+Parking · 20 m² · Demo
+	Revenue Share	Funding
+Asset verified
+	
+From 600
+mJPY / right unit
+	View on map
+
+
+Toranomon Shared Parking Bay 095 · Sepolia Test
+TORANOMON · MINATO
+Parking · 44 m² · Demo
+	Not issued yet	Dormant
+Asset verified
+	Not listed	View on map
+
+
+Toranomon Wall Canvas 083 · Sepolia Test
+TORANOMON · MINATO
+Advertising · 26 m² · Demo
+	Not issued yet	Dormant
+Asset verified
+	Not listed	View on map
+
+
+Toranomon Wall Canvas 167 · Sepolia Test
+TORANOMON · MINATO
+Advertising · 50 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Tsukishima Community Kitchen 084 · Sepolia Test
+TSUKISHIMA · CHUO
+Other · 61 m² · Demo
+	Revenue Share	Available
+Asset verified
+	
+From 1,800
+mJPY / right unit
+	View on map
+
+
+Tsukishima Community Kitchen 168 · Sepolia Test
+TSUKISHIMA · CHUO
+Other · 85 m² · Demo
+	Not issued yet	Pending verification	Not listed	View on map
+
+
+Tsukishima Community Solar Roof 036 · Sepolia Test
+TSUKISHIMA · CHUO
+Rooftop · 384 m² · Demo
+	Revenue Share	Active
+Asset verified
+	Not listed	View on map
+
+
+Tsukishima Community Solar Roof 120 · Sepolia Test
+TSUKISHIMA · CHUO
+Rooftop · 336 m² · Demo
+	Revenue Share	Available
+Asset verified
+	
+From 2,400
+mJPY / right unit
+	View on map
+
+
+Tsukishima Makers House 072 · Sepolia Test
+TSUKISHIMA · CHUO
+Vacant Home · 144 m² · Demo
+	Revenue Share	Funding
+Asset verified
+	
+From 900
+mJPY / right unit
+	View on map
+
+
+Tsukishima Makers House 156 · Sepolia Test
+TSUKISHIMA · CHUO
+Vacant Home · 96 m² · Demo
+	Not issued yet	Dormant
+Asset verified
+	Not listed	View on map
+
+
+Tsukishima Neighborhood Storage 012 · Sepolia Test
+TSUKISHIMA · CHUO
+Storage · 41 m² · Demo
+	Revenue Share	Active
+Asset verified
+	Not listed	View on map
+
+
+Tsukishima Neighborhood Storage 096 · Sepolia Test
+TSUKISHIMA · CHUO
+Storage · 65 m² · Demo
+	Revenue Share	Available
+Asset verified
+	
+From 600
+mJPY / right unit
+	View on map
+
+
+Tsukishima Pop-up Garden 024 · Sepolia Test
+TSUKISHIMA · CHUO
+Idle Land · 190 m² · Demo
+	Revenue Share	Active
+Asset verified
+	Not listed	View on map
+
+
+Tsukishima Pop-up Garden 108 · Sepolia Test
+TSUKISHIMA · CHUO
+Idle Land · 214 m² · Demo
+	Revenue Share	Available
+Asset verified
+	
+From 1,200
+mJPY / right unit
+	View on map
+
+
+Tsukishima Shared Parking Bay 060 · Sepolia Test
+TSUKISHIMA · CHUO
+Parking · 52 m² · Demo
+	Revenue Share	Funding
+Asset verified
+	
+From 2,400
+mJPY / right unit
+	View on map
+
+
+Tsukishima Shared Parking Bay 144 · Sepolia Test
+TSUKISHIMA · CHUO
+Parking · 76 m² · Demo
+	Not issued yet	Dormant
+Asset verified
+	Not listed	View on map
+
+
+Tsukishima Wall Canvas 048 · Sepolia Test
+TSUKISHIMA · CHUO
+Advertising · 34 m² · Demo
+	Revenue Share	Funding
+Asset verified
+	
+From 1,200
+mJPY / right unit
+	View on map
+
+
+Tsukishima Wall Canvas 132 · Sepolia Test
+TSUKISHIMA · CHUO
+Advertising · 58 m² · Demo
+	Not issued yet	Dormant
+Asset verified
+	Not listed	View on map
+
+
+Yaesu Community Kitchen 056 · Sepolia Test
+YAESU · CHUO
+Other · 53 m² · Demo
+	Usage Right	Available
+Asset verified
+	
+From 10,000
+mJPY / right unit
+	View on map
+
+
+Yaesu Community Kitchen 140 · Sepolia Test
+YAESU · CHUO
+Other · 77 m² · Demo
+	Revenue Share	Funding
+Asset verified
+	
+From 2,400
+mJPY / right unit
+	View on map
+
+
+Yaesu Community Solar Roof 008 · Sepolia Test
+YAESU · CHUO
+Rooftop · 376 m² · Demo
+	Not issued yet	Pending verification	Not listed	View on map
+
+
+Yaesu Community Solar Roof 092 · Sepolia Test
+YAESU · CHUO
+Rooftop · 328 m² · Demo
+	Usage Right	Available
+Asset verified
+	
+From 2,400
+mJPY / right unit
+	View on map
+
+
+Yaesu Community Solar Roof 176 · Sepolia Test
+YAESU · CHUO
+Rooftop · 352 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Yaesu Makers House 044 · Sepolia Test
+YAESU · CHUO
+Vacant Home · 136 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Yaesu Makers House 128 · Sepolia Test
+YAESU · CHUO
+Vacant Home · 88 m² · Demo
+	Revenue Share	Active
+Asset verified
+	Not listed	View on map
+
+
+Yaesu Neighborhood Storage 068 · Sepolia Test
+YAESU · CHUO
+Storage · 57 m² · Demo
+	Usage Right	Available
+Asset verified
+	
+From 24,000
+mJPY / right unit
+	View on map
+
+
+Yaesu Neighborhood Storage 152 · Sepolia Test
+YAESU · CHUO
+Storage · 81 m² · Demo
+	Revenue Share	Funding
+Asset verified
+	
+From 900
+mJPY / right unit
+	View on map
+
+
+Yaesu Pop-up Garden 080 · Sepolia Test
+YAESU · CHUO
+Idle Land · 206 m² · Demo
+	Usage Right	Available
+Asset verified
+	
+From 35,000
+mJPY / right unit
+	View on map
+
+
+Yaesu Pop-up Garden 164 · Sepolia Test
+YAESU · CHUO
+Idle Land · 158 m² · Demo
+	Revenue Share	Funding
+Asset verified
+	
+From 1,800
+mJPY / right unit
+	View on map
+
+
+Yaesu Shared Parking Bay 032 · Sepolia Test
+YAESU · CHUO
+Parking · 44 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Yaesu Shared Parking Bay 116 · Sepolia Test
+YAESU · CHUO
+Parking · 68 m² · Demo
+	Revenue Share	Active
+Asset verified
+	Not listed	View on map
+
+
+Yaesu Wall Canvas 020 · Sepolia Test
+YAESU · CHUO
+Advertising · 26 m² · Demo
+	Not issued yet	Draft	Not listed	View on map
+
+
+Yaesu Wall Canvas 104 · Sepolia Test
+YAESU · CHUO
+Advertising · 50 m² · Demo
+	Revenue Share	Active
+Asset verified
+	Not listed	View on map
+
+Prices are for the listed rights, not ownership of the building. Open a space to review its period, purpose and transfer terms.
+
+Map data: © OpenStreetMap · OpenMapTiles · OpenFreeMap
+
+TOKENIZE TOKYO © 2026
+Data: MultiBaas + verified Sepolia setup logs · Updated 4:31:22 AM

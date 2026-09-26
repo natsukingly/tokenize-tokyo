@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Tokenize Tokyo — Submission cover</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Manrope:wght@800&display=swap">
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#101214;color:#f1f2f3;font-family:'DM Sans',Arial,sans-serif}
+main{position:relative;width:1920px;height:1080px;padding:96px 120px;display:flex;flex-direction:column}
+.map{position:absolute;inset:0;overflow:hidden}
+/* crop the 1600x900 screenshot to the map viewport (x 207-1600, y 78-900) and scale it to fill the height */
+.map img{opacity:1}
+.map .shade{position:absolute;inset:0;background:
+  linear-gradient(90deg,#101214 0%,#101214 30%,rgba(16,18,20,.92) 44%,rgba(16,18,20,.55) 62%,rgba(16,18,20,.12) 82%,rgba(16,18,20,0) 100%),
+  linear-gradient(180deg,rgba(16,18,20,.9) 0%,rgba(16,18,20,0) 26%,rgba(16,18,20,0) 66%,rgba(16,18,20,.94) 92%)}
+.eyebrow{margin:0;color:#ece331;font-size:22px;letter-spacing:5px;font-weight:500;position:relative}
+.identity{margin-top:174px;position:relative}
+.wordmark{display:flex;align-items:center;gap:18px;white-space:nowrap;font-family:Manrope,Arial,sans-serif;font-size:134px;font-weight:800;letter-spacing:-7px;line-height:1.1}
+.wordmark svg{width:128px;height:128px;flex:none;transform:translateY(5px)}
+.subtitle{font-size:23px;letter-spacing:9px;color:#9da3a8;margin-top:38px}
+.tagline{margin:72px 0 0;font-size:47px;line-height:1.36;letter-spacing:-.8px;max-width:1240px;font-weight:400;position:relative}
+.tagline span{color:#ece331}
+footer{position:absolute;left:120px;right:120px;bottom:91px;display:flex;align-items:center;justify-content:space-between;padding-top:28px;border-top:1px solid #45494c;font-size:23px}
+.steps{display:flex;gap:32px;align-items:center}.steps i{font-style:normal;color:#ece331}.url{color:#9da3a8;font-size:20px}
+</style>
+<main>
+  <div class="map"><div class="crop" style="position:absolute;top:0;right:0;width:1505px;height:1080px;overflow:hidden"><img src="06-rooftop-map.png" style="position:absolute;left:-300px;top:-183px;width:2320px;height:auto;right:auto"></div><div class="shade"></div></div>
+  <p class="eyebrow">MORE POSSIBILITY. IN EVERY SQUARE METER.</p>
+  <div class="identity">
+    <div class="wordmark" aria-label="Tokenize Tokyo">TOKENIZE TOKY<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="24" fill="none" stroke="#f1f2f3" stroke-width="10.08"/><circle cx="32" cy="32" r="6.96" fill="#f1f2f3"/></svg></div>
+    <div class="subtitle">RWA TOKENIZATION PLATFORM · 東京トークン化計画</div>
+  </div>
+  <p class="tagline">Turn idle city spaces into tokenized real-world assets<br>to <span>fund, trade, and manage.</span></p>
+  <footer><div class="steps">Tokenize <i>→</i> Fund <i>→</i> Manage <i>→</i> Monitor</div><div class="url">tokenize-tokyo.vercel.app</div></footer>
+</main>
+</html>
