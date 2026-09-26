@@ -1,0 +1,32 @@
+<!doctype html><html><head><meta charset="utf-8"><title>TOKENIZE TOKYO - Ryu</title>
+<link href="https://fonts.googleapis.com/css2?family=Yuji+Boku&family=Yuji+Syuku&family=Oswald:wght@600&family=Shippori+Mincho+B1:wght@800&display=swap" rel="stylesheet">
+<script>if(new URLSearchParams(location.search).get("bg")==="dark")document.documentElement.classList.add("dark")</script>
+<style>html,body{margin:0;background:transparent;width:2000px;height:700px;overflow:hidden}body{display:flex;align-items:center;justify-content:center}
+html.dark,html.dark body{background:#0b0c0f}
+:root{--ink:#111;--gold:#D4AF37;--red:#C1272D}
+html.dark{--ink:#f4f1ea}
+.w{position:relative;display:flex;flex-direction:column;align-items:center}
+.row{position:relative;display:flex;align-items:center}
+.kanji{font-family:'Yuji Boku';font-size:380px;line-height:1;color:var(--ink);letter-spacing:-.06em;transform:rotate(-3deg)}
+.kanji span:last-child{display:inline-block;transform:translateY(.08em) rotate(4deg)}
+.seal{position:absolute;right:-110px;bottom:60px;width:150px;height:150px;border-radius:18px;background:var(--red);display:grid;place-items:center;transform:rotate(6deg);
+ box-shadow:inset 0 0 0 7px var(--red),inset 0 0 0 11px #fff4;}
+.seal span{font-family:'Shippori Mincho B1';font-weight:800;font-size:108px;color:#fff;line-height:1}
+.splat{position:absolute;border-radius:50%;background:radial-gradient(circle,var(--ink) 55%,transparent 62%);filter:blur(.4px)}
+.en{display:flex;align-items:center;gap:26px;margin-top:4px;font-family:Oswald;font-weight:600;font-size:72px;letter-spacing:.32em;margin-right:-.32em;color:var(--ink)}
+.en i{width:90px;height:4px;background:var(--gold)}
+.tag{font-family:'Yuji Syuku';font-size:34px;color:var(--gold);letter-spacing:.6em;margin-top:14px;margin-right:-.6em}
+</style></head><body>
+<div class="w">
+ <div class="row">
+  <div class="splat" style="left:10px;top:120px;width:46px;height:40px"></div>
+  <div class="splat" style="left:-30px;top:90px;width:22px;height:22px"></div>
+  <div class="splat" style="left:600px;top:40px;width:34px;height:34px"></div>
+  <div class="splat" style="left:650px;top:20px;width:14px;height:14px"></div>
+  <div class="splat" style="left:-10px;top:300px;width:16px;height:16px"></div>
+  <div class="kanji"><span>東</span><span>京</span></div>
+  <div class="seal"><span>証</span></div>
+ </div>
+ <div class="en"><i></i>TOKENIZE TOKYO<i></i></div>
+ <div class="tag">東京資産・証券化</div>
+</div></body></html>

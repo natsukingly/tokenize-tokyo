@@ -1,0 +1,25 @@
+<!doctype html><html><head><meta charset="utf-8"><title>TOKENIZE TOKYO - CP Tokyo</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,800;1,800&display=swap" rel="stylesheet">
+<script>if(new URLSearchParams(location.search).get('bg')==='dark')document.documentElement.classList.add('dark')</script>
+<style>
+@font-face{font-family:'Cyberway Riders';src:url(fonts/CyberwayRiders.otf) format('opentype')}
+:root{--y:#FCEE0A;--c:#00F0FF}
+html,body{margin:0;background:transparent;width:100%;height:100%;overflow:hidden}
+html.dark,html.dark body{background:#0b0c0f}
+body{display:flex;align-items:center;justify-content:center}
+.mark{display:flex;flex-direction:column;align-items:flex-start}
+.w0{font-family:'Barlow Condensed';font-weight:800;font-size:3.2vw;line-height:1;color:var(--y);
+  letter-spacing:.45em;text-transform:uppercase;margin-left:-4.2vw;margin-bottom:1vw}
+.w1{position:relative;font-family:'Cyberway Riders';font-size:19vw;line-height:1;white-space:nowrap}
+.w1 .ye,.w1 .cy{display:block}
+.w1 .ye{position:relative;color:var(--y)}
+.w1 .cy{position:absolute;left:0;top:0;color:var(--c);transform:translate(-.04em,.045em)}
+.w1 span{display:inline-block}
+</style></head><body>
+<div class="mark">
+  <div class="w0">TOKENIZE</div>
+  <div class="w1"><div class="ye"><span>T</span><span class="k-o">O</span><span class="k-k">K</span><span class="k-y">Y</span><span class="k-o2">O</span></div></div>
+</div>
+<script>
+const ye=document.querySelector('.w1 .ye'),cy=ye.cloneNode(true);cy.className='cy';ye.parentNode.insertBefore(cy,ye);
+</script></body></html>

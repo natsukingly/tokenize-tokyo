@@ -1,5 +1,42 @@
 # TOKENIZE TOKYO — ローカル実装報告
 
+## 2026-09-26: public wallet transaction update
+
+The main hosted URL now uses real Curvegrid Testnet transactions (`2017072401`). `/demo` preserves the local simulation. Added EIP-6963/injected wallet selection, network addition/switching, signed test-gas requests with a server-only faucet key, MockJPY mint, per-transaction progress, recent wallet history and the public `/tx/[hash]` explorer. Activity and asset history link directly to decoded functions/events. Live verifier controls read the relevant contract's `hasRole` and fail closed.
+
+公開サイトで自分のアドレスを接続し、テスト通貨取得・購入・保有確認・再出品・取消ができます。実際の所有権確認は引き続き模擬です。公開前に78 unit testsとbuildを確認し、秘密キーの静的ファイル混入は0件。制御されたテスト署名者をブラウザのEIP-1193インターフェースにつないで検証しています。MetaMask/Rabby拡張そのものの手動確認、Cloud Wallet、外部Webhook配送は別途残っています。
+
+These updates supersede the older browser-mode/explorer limitations in the historical sections below.
+
+## 最新追記 — 2026-09-26 17:48 JST
+
+以下の古い報告は履歴として残しています。現在の接続状況は[機能一覧](FEATURE_STATUS.md)と[残タスク](REMAINING_TASKS.md)を参照してください。
+
+- Curvegrid Testnetに6本を配置・MultiBaas link済み。49件の架空アセットを追加し、448件の実txを実行。
+- Event Queriesで50 assets / 44 rights / 72 listings / 69 sales / 3 baskets / 630 eventsを取得。426件のscenario actionをhashとevent名で照合、3 Basketの残高・underlying custody・集計一致を確認。
+- 売買高2,269,800 MockJPY、収益入金117,000 MockJPY、RevenueVault出金25,800 MockJPY。全て脚本に沿った価値のないテスト通貨。実績や利回りとして扱わない。
+- ブラウザのデモcatalogは49件・7カテゴリへ拡張。既存の保有/履歴を維持。
+- Overviewへ7日推移、一次/二次/Basket内訳、種類別activation、入出金、審査/稼働待ちの分析を追加。マップ中心表示への切り替えは維持。
+- ENSv2は名前生成・registry状態/期限/親子リンク・EAC role読取・限定unsigned descriptorをローカル実装。Sepolia配置・委譲による権利発行はまだ行っていない。
+- Mermaid全体構成、ライフサイクル、取引sequence、ENS階層をREADMEに追加。
+- 最新検証: TypeScript、build、57 unit tests、25 Foundry tests通過。詳細なブラウザ検証はFEATURE_STATUSのcommandsで再現。
+- `.env.local`と公開サイトのメインは`multibaas`に切替済み。外部Webhook delivery、Cloud Wallet/TXM、Safe、コンプライアンスは未完了。
+
+証跡: `deployments/testnet-demo-receipts.json`、`deployments/testnet-demo-verification.json`。再現: `npm run demo:verify:testnet`（読み取り）。
+
+## 追加更新 — 操作の簡素化と再金融市場
+
+- TokenizeをSpace／Right／Publishの3段階に変更。操作対象は一つの資産に限定し、詳細設定を折りたたみました。
+- 左メニュー「使い方ガイド」で購入・出品の日本語チュートリアルを開始できます。終了・再開可能で、自動取引は行いません。
+- 駐車場、倉庫、壁面広告、遊休地を加え、6カテゴリ・7出品を用意しました。追加カテゴリは既存contractのOtherとmetadata subtypeを使います。既存デモの保有・履歴は維持されます。
+- Marketsに小口持分購入→再出品→模擬約定、期間貸出→返却を実装。Portfolioの保有Rightを参照してモック市場を作成する導線もあります。
+- Marketsは独立したmock credits／localStorageです。実際の権利移転、担保設定、MockJPY移動、MultiBaas eventは生成しません。
+- 今回の検証: 型チェック、本番build、43 unit tests、9 browser E2Eが通過。計測対象のline coverageは98.06%（全画面のcoverageではありません）。390px幅での表示、画面エラー0も確認しました。
+
+追加ファイル: `TokenizeFlow.tsx`, `Tutorial.tsx`, `FinanceMarkets.tsx`, `AssetIcon.tsx`, `catalog.ts`, `finance-lab.ts`、各unit testsと`tests/onboarding.spec.ts`。画面は`docs/screenshots/tokenize-simple.png`, `tutorial.png`, `markets-fractions.png`, `markets-rentals.png`で確認できます。
+
+以下は最初の実装時点の記録です。catalog拡張後の`demo:seed`は取引数が増えます。保存済みの50件のAnvil receiptは当時の実行証跡です。今回Solidity自体は変更していません。
+
 ## 1. 実装した機能
 
 新規プロジェクトを `/Users/yamaguchinatsuki/Projects/tokenize-tokyo` に作成しました。
@@ -58,8 +95,8 @@ flowchart LR
 | Webhooks                 | HMAC・時刻・payload検証、重複排除、activity revision、UI再取得 | ローカルHTTP routeで確認。外部delivery未実施 |
 | RBAC / API Keys          | public DApp Userとserver/adminの設定分離、権限probe            | console上の権限確認未実施                    |
 | Cloud Wallet / TXM       | operator adapterとstatus CLI                                   | Azure／wallet未設定、利用実績なし            |
-| Transaction Explorer     | decoded transaction確認手順                                    | live hash未取得                              |
-| Safe / ENSv2             | Safe未実装、ENSv2は設計書のみ                                  | 未実施                                       |
+| Transaction Explorer | `/tx/[hash]`でSDK decoded関数/events、Activity/送信通知/履歴から直接移動 | 公開URLで実購入hashを確認済み |
+| Safe / ENSv2             | Safe未実装。ENSv2はローカル読取adapter・名前生成・Namespaces階層プレビュー画面を実装 | ENS実登録・委譲・発行連携は未実施 |
 
 Webhookの更新通知は2秒ごとのrevision pollingで伝達し、その後MultiBaas Event Queriesを再実行します。独自のチェーンindexerは運用しません。イベントをブラウザの一時的な表示モデルへ変換しています。
 

@@ -1,6 +1,6 @@
 # ENSv2 pitch material — current evidence and target demonstration
 
-この資料は2026-09-26時点の実装に合わせた説明素材。ENSv2がliveであるとはまだ言わない。
+この資料は2026-09-26時点の実装に合わせた説明素材。公開Sepoliaの登録・委譲発行は実証済み。公開サイトへの接続はまだ完了していないため、両者を区別して説明する。
 
 ## 1枚にまとめる内容
 
@@ -10,23 +10,23 @@
 flowchart LR
     B["Building issuer"] --> S["rooftop.building-1024.district.parent.eth"]
     S --> N["ENSv2: scoped namespace control"]
-    N --> A["UrbanNamespaceAuthority\nSeparate issuance grant — planned"]
+    N --> A["UrbanNamespaceAuthority\nSeparate bounded issuance grant"]
     A --> R["Roof-only right proposal"]
     R --> V["Independent verifier approval"]
     V --> M["MultiBaas indexed marketplace"]
 ```
 
-表示するstatus: **Local adapter tested · Sepolia deployment pending**。
+表示するstatus: **Official-contract integration tested · public Sepolia / MultiBaas cutover in progress**。
 
-- 現在: 親名を明示した名前生成、実registry ABIによるread、期限/親子関係/roleのチェック、unsigned grant/revoke descriptor。
-- 次段階: Sepolia登録、実権限委譲、delegated mint入口、Universal Resolver、MultiBaas event証跡。
+- 現在: 公式ENSv2 registry、resolver、registrarの連携、UrbanNamespaceAuthority、限定発行・取消、ERC-1155発行後の審査待ち、ENS Indexの実ウォレット操作を実装。15コントラクトテスト、ローカルfork、公開Sepoliaで登録・限定発行・取消後拒否を検証。
+- 次段階: 作成済みSepolia MultiBaasへのAPI設定・link / query、公開ブラウザでのウォレット署名。最新の実績はENSV2_DESIGN.mdと公開manifestを確認。
 - 限界: ENS名の支配は物件所有権の証明ではなく、名前の編集権限は権利発行やVerifier権限ではない。
 
 ## 25秒の読み上げ
 
-> A building contains several independent spaces. ENSv2 gives each space a namespace and scoped control. Our local adapter checks name state, expiry and canonical registry links. The next step is an explicit issuance adapter on Sepolia, allowing an operator to propose a rooftop right without control over the interior. Verification remains separate. ENS deployment is still pending.
+> A building contains several independent spaces. ENSv2 gives each space a namespace and scoped control. Our on-chain authority checks name state, expiry and canonical registry links. Our explicit issuance adapter allows an operator to propose a rooftop right without control over the interior; both official-contract tests and public Sepolia simulations reject issuance after revocation. Verification remains separate. The hosted app cutover is pending its Sepolia MultiBaas connection.
 
-## 実装完了後のデモ（現在はまだ実行不可）
+## 公開ブラウザ接続後のデモ（コントラクト経路はローカルで実証済み）
 
 1. Ownerが建物のrooftop namespaceだけOperatorへ委譲。
 2. OperatorがSolar用途・許可期間内の権利を提案。独立Verifier承認後に出品。

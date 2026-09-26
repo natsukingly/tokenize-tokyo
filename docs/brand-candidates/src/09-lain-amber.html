@@ -1,0 +1,27 @@
+<!doctype html><html><head><meta charset="utf-8"><title>TOKENIZE TOKYO - Wired</title>
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script>if(new URLSearchParams(location.search).get("bg")==="dark")document.documentElement.classList.add("dark")</script>
+<style>html,body{margin:0;background:transparent;width:2000px;height:700px;overflow:hidden}body{display:flex;align-items:center;justify-content:center}
+html.dark,html.dark body{background:#000}
+:root{--g:#FFB000}
+.t{position:relative;color:var(--g);font-family:'Share Tech Mono'}
+.hex{position:absolute;inset:-70px -120px;font-family:'Share Tech Mono';font-size:19px;line-height:1.35;color:var(--g);opacity:.13;white-space:pre;overflow:hidden;
+ -webkit-mask-image:radial-gradient(ellipse at center,#000 30%,transparent 72%)}
+.fx{position:relative;-webkit-mask-image:repeating-linear-gradient(#000 0 3px,rgba(0,0,0,.45) 3px 5px)}
+.hdr{font-size:34px;opacity:.85;margin-bottom:10px}
+.hdr b{font-weight:400;color:#fff;text-shadow:0 0 8px var(--g)}
+.word{font-family:VT323;font-size:250px;line-height:.82;letter-spacing:.02em;text-shadow:0 0 18px rgba(255,176,0,.65),0 0 3px var(--g);white-space:nowrap}
+.cur{display:inline-block;width:.34em;height:.56em;background:var(--g);vertical-align:-.02em;margin-left:.04em;box-shadow:0 0 18px rgba(255,176,0,.7);animation:b 1s steps(1) infinite}
+@keyframes b{50%{opacity:0}}
+.foot{font-size:26px;margin-top:18px;opacity:.7;letter-spacing:.12em}
+</style></head><body>
+<div class="t"><div class="hex" id="hex"></div>
+ <div class="fx">
+  <div class="hdr">&gt; connect <b>wired://tokyo.rwa</b> --present-day --present-time</div>
+  <div class="word">TOKENIZE</div>
+  <div class="word">TOKYO_<span class="cur"></span></div>
+  <div class="foot">[ok] 23 wards mapped · asset layer :: on-chain · lain@navi:~$</div>
+ </div>
+</div>
+<script>let s='',x=0x7f3a;for(let r=0;r<40;r++){let l=(0x0e00+r*16).toString(16).padStart(8,'0')+'  ';for(let i=0;i<40;i++){x=(x*1103515245+12345)&0x7fffffff;l+=((x>>16)&255).toString(16).padStart(2,'0')+(i%8==7?'  ':' ')}s+=l+'\n'}document.getElementById('hex').textContent=s</script>
+</body></html>

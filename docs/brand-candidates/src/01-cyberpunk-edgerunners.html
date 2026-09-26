@@ -1,0 +1,48 @@
+<!doctype html><html><head><meta charset="utf-8"><title>TOKENIZE TOKYO - Edgerunners</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@1,900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script>if(new URLSearchParams(location.search).get('bg')==='dark')document.documentElement.classList.add('dark')</script>
+<style>
+@font-face{font-family:'Cyberway Riders';src:url(fonts/CyberwayRiders.otf) format('opentype')}
+:root{--y:#FCEE0A;--c:#00F0FF}
+html,body{margin:0;background:transparent;width:2000px;height:700px;overflow:hidden}
+html.dark,html.dark body{background:#0b0c0f}
+body{display:flex;align-items:center;justify-content:center}
+.stage{position:relative}
+.mark{position:relative;box-sizing:border-box;padding:70px 90px 40px 90px;display:flex;flex-direction:column;align-items:flex-end;--y:#FCEE0A;--c:#00F0FF}
+.l1{font-family:'Cyberway Riders';font-size:300px;line-height:.8;color:var(--y);letter-spacing:.012em;
+  transform:skewX(-8deg) rotate(-2.5deg);text-shadow:-.045em .05em 0 var(--c);white-space:nowrap;padding-right:.08em}
+.l1 span{display:inline-block}
+.l1 span:nth-child(2){transform:translateY(-.04em)}
+.l1 span:nth-child(3){transform:translateY(.03em)}
+.l1 span:nth-child(5){transform:translateY(-.05em)}
+.l1 span:nth-child(7){transform:translateY(.04em)}
+.row2{display:flex;flex-direction:column;align-items:flex-end;margin-top:18px;margin-right:30px}
+.l2{font-family:'Barlow Condensed';font-style:italic;font-weight:900;font-size:150px;line-height:.9;color:var(--y);
+  letter-spacing:.28em;margin-right:-.28em;text-shadow:-6px 7px 0 var(--c)}
+.hud{display:flex;align-items:center;gap:14px;margin-top:10px;font-family:'Share Tech Mono';font-size:26px;color:var(--c);letter-spacing:.3em;width:100%}
+.hud i{flex:1;height:3px;background:var(--c);min-width:300px;position:relative}
+.hud i::after{content:"";position:absolute;right:0;top:-6px;width:40px;height:15px;background:var(--c);clip-path:polygon(0 40%,100% 40%,100% 100%,20% 100%)}
+.reg{position:absolute;top:470px;right:30px;font-family:'Share Tech Mono';font-size:22px;color:var(--y);border:2px solid var(--y);border-radius:50%;width:30px;height:30px;display:grid;place-items:center;line-height:1}
+.glitch{position:absolute;inset:0;pointer-events:none}
+.glitch .reg{display:none}
+.glitch.cy .l1,.glitch.cy .l2{color:var(--c);text-shadow:none}
+.glitch.rd .l1,.glitch.rd .l2{color:#FF003C;text-shadow:none}
+</style></head><body>
+<div class="stage" id="stage">
+  <div class="mark" id="mark">
+    <div class="l1"><span>T</span><span>O</span><span>K</span><span>E</span><span>N</span><span>I</span><span>Z</span><span>E</span></div>
+    <div class="row2"><div class="l2">TOKYO</div>
+      <div class="hud"><i></i><span>2026 · TOKYO · RWA</span></div></div>
+  </div>
+  <div class="reg">R</div>
+</div>
+<script>
+// glitch slices: [top%, height%, shiftPx, variant]
+const slices=[[26,3,-18,''],[36,2,26,'cy'],[44,2,12,''],[49,2.6,-26,'rd'],[77,2.4,-16,'']];
+const stage=document.getElementById('stage'),mark=document.getElementById('mark');
+// cut holes in the base where yellow (displacement) slices go, so they read as shifted, not doubled
+const stops=[];for(const [t,h,dx,v] of slices){if(v)continue;stops.push(`#000 ${t}%`,`transparent ${t}%`,`transparent ${t+h}%`,`#000 ${t+h}%`);}
+mark.style.webkitMaskImage=mark.style.maskImage=`linear-gradient(#000 0%,${stops.join(',')},#000 100%)`;
+for(const [t,h,dx,v] of slices){const g=mark.cloneNode(true);g.removeAttribute('id');g.style.maskImage=g.style.webkitMaskImage='none';g.className='mark glitch '+v;
+  g.style.clipPath=`inset(${t}% -200px ${100-t-h}% -200px)`;g.style.transform=`translateX(${dx}px)`;stage.appendChild(g);}
+</script></body></html>
