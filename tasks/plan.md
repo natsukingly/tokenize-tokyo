@@ -45,3 +45,5 @@
 ## 17:40 方針変更（natsuki）
 - ENS 版デッキは「ENSv2 実装済み」前提で作成。#ens-status 1要素と slide 5 のチップで戻せる。見た目は Lain Terminal 調（ens.html のみ）
 - 提出前チェック: Codex の Sepolia ENSv2 実装が本当に動いているか。動いていなければ ens.html の2か所を proposed に戻し、Q&A 13/14（Codex 記述「現時点では未接続」）と整合させる
+- 18:05 Codex が同じ testnet deployment に 448 tx 投入（assets 50 / rights 44 / sales 69 / events 630）。3001 を再ビルド後、live ダッシュボードが 5 秒で全件表示（MultiBaas 32 リクエスト、エラー0）。証拠: docs/screenshots/multibaas-explore-live.png
+- Codex の docs/REMAINING_TASKS.md と docs/pitch/ENS_IMPLEMENTATION.md は「ENS の Live 表記は実証が揃うまで不可」「Local adapter tested · Sepolia deployment pending」。ens.html の LIVE 表記と矛盾 → natsuki 判断待ち
