@@ -37,3 +37,17 @@ it("only links real transaction hashes", () => {
   expect(isTxHash("0x" + "f".repeat(64))).toBe(true);
   expect(isTxHash("simulated-1")).toBe(false);
 });
+it("explains gas shortage in a MultiBaas HTTP 400 response without confusing it with MockJPY", () => {
+  expect(
+    walletError({
+      response: {
+        status: 400,
+        data: { message: "insufficient funds for transfer" },
+      },
+      message: "Request failed with status code 400",
+    }),
+  ).toContain("Get test ETH");
+  expect(walletError({ shortMessage: "Insufficient funds for gas" })).toContain(
+    "MockJPY cannot pay gas",
+  );
+});

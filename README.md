@@ -117,7 +117,7 @@ Reports are dated snapshots of seeded test activity, not user adoption. The earl
 
 ### Architecture
 
-The application uses Next.js, React, TypeScript and MapLibre. Solidity contracts are built and tested with Foundry. The main market uses the MultiBaas TypeScript SDK for event queries, unsigned transaction composition and receipts. On Sepolia, core balances, claimable revenue and verifier permissions use batched viem Multicall reads through the configured RPC. Other chains retain SDK contract reads. ENS namespace validation also uses viem reads on Sepolia.
+The application uses Next.js, React, TypeScript and MapLibre. Solidity contracts are built and tested with Foundry. MultiBaas supplies indexed events, aggregates, contract APIs and Cloud Wallet fulfillment. On Sepolia, core balances use viem Multicall; wallet actions are ABI-encoded locally, simulated through RPC, signed/submitted by the user's wallet and confirmed through RPC. Other chains retain SDK reads, unsigned composition and receipts. ENS namespace validation also uses viem reads on Sepolia.
 
 ```mermaid
 flowchart TD
@@ -133,9 +133,8 @@ flowchart TD
     ENS["Official ENSv2 registries + resolver on Sepolia"]
     AUTH["UrbanNamespaceAuthority: bounded issuance grants"]
 
-    UI -->|"reads / validated unsigned calls"| MB
-    MB -->|"transaction to sign"| UI
-    UI --> WALLET --> CORE
+    UI -->|"event queries + aggregates"| MB
+    UI -->|"locally encoded wallet call"| WALLET --> CORE
     CORE -->|"indexed events / receipts"| MB
     MB -->|"aggregates + indexed activity"| UI
     UI -->|"batched balances + claims + permissions via RPC"| CORE
@@ -316,7 +315,7 @@ Without `--broadcast`, setup only checks the official contracts. Adding `--broad
 | Use                                                | How TOKENIZE TOKYO uses it                                                                                                                                                                                                      | Relevant code — start here                                                                                                                                                                                                                                           |
 | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **1. Deployment workflow and contract onboarding** | Foundry broadcasts deployment. Forge MultiBaas links the six core contract ABIs, addresses, labels and indexing start blocks. Sepolia setup adds the ENS links; card checkout links its executor separately.                                                                                     | [Deploy.s.sol](contracts/script/Deploy.s.sol); [Link.s.sol: `link`](contracts/script/Link.s.sol#L20); [link-multibaas.ts](scripts/link-multibaas.ts)                                                                                                                 |
-| **2. Contract interaction** | Compose registration, approval, purchase, revenue and basket transactions with `signAndSubmit: false`; the user's wallet signs and submits. Core contract reads use SDK calls on other chains and batched RPC reads on Sepolia to conserve the MultiBaas plan quota. | [multibaas.ts: `readContract`, `sendViaMultiBaas`, `sendAtMultiBaas`](src/lib/multibaas.ts); [core-reads.ts: `readCoreBatch`](src/lib/core-reads.ts); [transactions.ts: `walletTransaction`](src/lib/transactions.ts) |
+| **2. Contract interaction** | On Curvegrid Testnet, compose unsigned transactions with `signAndSubmit: false` for wallet signing. Sepolia wallet actions use local ABI encoding and RPC preflight/receipts to remain available when the provider's contract-method quota is exhausted. Server Cloud Wallet fulfillment continues to use MultiBaas. | [multibaas.ts: network routing](src/lib/multibaas.ts); [core-transactions.ts: explicit action ABIs](src/lib/core-transactions.ts); [wallet-rpc.ts: simulation, wallet submission and receipt tracking](src/lib/wallet-rpc.ts); [operator.ts](src/server/operator.ts) |
 | **3. Event indexing and dashboard aggregation**    | Discover assets/rights/listings, reconstruct lifecycle and holder activity, and query trade/deposit/claim totals with the `add` aggregator. Queries filter by contract address and paginate 50 rows at a time.                  | [queries.ts: `eventQuery`](src/lib/queries.ts#L154); [multibaas.ts: `queryRows`](src/lib/multibaas.ts#L44), [`loadMarket`](src/lib/multibaas.ts#L61); [projection.ts: `project`](src/lib/projection.ts#L42); [MarketOverview.tsx](src/components/MarketOverview.tsx) |
 | **4. ABI-backed REST API access**                  | Linked ABIs expose contract functions through the MultiBaas API. The TypeScript SDK's `ContractsApi`, `EventQueriesApi` and `ChainsApi` use the deployment's `/api/v0` endpoint. No custom per-contract REST wrapper is needed. | [multibaas.ts: `clients`](src/lib/multibaas.ts#L15); [config.ts: contract labels](src/lib/config.ts#L17); [Link.s.sol](contracts/script/Link.s.sol)                                                                                                                  |
 | **5. Transaction monitoring and explorer**         | Poll receipts via `ChainsApi.getTransactionReceipt`. Display decoded calls, transfers, status and receipts at a shareable `/tx/[hash]` URL using `getTransaction` and `getTransactionReceipt`.                                  | [multibaas.ts: confirmation polling](src/lib/multibaas.ts#L253); [TransactionExplorer.tsx](src/components/TransactionExplorer.tsx#L18); [transaction page](src/app/tx/[hash]/page.tsx)                                                                               |
@@ -324,21 +323,24 @@ Without `--broadcast`, setup only checks the official contracts. Adding `--broad
 
 **Deployment attribution:** MultiBaas manages the linked contracts and their API/indexing. On-chain deployment is performed by Foundry; the project does not claim that the MultiBaas SDK broadcasts those deployments.
 
-**Read quota resilience:** the Sepolia dashboard batches whitelisted view calls, checks the RPC chain ID and preserves uint256 precision. Event queries and aggregates still come from MultiBaas. Background refresh runs once per minute while visible. Exhausted plan quotas are not retried as short-lived throttling; MultiBaas-dependent writes still require available provider quota. [Regression tests](src/lib/core-reads.test.ts), [read retry policy](src/lib/read-retry.ts), [live connected-wallet check](tests/market-rate-limit.spec.ts).
+**Quota resilience:** Sepolia balance reads are batched, and browser-wallet actions no longer need the quota-limited contract-method endpoint. The app verifies the RPC/wallet chain, simulates the call, rechecks the account and asks the wallet to submit exactly once. Event queries and aggregates still come from MultiBaas; background refresh runs once per minute while visible. Cloud Wallet and other remaining provider-dependent endpoints still require available quota. [Read tests](src/lib/core-reads.test.ts), [transaction safety tests](src/lib/wallet-rpc.test.ts), [real local-contract lifecycle](scripts/test-wallet-rpc.ts), [browser preparation checks](tests/market-rate-limit.spec.ts).
 
 **New fractional/rental flows:** [rights-finance.ts](src/lib/rights-finance.ts) uses `loadFinance` for ABI-backed reads, `sendFinanceIntent` for validated unsigned calls and receipt tracking, and `loadFinanceActivity` for eleven indexed event types. [link-finance-multibaas.ts](scripts/link-finance-multibaas.ts) registers the two extension ABIs and addresses. Their [browser verification](deployments/finance-local-verification.json) uses real local Anvil contracts with a MultiBaas API fixture; public linking and live-service verification are pending. [Exact code map and rollout steps](docs/FINANCE_IMPLEMENTATION.md)
 
-The main transaction path is implemented as follows:
+The Sepolia browser-wallet transaction path is:
 
 ```text
 UI action
-  → ContractsApi.callContractFunction(..., { from, args, signAndSubmit: false })
-  → validate returned sender, recipient, value and calldata
+  → encode a permitted ABI action locally
+  → verify chain / contract bytecode and simulate with eth_call
+  → recheck the connected account and network
   → wallet eth_sendTransaction
-  → ChainsApi.getTransactionReceipt
+  → configured Sepolia RPC receipt for that exact hash
   → EventQueriesApi.executeArbitraryEventQuery
   → refreshed holdings, lifecycle and dashboard
 ```
+
+Curvegrid Testnet retains `ContractsApi.callContractFunction(..., { signAndSubmit: false })` and SDK receipt monitoring. Cloud Wallet submission is a separate server-side path. The local Testnet's HTTP 400 `insufficient funds for transfer` means native test ETH is missing; obtain it through **Get test ETH** in the account panel. MockJPY cannot pay gas.
 
 The app rechecks the connected account and chain before signing, including between approval and purchase. Failed API reads remain visible; `multibaas` mode does not silently substitute simulated data. The core market has no custom event indexer. Sepolia balance/permission reads and ENS namespace inspection use explicit RPC read paths.
 

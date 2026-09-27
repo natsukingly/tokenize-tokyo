@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { decodeFunctionData, parseAbi } from "viem";
 
 // Opt-in against the real Sepolia deployment. Public address only: the injected
 // provider cannot sign, submit transactions or authenticate an account.
@@ -38,6 +39,7 @@ test("connected portfolio loads while MultiBaas contract methods return 429", as
     const listeners: Record<string, ((...args: unknown[]) => void)[]> = {};
     const methods: string[] = [];
     (window as any).__qaWalletRequests = methods;
+    (window as any).__qaProposals = [];
     const provider = {
       isMetaMask: true,
       isConnected: () => true,
@@ -57,6 +59,12 @@ test("connected portfolio loads while MultiBaas contract methods return 429", as
         if (method === "eth_chainId") return "0xaa36a7";
         if (method === "net_version") return "11155111";
         if (method === "eth_getBalance") return "0x0";
+        if (method === "eth_sendTransaction") {
+          (window as any).__qaProposals.push(params?.[0]);
+          throw Object.assign(new Error("QA wallet rejects all transactions"), {
+            code: 4001,
+          });
+        }
         if (
           method === "wallet_getPermissions" ||
           (method === "wallet_requestPermissions" &&
@@ -174,4 +182,83 @@ test("connected portfolio loads while MultiBaas contract methods return 429", as
     }),
     contentType: "application/json",
   });
+  if (process.env.MARKET_WRITE_QA === "1") {
+    // Capture the request at the wallet boundary and reject it. Nothing is signed
+    // or broadcast on Sepolia. Real execution is covered by isolated Anvil.
+    await page
+      .getByRole("button", { name: "Tokenize a space", exact: true })
+      .click();
+    const form = page.getByRole("dialog", {
+      name: "Tokenize a space",
+      exact: true,
+    });
+    await form
+      .getByLabel("Asset name", { exact: true })
+      .fill("Unsubmitted quota regression roof");
+    await form.getByRole("button", { name: "Continue to rights" }).click();
+    await form.getByRole("button", { name: "Review & publish" }).click();
+    await form
+      .getByRole("button", { name: "Register demo asset", exact: true })
+      .click();
+    await expect
+      .poll(() => page.evaluate(() => (window as any).__qaProposals.length))
+      .toBe(1);
+    await expect(
+      form.getByText(/Request cancelled in your wallet/),
+    ).toBeVisible();
+    const registered = await page.evaluate(
+      () => (window as any).__qaProposals[0],
+    );
+    expect(
+      decodeFunctionData({
+        abi: parseAbi(["function registerAsset(bytes32,string,uint8)"]),
+        data: registered.data,
+      }).functionName,
+    ).toBe("registerAsset");
+    await form
+      .getByRole("button", { name: "Close tokenization", exact: true })
+      .click();
+    await page
+      .getByRole("navigation")
+      .getByRole("button", { name: "Markets", exact: true })
+      .click();
+    const directory = page.getByRole("region", { name: "Asset directory" });
+    await directory
+      .getByLabel("Find a space", { exact: true })
+      .fill("Akihabara Parking Bay");
+    await directory
+      .getByRole("button", { name: /^View details for/ })
+      .first()
+      .click();
+    const details = page.locator(
+      'dialog[aria-labelledby="directory-asset-title"]',
+    );
+    await details
+      .getByLabel("I have reviewed this right and its terms.")
+      .check();
+    await details
+      .getByRole("button", { name: "Acquire right", exact: true })
+      .click();
+    await expect
+      .poll(() => page.evaluate(() => (window as any).__qaProposals.length))
+      .toBe(2);
+    const approval = await page.evaluate(
+      () => (window as any).__qaProposals[1],
+    );
+    const decoded = decodeFunctionData({
+      abi: parseAbi(["function approve(address,uint256)"]),
+      data: approval.data,
+    });
+    expect(decoded.functionName).toBe("approve");
+    expect(decoded.args?.[1]).toBeGreaterThan(0n);
+    expect(sdkReads).toBe(0);
+    await testInfo.attach("wallet-preparation-evidence", {
+      body: JSON.stringify({
+        methods: ["registerAsset", "approve"],
+        sdkReads,
+        broadcast: false,
+      }),
+      contentType: "application/json",
+    });
+  }
 });

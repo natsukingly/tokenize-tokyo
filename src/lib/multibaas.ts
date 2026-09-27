@@ -18,6 +18,9 @@ import {
   type CoreRead,
 } from "./core-reads";
 import { retryRead } from "./read-retry";
+import { usesSepoliaRpc } from "./sepolia-rpc";
+import { encodeCoreWrite } from "./core-transactions";
+import { sendWalletCall } from "./wallet-rpc";
 import {
   indexBootstrap,
   combineIndexedEvents,
@@ -225,6 +228,14 @@ export async function sendViaMultiBaas(
   args: unknown[] = [],
   onProgress?: (progress: TransactionProgress) => void,
 ) {
+  if (usesSepoliaRpc())
+    return sendWalletCall(
+      provider,
+      from,
+      config.addresses[contract],
+      encodeCoreWrite(contract, method, args),
+      onProgress,
+    );
   return sendAtMultiBaas(
     provider,
     from,
@@ -273,6 +284,9 @@ export async function sendAtMultiBaas(
   onProgress?: (progress: TransactionProgress) => void,
   expectedData?: string,
 ) {
+  // ENS and finance actions already supply ABI-encoded, reviewed calldata.
+  if (usesSepoliaRpc() && expectedData)
+    return sendWalletCall(provider, from, address, expectedData, onProgress);
   onProgress?.({ phase: "preparing" });
   await assertWallet(provider, from);
   const { data } = await clients().contracts.callContractFunction(

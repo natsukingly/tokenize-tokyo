@@ -19,12 +19,21 @@ export function walletError(error: unknown): string {
     code?: number;
     message?: string;
     shortMessage?: string;
-    response?: { status?: number };
+    response?: { status?: number; data?: { message?: string } };
   };
   if (e?.code === 4001)
     return "Request cancelled in your wallet. Nothing else was sent.";
   if (e?.code === -32002)
     return "A wallet request is already open. Check your wallet extension.";
+  const detail = [e?.response?.data?.message, e?.shortMessage, e?.message]
+    .filter((value) => typeof value === "string")
+    .join(" ");
+  if (
+    /insufficient funds|insufficient balance for (gas|transfer)/i.test(detail)
+  )
+    return config.chainId === 2017072401
+      ? "Not enough test ETH for network fees. Open your account and choose Get test ETH, then retry. MockJPY cannot pay gas."
+      : `Not enough test ETH for network fees. Fund this wallet on ${NETWORK_NAME}, then retry. MockJPY cannot pay gas.`;
   if (e?.response?.status === 403)
     return "MultiBaas access denied. Check the DApp key and allowed website origin.";
   return (

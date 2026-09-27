@@ -12,6 +12,7 @@
     "test:coverage": "vitest run --coverage",
     "test:contracts": "forge test --root contracts",
     "test:finance": "tsx scripts/test-finance.ts",
+    "test:wallet-rpc": "tsx scripts/test-wallet-rpc.ts",
     "finance:link": "tsx scripts/link-finance-multibaas.ts",
     "test:e2e": "playwright test",
     "test:accounts": "playwright test --config playwright.account.config.ts",

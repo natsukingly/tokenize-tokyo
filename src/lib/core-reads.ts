@@ -1,12 +1,6 @@
-import {
-  createPublicClient,
-  http,
-  parseAbi,
-  type Abi,
-  type Address,
-} from "viem";
-import { sepolia } from "viem/chains";
+import { parseAbi, type Abi, type Address } from "viem";
 import { config, type ContractKey } from "./config";
+import { sepoliaRpc, usesSepoliaRpc } from "./sepolia-rpc";
 
 const roles =
   "function hasRole(bytes32 role,address account) view returns(bool)";
@@ -36,8 +30,7 @@ export type CoreRead = {
 
 export function supportsBatchedReads(calls: CoreRead[]) {
   return (
-    config.chainId === sepolia.id &&
-    !!config.rpc &&
+    usesSepoliaRpc() &&
     calls.every((call) =>
       abis[call.contract].some(
         (item) => item.type === "function" && item.name === call.method,
@@ -46,14 +39,6 @@ export function supportsBatchedReads(calls: CoreRead[]) {
   );
 }
 
-let client: ReturnType<typeof createReader> | undefined;
-let verifiedChain: Promise<void> | undefined;
-function createReader() {
-  return createPublicClient({
-    chain: sepolia,
-    transport: http(config.rpc, { timeout: 10000, retryCount: 1 }),
-  });
-}
 function strings(value: unknown): unknown {
   if (typeof value === "bigint") return value.toString();
   if (Array.isArray(value)) return value.map(strings);
@@ -69,18 +54,7 @@ export async function readCoreBatch(calls: CoreRead[]): Promise<unknown[]> {
   if (!calls.length) return [];
   if (!supportsBatchedReads(calls))
     throw new Error("Unsupported batched contract read.");
-  const rpc = (client ||= createReader());
-  verifiedChain ||= rpc
-    .getChainId()
-    .then((chainId) => {
-      if (chainId !== config.chainId)
-        throw new Error("The read RPC is connected to the wrong network.");
-    })
-    .catch((error) => {
-      verifiedChain = undefined;
-      throw error;
-    });
-  await verifiedChain;
+  const rpc = await sepoliaRpc();
   const result = await rpc.multicall({
     contracts: calls.map((call) => ({
       address: config.addresses[call.contract] as Address,
