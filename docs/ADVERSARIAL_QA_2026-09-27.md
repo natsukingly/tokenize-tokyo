@@ -49,8 +49,15 @@ Evidence is saved locally under `.data/adversarial-qa/`, including JSON test res
 - Of the nine opt-in browser cases skipped in the local regression, seven were separately exercised on the public site. Live wallet signing and the older Curvegrid-specific mobile tour scenario remain unexecuted.
 - `npm audit --omit=dev` reported 23 moderate findings, zero high and zero critical findings. Dependencies were not upgraded during submission QA; a separate dependency update and regression run is still needed.
 - Coverage percentages apply to the files listed in `vitest.config.ts`, not to the entire application. This QA is not a security audit or a guarantee that every defect has been found.
-- These fixes are local until the deployment record below states otherwise.
 
 ## Deployment
 
-Not deployed by this QA run.
+Released on **2026-09-27 at approximately 09:18 JST**, following the user's production release request.
+
+- Source commit: [`3f8415178a84e44f2fefbc389601504618ee7ab6`](https://github.com/natsukingly/tokenize-tokyo/commit/3f8415178a84e44f2fefbc389601504618ee7ab6), pushed to `main`.
+- Vercel production deployment: `dpl_MacG8GR1WUMHwNbHk51my9i8jzXo`, confirmed **Ready**.
+- Public alias: [tokenize-tokyo.vercel.app](https://tokenize-tokyo.vercel.app/).
+- Deployed from an isolated archive of the committed code. Every `src/` file matched the tested source manifest; existing Vercel production environment settings were used.
+- Post-release public-site verification: **19 passed, 0 failed, 0 skipped**, covering all ten adversarial cases, four Privy cases, three loading/error cases and two ENS showcase cases. These repeat previously tested scenarios and are not added to the distinct-scenario total above.
+- `/`, `/demo`, `/ens`, `/cities` and `/present` returned HTTP 200. The card checkout availability endpoint returned HTTP 200 with `available: true`.
+- Local release evidence: `.data/release-3f84151/public-smoke.json` and `public-smoke.log`. No new payments or on-chain transactions were submitted.
