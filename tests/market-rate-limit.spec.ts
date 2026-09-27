@@ -7,6 +7,16 @@ test.skip(
   "Requires live Sepolia configuration",
 );
 
+test.afterEach(async ({ page }, testInfo) => {
+  const methods = await page.evaluate(
+    () => (window as any).__qaWalletRequests || [],
+  );
+  await testInfo.attach("read-only-wallet-methods", {
+    body: JSON.stringify(methods),
+    contentType: "application/json",
+  });
+});
+
 test("connected portfolio loads while MultiBaas contract methods return 429", async ({
   page,
 }, testInfo) => {
@@ -26,15 +36,43 @@ test("connected portfolio loads while MultiBaas contract methods return 429", as
   await page.addInitScript(() => {
     const account = "0x83d04b1c4511fb874ebbfec6a816355d1e0f7cc8";
     const listeners: Record<string, ((...args: unknown[]) => void)[]> = {};
+    const methods: string[] = [];
+    (window as any).__qaWalletRequests = methods;
     const provider = {
       isMetaMask: true,
       isConnected: () => true,
-      request: async ({ method }: { method: string }) => {
+      _metamask: { isUnlocked: async () => true },
+      chainId: "0xaa36a7",
+      selectedAddress: account,
+      request: async ({
+        method,
+        params,
+      }: {
+        method: string;
+        params?: Record<string, unknown>[];
+      }) => {
+        methods.push(method);
         if (["eth_accounts", "eth_requestAccounts"].includes(method))
           return [account];
         if (method === "eth_chainId") return "0xaa36a7";
         if (method === "net_version") return "11155111";
         if (method === "eth_getBalance") return "0x0";
+        if (
+          method === "wallet_getPermissions" ||
+          (method === "wallet_requestPermissions" &&
+            Object.keys(params?.[0] || {}).join() === "eth_accounts")
+        )
+          return [
+            {
+              parentCapability: "eth_accounts",
+              caveats: [{ type: "restrictReturnedAccounts", value: [account] }],
+            },
+          ];
+        if (
+          method === "wallet_switchEthereumChain" &&
+          params?.[0]?.chainId === "0xaa36a7"
+        )
+          return null;
         throw Object.assign(
           new Error("Read-only QA wallet: unsupported method " + method),
           { code: 4200 },
@@ -89,14 +127,25 @@ test("connected portfolio loads while MultiBaas contract methods return 429", as
     name: "Connect MetaMask",
     exact: true,
   });
-  if (await external.isVisible()) {
+  const usesPrivy = await external.isVisible();
+  if (usesPrivy) {
     await expect(external).toBeEnabled({ timeout: 20000 });
     await external.click();
   }
   await page.getByRole("button", { name: "MetaMask", exact: true }).click();
-  await page
-    .getByRole("button", { name: "Open My assets", exact: true })
-    .click({ timeout: 30000 });
+  if (usesPrivy) {
+    await expect(
+      page.getByRole("dialog", { name: "log in or sign up" }),
+    ).toBeHidden({ timeout: 30000 });
+    await page
+      .locator(".sidebar nav")
+      .getByRole("button", { name: "My assets", exact: true })
+      .click();
+  } else {
+    await page
+      .getByRole("button", { name: "Open My assets", exact: true })
+      .click({ timeout: 30000 });
+  }
   await expect(page.locator(".section-title")).toContainText("mJPY", {
     timeout: 30000,
   });
@@ -108,6 +157,14 @@ test("connected portfolio loads while MultiBaas contract methods return 429", as
   expect(sdkReads).toBe(0);
   expect(rpcReads).toBeGreaterThan(0);
   expect(rpcFailures).toEqual([]);
+  const methods: string[] = await page.evaluate(
+    () => (window as any).__qaWalletRequests,
+  );
+  expect(
+    methods.some((method) =>
+      /sign|sendTransaction|sendRawTransaction/i.test(method),
+    ),
+  ).toBe(false);
   await testInfo.attach("account-read-evidence", {
     body: JSON.stringify({
       sdkReads,

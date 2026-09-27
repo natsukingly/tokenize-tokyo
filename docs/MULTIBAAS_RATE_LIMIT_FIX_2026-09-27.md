@@ -29,3 +29,12 @@ Indexed event queries still succeeded during this incident. An actual connected-
 This restores the core portfolio read path while event queries remain available. It does not restore exhausted MultiBaas quota or guarantee that provider-dependent transactions, Cloud Wallet fulfillment, finance extensions or receipt endpoints are available. Those still require a provider quota increase or the next quota window. Exact reset time and paid upgrade terms need confirmation from Curvegrid.
 
 Changes are maintained on `fix/multibaas-read-rate-limit`; deployment is from this branch without a commit or merge to `main`.
+
+## Production release and direct-origin verification
+
+- Application commit: `2d92e3ea3ecdbf7fe47153f54c5f3d4630fc1905`.
+- Vercel deployment: `dpl_A476u1Ss7jcmV3ZiBxJsP71M9qXi`, confirmed `READY` and aliased to [the public application](https://tokenize-tokyo.vercel.app/).
+- Public checks: **8 passed** — three loading/error cases, four Privy entry/cancellation cases, and one connected portfolio check. The connected test uses the actual Privy external-wallet selector with an injected read-only provider; it does not authenticate, create a wallet or sign anything.
+- On the public origin, event queries went directly to MultiBaas without the local CORS forwarding. The connected public test account displayed **27 holdings**, with **2 RPC read requests**, **0 failed RPC HTTP responses**, and **0 MultiBaas contract-method requests** despite those methods being forced to 429 in the test.
+- The test fixture was extended to support MetaMask's account-access permission request and the Privy dialog flow. All signing/submission methods remain rejected. Production application code was unchanged by that test-only adjustment.
+- `main` and `origin/main` remained at `16700e338ba30aaaa75d8ea1f2b7bd8666729dc0`.
