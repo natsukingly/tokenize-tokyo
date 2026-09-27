@@ -40,8 +40,8 @@ export default function PitchPresenter() {
       e.preventDefault();
       e.stopPropagation();
       if (e.key === "ArrowLeft") setSlide((v) => Math.max(0, v - 1));
-      else if (state.current.slide === 3) setView("demo");
-      else setSlide((v) => Math.min(3, v + 1));
+      else if (state.current.slide === 4) setView("demo");
+      else setSlide((v) => Math.min(4, v + 1));
     }
   }, []);
   useEffect(() => {
@@ -91,7 +91,7 @@ export default function PitchPresenter() {
         hidden={view !== "slides"}
         aria-label="Opening slides"
       >
-        {[1, 2, 3, 4].map((n, i) => (
+        {[1, 2, 3, 4, 5].map((n, i) => (
           <img
             key={n}
             src={`/pitch/intro/slide-${n}.png`}
@@ -101,6 +101,7 @@ export default function PitchPresenter() {
                 "Unused rooftops and solar potential",
                 "Assets missing from investment listings",
                 "So we built Tokenize Tokyo",
+                "How it fits together: app, MultiBaas, contracts, ENS",
               ][i]
             }
             hidden={slide !== i}
@@ -147,7 +148,7 @@ export default function PitchPresenter() {
         </button>
         <button
           onClick={() => {
-            if (slide === 3) setView("demo");
+            if (slide === 4) setView("demo");
             else {
               setView("slides");
               setSlide((v) => v + 1);

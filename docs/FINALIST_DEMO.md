@@ -2,11 +2,11 @@
 
 Local entry: http://127.0.0.1:3000/present
 
-The current [bilingual script](submission-kit/pitch-current/general.md) targets 3:55, leaving five seconds before the four-minute limit. The opening uses the four current slides. The simulator follows one new rooftop through separate asset and right review, issuance, a ten-unit purchase, activation, a 10,000 mJPY deposit, a 1,000 mJPY claim and a two-unit resale offer. No real transaction is sent.
+The current [bilingual script](submission-kit/pitch-current/general.md) targets 3:55, leaving five seconds before the four-minute limit. The opening uses the five current slides (the fifth is the architecture overview). The simulator follows one new rooftop through separate asset and right review, issuance, a ten-unit purchase, activation, a 10,000 mJPY deposit, a 1,000 mJPY claim and a two-unit resale offer. No real transaction is sent.
 
 ## Present
 
-- Use left/right arrows for slides. From the logo, right arrow opens the demo.
+- Use left/right arrows for slides. From the architecture slide (5th), right arrow opens the demo.
 - S returns to the last opening slide. D returns to the same demo state. A opens the animated architecture. Alt+1 / Alt+2 / Alt+3 work while an input is focused.
 - In the architecture, arrows or Space move through issuance, trading, bundles and income. P plays one sequence, 0 returns to the overview, and N shows notes. Leaving the diagram stops autoplay and preserves its current state.
 - H shows or hides the presentation controls. They are hidden initially.
