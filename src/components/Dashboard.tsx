@@ -63,6 +63,7 @@ import {
   type LensKind,
 } from "@/lib/dormant";
 import { loadMarket, readContract, sendViaMultiBaas } from "@/lib/multibaas";
+import { marketReadError } from "@/lib/read-retry";
 import {
   WalletConnectionProvider,
   useWalletConnection,
@@ -181,15 +182,14 @@ function DashboardContent({ demo }: { demo: boolean }) {
     if (DEMO || !account) return;
     let cancelled = false;
     const role = keccak256(stringToHex("VERIFIER_ROLE"));
-    Promise.all([
-      readContract("registry", "hasRole", [role, account]),
-      readContract("rights", "hasRole", [role, account]),
-    ])
-      .then(([registry, rights]) => {
+    // UrbanRightToken's verifier modifier delegates to the asset registry.
+    // It has no hasRole method of its own.
+    readContract("registry", "hasRole", [role, account])
+      .then((allowed) => {
         if (!cancelled)
           setVerifierRoles({
-            registry: registry === true,
-            rights: rights === true,
+            registry: allowed === true,
+            rights: allowed === true,
             account,
           });
       })
@@ -384,9 +384,7 @@ function DashboardContent({ demo }: { demo: boolean }) {
       } else refreshPending.current = true;
       setLastSync(new Date().toLocaleTimeString());
     } catch (e) {
-      setLoadError(
-        "Check your connection and try again. Previously loaded data is kept until an update succeeds.",
-      );
+      setLoadError(marketReadError(e));
     } finally {
       loading.current = false;
       if (refreshPending.current) {
@@ -406,7 +404,7 @@ function DashboardContent({ demo }: { demo: boolean }) {
     let revision = "",
       running = false;
     const timer = setInterval(async () => {
-      if (running) return;
+      if (running || document.visibilityState === "hidden") return;
       running = true;
       try {
         const res = await fetch("/api/activity", { cache: "no-store" });
@@ -421,7 +419,9 @@ function DashboardContent({ demo }: { demo: boolean }) {
         running = false;
       }
     }, 2000);
-    const fallback = setInterval(() => void refresh(), 15000);
+    const fallback = setInterval(() => {
+      if (!loading.current && document.visibilityState !== "hidden") void refresh();
+    }, 60000);
     return () => {
       clearInterval(timer);
       clearInterval(fallback);

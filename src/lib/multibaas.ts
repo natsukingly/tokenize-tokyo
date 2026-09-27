@@ -13,6 +13,12 @@ import { walletTransaction, type WalletProvider } from "./transactions";
 import { assertWallet, isTxHash, type TransactionProgress } from "./wallet";
 import type { ChainEvent, MarketState } from "./model";
 import {
+  readCoreBatch,
+  supportsBatchedReads,
+  type CoreRead,
+} from "./core-reads";
+import { retryRead } from "./read-retry";
+import {
   indexBootstrap,
   combineIndexedEvents,
   combineIndexedTotal,
@@ -36,15 +42,33 @@ export async function readContract(
   method: string,
   args: unknown[] = [],
 ) {
-  const { data } = await clients().contracts.callContractFunction(
-    config.addresses[contract],
-    labels[contract],
-    method,
-    { args, formatInts: "as_strings" },
+  const call = { contract, method, args };
+  if (supportsBatchedReads([call])) return (await readCoreBatch([call]))[0];
+  const { data } = await retryRead(() =>
+    clients().contracts.callContractFunction(
+      config.addresses[contract],
+      labels[contract],
+      method,
+      { args, formatInts: "as_strings" },
+    ),
   );
   if (data.result.kind !== "MethodCallResponse" || !("output" in data.result))
     throw new Error("Unexpected MultiBaas read response");
   return data.result.output as unknown;
+}
+export async function readContracts(calls: CoreRead[]): Promise<unknown[]> {
+  if (!calls.length) return [];
+  if (supportsBatchedReads(calls)) return readCoreBatch(calls);
+  const result: unknown[] = [];
+  for (let i = 0; i < calls.length; i += 4)
+    result.push(
+      ...(await Promise.all(
+        calls
+          .slice(i, i + 4)
+          .map((call) => readContract(call.contract, call.method, call.args)),
+      )),
+    );
+  return result;
 }
 export async function queryRows(
   query: EventQuery,
@@ -54,7 +78,9 @@ export async function queryRows(
   // MultiBaas rejects limit values above 50 with a bare "invalid request".
   const PAGE = 50;
   for (let offset = 0; offset < 100000; offset += PAGE) {
-    const { data } = await api.executeArbitraryEventQuery(query, offset, PAGE);
+    const { data } = await retryRead(() =>
+      api.executeArbitraryEventQuery(query, offset, PAGE),
+    );
     const page = data.result.rows as Record<string, unknown>[];
     rows.push(...page);
     if (page.length < PAGE) return rows;
@@ -91,9 +117,9 @@ export async function loadMarket(account?: string): Promise<MarketState> {
   const combined = combineIndexedEvents(bootstrap, all);
   const state = project(combined, config.addresses.rights);
   // Event Query exposes block order but no log index. Resolve tied lifecycle
-  // transitions through the SDK so multiple transactions in one block cannot
+  // transitions from current contract state so transactions in one block cannot
   // make a revised/rejected asset appear verified (or vice versa).
-  for (const asset of state.assets) {
+  const tiedAssets = state.assets.filter((asset) => {
     const lifecycle = combined.filter(
       (e) =>
         [
@@ -105,20 +131,24 @@ export async function loadMarket(account?: string): Promise<MarketState> {
         ].includes(e.name) && String(e.args.assetId) === asset.id,
     );
     const latestBlock = Math.max(...lifecycle.map((e) => e.block));
-    if (lifecycle.filter((e) => e.block === latestBlock).length > 1) {
-      const current = (await readContract("registry", "getAsset", [
-        asset.id,
-      ])) as { status?: unknown } | unknown[];
-      const status = Number(
-        Array.isArray(current) ? current[4] : current.status,
-      );
-      if (!Number.isInteger(status) || status < 0 || status > 3)
-        throw new Error("Invalid registry state response");
-      asset.status = (
-        ["Draft", "Pending verification", "Verified", "Rejected"] as const
-      )[status];
-    }
-  }
+    return lifecycle.filter((e) => e.block === latestBlock).length > 1;
+  });
+  const currentAssets = await readContracts(
+    tiedAssets.map((asset) => ({
+      contract: "registry",
+      method: "getAsset",
+      args: [asset.id],
+    })),
+  );
+  tiedAssets.forEach((asset, index) => {
+    const current = currentAssets[index] as { status?: unknown } | unknown[];
+    const status = Number(Array.isArray(current) ? current[4] : current.status);
+    if (!Number.isInteger(status) || status < 0 || status > 3)
+      throw new Error("Invalid registry state response");
+    asset.status = (
+      ["Draft", "Pending verification", "Verified", "Rejected"] as const
+    )[status];
+  });
   const totals = await Promise.all(
     [
       ["ListingPurchased", "totalPrice"],
@@ -145,36 +175,45 @@ export async function loadMarket(account?: string): Promise<MarketState> {
   [state.metrics.volume, state.metrics.deposited, state.metrics.claimed] =
     totals;
   if (account) {
-    state.cash = String(
-      await readContract("settlement", "balanceOf", [account]),
-    );
+    const calls: CoreRead[] = [
+      { contract: "settlement", method: "balanceOf", args: [account] },
+    ];
+    const apply: ((value: unknown) => void)[] = [
+      (value) => {
+        state.cash = String(value);
+      },
+    ];
     for (const [token, items] of [
       ["rights", state.rights],
       ["basket", state.baskets],
     ] as const) {
       if (!items.length) continue;
-      const balances = (await readContract(token, "balanceOfBatch", [
-        items.map(() => account),
-        items.map((item) => item.id),
-      ])) as string[];
-      items.forEach((item, i) => {
-        state.balances[token + ":" + item.id] = String(balances[i]);
+      calls.push({
+        contract: token,
+        method: "balanceOfBatch",
+        args: [items.map(() => account), items.map((item) => item.id)],
+      });
+      apply.push((value) => {
+        if (!Array.isArray(value) || value.length !== items.length)
+          throw new Error("Invalid token balances response.");
+        items.forEach((item, i) => {
+          state.balances[token + ":" + item.id] = String(value[i]);
+        });
       });
       // Past holders can still claim accrued revenue, even with a zero balance.
-      for (let i = 0; i < items.length; i += 4) {
-        await Promise.all(
-          items.slice(i, i + 4).map(async (item) => {
-            state.claimable[token + ":" + item.id] = String(
-              await readContract(
-                token === "rights" ? "revenue" : "basket",
-                "claimable",
-                [item.id, account],
-              ),
-            );
-          }),
-        );
+      for (const item of items) {
+        calls.push({
+          contract: token === "rights" ? "revenue" : "basket",
+          method: "claimable",
+          args: [item.id, account],
+        });
+        apply.push((value) => {
+          state.claimable[token + ":" + item.id] = String(value);
+        });
       }
     }
+    const values = await readContracts(calls);
+    values.forEach((value, index) => apply[index](value));
   }
   return state;
 }

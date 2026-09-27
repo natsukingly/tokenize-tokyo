@@ -71,7 +71,7 @@ test("background market refresh stays unobtrusive", async ({ page }) => {
   await expect(page.locator(".metrics")).toBeVisible();
   hold = true;
   const before = calls;
-  await page.clock.runFor(15001);
+  await page.clock.runFor(60001);
   await expect.poll(() => calls).toBeGreaterThan(before);
   await expect(
     page.getByRole("status", { name: "Loading progress" }),
