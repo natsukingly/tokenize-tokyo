@@ -27,3 +27,9 @@ A read-only unsigned approval probe with a public test account returned HTTP 400
 `walletError` now gives that instruction when the provider's actual error reports insufficient funds, instead of only showing the HTTP 400 message.
 
 All changes are on `fix/multibaas-read-rate-limit`. No commit or merge to `main` is required for the production release.
+
+## Production confirmation
+
+- Released application commit `27bed646fb5467b7da15382d0f1a27ca1ba2dfac` as Vercel deployment `dpl_5A1NLGcyp64sULgJbBJxTn48UWFM`, confirmed `READY` at [the public app](https://tokenize-tokyo.vercel.app/).
+- The direct public-origin browser check passed through the actual Privy external-wallet selector. It displayed 27 holdings and delivered both `registerAsset` and `approve` requests to the injected wallet, with **zero MultiBaas contract-method requests**. Both proposals were rejected by the test wallet before signing/submission. Public transactions were not sent.
+- `main` and `origin/main` remained at `16700e338ba30aaaa75d8ea1f2b7bd8666729dc0`. The release archive contained no local environment files.
